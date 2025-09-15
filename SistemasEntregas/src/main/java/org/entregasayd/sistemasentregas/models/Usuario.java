@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "usuario")
 @NoArgsConstructor
@@ -12,34 +14,53 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_persona")
     private Persona persona;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_rol")
     private Rol rol;
 
     @Column(name = "nombre_usuario", nullable = false, unique = true, length = 50)
     private String nombreUsuario;
 
-    @Column(name = "contrasenia_hash", nullable = false, length = 255)
+    @Column(name = "contrasenia_hash", nullable = false)
     private String contraseniaHash;
 
-    @Column(name = "intentos_fallidos", nullable = false)
-    private Integer intentosFallidos;
+    @Column(name = "two_factor_enabled")
+    private boolean twoFactorEnable;
 
-    @Column(name = "token_active", nullable = false)
-    private Boolean tokenActive;
+    @Column(name = "intentos_fallidos", nullable = false)
+    private Integer intentosFallidos = 0;
 
     @Column(name = "ultima_fecha_acceso")
-    private String ultimaFechaAcceso;
+    private LocalDateTime ultimaFechaAcceso;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
-    private String estado;
+    private Estado estado;
 
-    @Column(name = "fecha_creacion", nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-    private String fechaCreacion;
+    @Column(name = "fecha_creacion", updatable = false, nullable = false)
+    private LocalDateTime fechaCreacion;
 
-    @Column(name = "fecha_ultima_actualizacion", nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private String fechaUltimaActualizacion;
+    @Column(name = "fecha_ultima_actualizacion", nullable = false)
+    private LocalDateTime fechaUltimaActualizacion;
+
+    @PrePersist
+    public void onCreate() {
+        fechaCreacion = LocalDateTime.now();
+        fechaUltimaActualizacion = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        fechaUltimaActualizacion = LocalDateTime.now();
+    }
+    public enum Estado {
+        ACTIVO,
+        INACTIVO,
+        SUSPENDIDO;
+    }
 }
