@@ -5,27 +5,62 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "token_autenticacion")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class TokenAutenticacion {
+
     @Id
-    private Long id;
-    @ManyToOne
-    @JoinColumn(name = "id_usuario")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_token")
+    private Long idToken;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
-    @Column(name = "token_hash", nullable = false, length = 255)
+
+    @Column(name = "token_hash", nullable = false, length = 512)
     private String tokenHash;
-    @Column(name = "tipo_token", nullable = false, columnDefinition = "ENUM('verificacion_email', 'reset_password', '2fa', 'login')")
-    private String tipoToken;
-    @Column(name = "fecha_creacion", nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-    private String fechaCreacion;
-    @Column(name = "fecha_expiracion", nullable = false, columnDefinition = "DATETIME")
-    private String fechaExpiracion;
-    @Column(name = "estado", nullable = false, columnDefinition = "ENUM('activo', 'usado', 'expirado') DEFAULT 'activo'")
-    private String estado;
-    @Column(name = "codigo_verificacion", nullable = false, length = 10)
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_token", nullable = false)
+    private TipoToken tipoToken;
+
+    @Column(name = "fecha_creacion", nullable = false, updatable = false)
+    private LocalDateTime fechaCreacion;
+
+    @Column(name = "fecha_expiracion")
+    private LocalDateTime fechaExpiracion;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = false)
+    private Estado estado = Estado.ACTIVO;
+
+    @Column(name = "codigo_verificacion", length = 20)
     private String codigoVerificacion;
+
+    @PrePersist
+    protected void onCreate() {
+        fechaCreacion = LocalDateTime.now();
+        if (estado == null) {
+            estado = Estado.ACTIVO;
+        }
+    }
+
+    public enum TipoToken {
+        VERIFICACION_EMAIL,
+        RESET_PASSWORD,
+        _2FA,
+        LOGIN
+    }
+
+    public enum Estado {
+        ACTIVO,
+        USADO,
+        EXPIRADO
+    }
 }
