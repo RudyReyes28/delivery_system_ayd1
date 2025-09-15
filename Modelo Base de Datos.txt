@@ -1,0 +1,654 @@
+======================================
+    USUARIOS Y AUTENTICACIÓN
+======================================
+
+DIRECCION
+    id_direccion (PK)
+    tipo_direccion ENUM('residencia','trabajo','entrega','fiscal') NOT NULL
+    municipio VARCHAR(100) NOT NULL
+    departamento VARCHAR(100) NOT NULL
+    pais VARCHAR(50) DEFAULT 'Guatemala'
+    codigo_postal VARCHAR(10)
+    referencias TEXT
+    activa BOOLEAN DEFAULT TRUE
+	
+	
+
+PERSONA
+    id_persona (PK)
+    nombre
+    apellido
+    fecha_nacimiento
+    dpi
+    correo (UNIQUE)
+    telefono
+    id_direccion
+    ciudad
+    pais
+    codigo_postal
+    fecha_registro
+    estado (activo/inactivo)
+
+ROL
+    id_rol (PK)
+    nombre_rol
+    descripcion
+    fecha_creacion
+
+USUARIO
+    id_usuario (PK)
+    id_persona (FK)
+    id_rol (FK)
+    nombre_usuario (UNIQUE)
+    contrasenia_hash
+	two_factor_enabled
+    intentos_fallidos
+    ultima_fecha_acceso
+    estado (activo/inactivo/suspendido)
+    fecha_creacion
+    fecha_ultima_actualizacion
+
+TOKEN_AUTENTICACION
+    id_token (PK)
+    id_usuario (FK)
+    token_hash
+    tipo_token (verificacion_email/reset_password/2fa/login)
+    fecha_creacion
+    fecha_expiracion
+    estado (activo/usado/expirado)
+    codigo_verificacion
+	
+======================================
+ORGANIZACIÓN EMPRESARIAL
+======================================
+
+-- Empresas/Comercios (entidad independiente)
+EMPRESA
+    id_empresa (PK)
+    tipo_empresa ENUM('comercio_afiliado','empresa_logistica','proveedor') DEFAULT 'comercio_afiliado'
+    nombre_comercial VARCHAR(200) NOT NULL
+    razon_social VARCHAR(200) NOT NULL
+    nit VARCHAR(20) UNIQUE NOT NULL
+    registro_mercantil VARCHAR(50)
+    
+    -- Fechas importantes
+    fecha_constitucion DATE
+    fecha_afiliacion DATE NOT NULL
+    fecha_vencimiento_afiliacion DATE
+    
+    -- Estado y configuración
+    estado ENUM('activa','inactiva','suspendida','morosa') DEFAULT 'activa'
+    
+
+-- Contactos de empresa (personas que representan a la empresa)
+EMPRESA_CONTACTO
+    id_empresa_contacto (PK)
+    id_empresa (FK)
+    id_persona (FK)
+    cargo VARCHAR(100)
+    fecha_inicio DATE DEFAULT (CURRENT_DATE)
+    fecha_fin DATE NULL
+    activo BOOLEAN DEFAULT TRUE
+    
+-- Sucursales (ubicaciones físicas de las empresas)
+SUCURSAL
+    id_sucursal (PK)
+    id_empresa (FK)
+    codigo_sucursal VARCHAR(20) NOT NULL
+    nombre_sucursal VARCHAR(150) NOT NULL
+    id_direccion (FK) -- Referencia a tabla DIRECCION
+    
+    
+    -- Horarios
+    horario_apertura TIME
+    horario_cierre TIME
+    dias_operacion VARCHAR(7) -- 'LMXJVSD' formato
+    
+    -- Estado
+    estado ENUM('activa','inactiva','temporal','mantenimiento') DEFAULT 'activa'
+    
+-- Personal de sucursal
+SUCURSAL_PERSONAL
+    id_sucursal_personal (PK)
+    id_sucursal (FK)
+    id_usuario (FK) -- Usuario que trabaja en la sucursal
+    cargo VARCHAR(100)
+    es_encargado BOOLEAN DEFAULT FALSE
+    fecha_inicio DATE DEFAULT (CURRENT_DATE)
+    fecha_fin DATE NULL
+    activo BOOLEAN DEFAULT TRUE
+    
+
+======================================
+RECURSOS HUMANOS Y CONTRATOS
+======================================
+-- Información laboral específica del empleado
+EMPLEADO
+    id_empleado (PK)
+    id_usuario (FK) -- Relación con usuario del sistema
+    codigo_empleado VARCHAR(20) UNIQUE NOT NULL
+    numero_igss VARCHAR(20) UNIQUE
+    numero_irtra VARCHAR(20)
+    tipo_sangre VARCHAR(5)
+    estado_civil ENUM('soltero','casado','divorciado','viudo','union_libre')
+    numero_dependientes INT DEFAULT 0
+    
+    -- Información de emergencia
+    contacto_emergencia_nombre VARCHAR(200)
+    contacto_emergencia_telefono VARCHAR(20)
+    
+    -- Estado laboral
+    estado_empleado ENUM('activo','inactivo','suspendido','despedido','renunciado') DEFAULT 'activo'
+    fecha_ingreso DATE NOT NULL
+    fecha_salida DATE NULL
+    motivo_salida TEXT
+    
+
+-- Contratos laborales
+CONTRATO
+    id_contrato (PK)
+    id_empleado (FK)
+    numero_contrato VARCHAR(50) UNIQUE NOT NULL
+    tipo_contrato ENUM('indefinido','temporal','por_servicios','practicante') NOT NULL
+    modalidad_trabajo ENUM('presencial','remoto','hibrido') DEFAULT 'presencial'
+    
+    -- Vigencia
+    fecha_inicio DATE NOT NULL
+    fecha_fin DATE NULL
+    renovacion_automatica BOOLEAN DEFAULT FALSE
+    
+    -- Términos económicos
+    salario_base DECIMAL(10,2) DEFAULT 0.00
+    moneda VARCHAR(3) DEFAULT 'GTQ'
+    frecuencia_pago ENUM('semanal','quincenal','mensual') DEFAULT 'quincenal'
+    
+    -- Beneficios
+    incluye_aguinaldo BOOLEAN DEFAULT TRUE
+    incluye_bono_14 BOOLEAN DEFAULT TRUE
+    incluye_vacaciones BOOLEAN DEFAULT TRUE
+    incluye_igss BOOLEAN DEFAULT TRUE
+    
+    -- Estado del contrato
+    estado_contrato ENUM('borrador','activo','suspendido','terminado','rescindido') DEFAULT 'borrador'
+    
+
+
+-- Configuración de comisiones por contrato
+CONTRATO_COMISION
+    id_contrato_comision (PK)
+    id_contrato (FK)
+    tipo_comision ENUM('porcentaje','fijo_por_entrega','escalonado') NOT NULL
+    porcentaje DECIMAL(5,2) DEFAULT 0.00
+    monto_fijo DECIMAL(8,2) DEFAULT 0.00
+    aplica_desde DATE DEFAULT (CURRENT_DATE)
+    aplica_hasta DATE NULL
+    activo BOOLEAN DEFAULT TRUE
+    
+    -- Condiciones especiales
+    minimo_entregas_mes INT DEFAULT 0
+    maximo_entregas_mes INT NULL
+    factor_multiplicador DECIMAL(4,2) DEFAULT 1.00 -- Para bonificaciones
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+-- Información específica de repartidores
+REPARTIDOR
+    id_repartidor (PK)
+    id_empleado (FK)
+    
+    -- Licencia de conducir
+    numero_licencia VARCHAR(50) UNIQUE
+    tipo_licencia ENUM('A','B','C','M','NINGUNA') DEFAULT 'NINGUNA'
+    fecha_vencimiento_licencia DATE
+    
+    -- Zona de trabajo
+    zona_asignada VARCHAR(100)
+    radio_cobertura_km DECIMAL(4,1) DEFAULT 10.0
+    
+    -- Estado operativo
+    disponibilidad ENUM('disponible','ocupado','descanso','inactivo') DEFAULT 'disponible'
+    
+    -- Métricas de desempeño
+    calificacion_promedio DECIMAL(3,2) DEFAULT 0.00
+    total_entregas_completadas INT DEFAULT 0
+    total_entregas_fallidas INT DEFAULT 0
+    
+
+-- Vehículos asignados a repartidores
+VEHICULO
+    id_vehiculo (PK)
+    tipo_vehiculo ENUM('bicicleta','motocicleta','automovil','pickup','van','a_pie') NOT NULL
+    marca VARCHAR(50)
+    modelo VARCHAR(50)
+    anio INT
+    placa VARCHAR(20) UNIQUE
+    color VARCHAR(30)
+    capacidad_carga_kg DECIMAL(6,2) DEFAULT 0.00
+    capacidad_volumen_m3 DECIMAL(5,2) DEFAULT 0.00
+    
+    -- Documentación
+    numero_tarjeta_circulacion VARCHAR(50)
+    numero_poliza_seguro VARCHAR(50)
+    fecha_vencimiento_seguro DATE
+    
+    estado_vehiculo ENUM('activo','mantenimiento','averiado','inactivo') DEFAULT 'activo'
+    
+	
+-- Asignación de vehículos a repartidores
+REPARTIDOR_VEHICULO
+    id_repartidor_vehiculo (PK)
+    id_repartidor (FK)
+    id_vehiculo (FK)
+    fecha_asignacion DATE DEFAULT (CURRENT_DATE)
+    fecha_desasignacion DATE NULL
+    es_vehiculo_principal BOOLEAN DEFAULT TRUE
+    activo BOOLEAN DEFAULT TRUE
+    
+
+======================================
+CLIENTES Y DESTINATARIOS
+======================================
+
+-- Clientes finales (pueden o no ser usuarios del sistema)
+CLIENTE
+    id_cliente (PK)
+    id_persona (FK) -- NULL si no está registrado como usuario
+    id_usuario (FK) -- NULL si no tiene cuenta en el sistema
+    codigo_cliente VARCHAR(20) UNIQUE
+    
+    -- Información básica (para clientes no registrados)
+    nombre_completo VARCHAR(200) NOT NULL
+    telefono VARCHAR(20) NOT NULL
+    email VARCHAR(150)
+    
+    -- Preferencias de entrega
+    horario_preferido_inicio TIME
+    horario_preferido_fin TIME
+    instrucciones_entrega TEXT
+    acepta_entregas_vecinos BOOLEAN DEFAULT FALSE
+    requiere_identificacion BOOLEAN DEFAULT FALSE
+    
+    -- Estado y métricas
+    estado ENUM('activo','inactivo') DEFAULT 'activo'
+    total_entregas_recibidas INT DEFAULT 0
+    total_entregas_rechazadas INT DEFAULT 0
+    calificacion_promedio DECIMAL(3,2) DEFAULT 0.00
+    
+
+-- Direcciones específicas de entrega para clientes
+DIRECCION_ENTREGA
+    id_direccion_entrega (PK)
+    id_cliente (FK)
+    id_direccion (FK) -- Referencia a dirección base
+    alias_direccion VARCHAR(50) -- "Casa", "Oficina", "Casa de mamá"
+    instrucciones_especificas TEXT
+    punto_referencia TEXT
+    persona_recibe VARCHAR(200) -- Quien puede recibir en esa dirección
+    activa BOOLEAN DEFAULT TRUE
+
+======================================
+LOGÍSTICA Y ENTREGAS
+======================================
+
+-- Catálogo de servicios de entrega
+TIPO_SERVICIO
+    id_tipo_servicio (PK)
+    codigo_servicio VARCHAR(20) UNIQUE NOT NULL
+    nombre_servicio VARCHAR(100) NOT NULL
+    descripcion TEXT
+    tiempo_entrega_horas INT NOT NULL
+    precio_base DECIMAL(8,2) NOT NULL
+    peso_maximo_kg DECIMAL(6,2)
+    volumen_maximo_m3 DECIMAL(5,2)
+    activo BOOLEAN DEFAULT TRUE
+    
+
+-- Guías de entrega
+GUIA
+    id_guia (PK)
+    numero_guia VARCHAR(50) UNIQUE NOT NULL -- Para tracking público
+    codigo_interno VARCHAR(50) UNIQUE NOT NULL -- Para uso interno
+    
+    -- Relaciones principales
+    id_empresa (FK) -- Empresa que envía
+    id_sucursal_origen (FK) -- Sucursal de recolección
+    id_cliente (FK) -- Cliente destinatario
+    id_direccion_entrega (FK) -- Dirección específica de entrega
+    id_repartidor (FK) NULL -- Asignado después
+    id_tipo_servicio (FK)
+    
+    -- Información del envío
+    descripcion_contenido TEXT NOT NULL
+    valor_declarado DECIMAL(10,2) DEFAULT 0.00
+    peso_kg DECIMAL(6,2)
+    dimensiones VARCHAR(50) -- "largo x ancho x alto"
+    es_fragil BOOLEAN DEFAULT FALSE
+    observaciones TEXT
+    
+    -- Control de fechas
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fecha_programada_recoleccion TIMESTAMP
+    fecha_recoleccion_real TIMESTAMP NULL
+    fecha_estimada_entrega TIMESTAMP
+    fecha_entrega_real TIMESTAMP NULL
+    
+    -- Estados y control
+    estado_actual ENUM('creada','asignada','recolectada','en_transito','en_reparto','entregada','devuelta','cancelada') DEFAULT 'creada'
+    prioridad ENUM('normal','alta','urgente') DEFAULT 'normal'
+    intentos_entrega INT DEFAULT 0
+    max_intentos INT DEFAULT 3
+    
+    -- Cálculos financieros
+    subtotal DECIMAL(10,2) NOT NULL
+    descuentos DECIMAL(10,2) DEFAULT 0.00
+    recargos DECIMAL(10,2) DEFAULT 0.00
+    total DECIMAL(10,2) NOT NULL
+    
+    -- Información de pago
+    forma_pago ENUM('credito','contado','contra_entrega') DEFAULT 'credito'
+    estado_pago ENUM('pendiente','pagado','vencido') DEFAULT 'pendiente'
+    
+
+-- Historial de estados de la guía
+GUIA_ESTADO
+    id_guia_estado (PK)
+    id_guia (FK)
+    estado_anterior ENUM('creada','asignada','recolectada','en_transito','en_reparto','entregada','devuelta','cancelada')
+    estado_nuevo ENUM('creada','asignada','recolectada','en_transito','en_reparto','entregada','devuelta','cancelada') NOT NULL
+    id_usuario_cambio (FK) -- Usuario que realizó el cambio
+    
+    -- Información contextual
+    comentarios TEXT
+    motivo_cambio TEXT
+    
+    fecha_cambio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+-- Asignaciones de guías a repartidores
+ASIGNACION_REPARTIDOR
+    id_asignacion (PK)
+    id_guia (FK)
+    id_repartidor (FK)
+    tipo_asignacion ENUM('automatica','manual','reasignacion') NOT NULL
+    fecha_asignacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fecha_aceptacion TIMESTAMP NULL
+    fecha_rechazo TIMESTAMP NULL
+    motivo_rechazo TEXT
+    
+    -- Control de tiempos
+    tiempo_limite_aceptacion TIMESTAMP
+    tiempo_estimado_recoleccion INT -- En minutos
+    tiempo_estimado_entrega INT -- En minutos
+    
+    estado_asignacion ENUM('pendiente','aceptada','rechazada','completada','cancelada') DEFAULT 'pendiente'
+    asignada_por INT -- Usuario que realizó la asignación
+    
+
+-- Evidencias de entrega
+EVIDENCIA_ENTREGA
+    id_evidencia (PK)
+    id_guia (FK)
+    tipo_evidencia ENUM('foto_paquete','foto_entrega','firma_digital','documento_identidad') NOT NULL
+    
+    -- Archivo
+    nombre_archivo VARCHAR(200)
+    url_archivo VARCHAR(500) NOT NULL
+    
+    
+    -- Información del receptor
+    nombre_receptor VARCHAR(200)
+    documento_receptor VARCHAR(50)
+    parentesco_receptor VARCHAR(50)
+    observaciones TEXT
+    
+
+-- Incidencias durante el proceso de entrega
+INCIDENCIA
+    id_incidencia (PK)
+    id_guia (FK)
+    id_repartidor (FK)
+    codigo_incidencia VARCHAR(20) UNIQUE NOT NULL
+    
+    tipo_incidencia ENUM(
+        'cliente_ausente',
+        'direccion_incorrecta',
+        'paquete_danado',
+        'vehiculo_averiado',
+        'accidente_transito',
+        'zona_insegura',
+        'condiciones_climaticas',
+        'cliente_rechaza',
+        'otro'
+    ) NOT NULL
+    
+    severidad ENUM('baja','media','alta','critica') DEFAULT 'media'
+    descripcion TEXT NOT NULL
+    solucion_aplicada TEXT
+    requiere_devolucion BOOLEAN DEFAULT FALSE
+    costo_adicional DECIMAL(8,2) DEFAULT 0.00
+    
+    
+    -- Control de resolución
+    fecha_reporte TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fecha_atencion TIMESTAMP NULL
+    fecha_resolucion TIMESTAMP NULL
+    estado ENUM('abierta','en_atencion','resuelta','cerrada') DEFAULT 'abierta'
+    
+    reportada_por INT
+    atendida_por INT
+    
+
+-- Cancelaciones de guías
+CANCELACION_GUIA
+    id_cancelacion (PK)
+    id_guia (FK)
+    motivo_categoria ENUM(
+        'error_informacion',
+        'cambio_cliente',
+        'producto_no_disponible',
+        'fuerza_mayor',
+        'decision_comercial',
+        'otro'
+    ) NOT NULL
+    
+    motivo_detalle TEXT NOT NULL
+    cancelada_por INT -- Usuario que canceló
+    fecha_cancelacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    
+    -- Impacto financiero
+    aplica_penalizacion BOOLEAN NOT NULL
+    monto_penalizacion DECIMAL(8,2) DEFAULT 0.00
+    
+    -- Si ya estaba asignada a repartidor
+    pagar_comision_repartidor BOOLEAN DEFAULT FALSE
+    monto_comision_pagar DECIMAL(8,2) DEFAULT 0.00
+    
+
+    estado_cancelacion ENUM('solicitada','autorizada','procesada','rechazada') DEFAULT 'solicitada'
+	
+
+======================================
+PROGRAMA DE FIDELIZACIÓN
+======================================
+-- Niveles de fidelización
+NIVEL_FIDELIZACION
+    id_nivel (PK)
+    codigo_nivel VARCHAR(20) UNIQUE NOT NULL -- 'PLATA', 'ORO', 'DIAMANTE'
+    nombre_nivel VARCHAR(50) NOT NULL
+    descripcion TEXT
+    
+    -- Rangos de entregas para calificar
+    entregas_minimas INT NOT NULL
+    entregas_maximas INT NULL -- NULL = ilimitado
+    
+    -- Beneficios
+    descuento_porcentaje DECIMAL(5,2) NOT NULL
+    cancelaciones_gratuitas_mes INT DEFAULT 0
+    porcentaje_penalizacion DECIMAL(5,2) NOT NULL
+    
+    -- Vigencia
+    activo BOOLEAN DEFAULT TRUE
+    fecha_inicio_vigencia DATE NOT NULL
+    fecha_fin_vigencia DATE NULL
+    
+
+-- Historial de niveles de fidelización por empresa
+EMPRESA_FIDELIZACION
+    id_empresa_fidelizacion (PK)
+    id_empresa (FK)
+    id_nivel_fidelizacion (FK)
+    
+    -- Período de evaluación
+    mes INT NOT NULL
+    anio INT NOT NULL
+    
+    -- Métricas del período
+    total_entregas INT NOT NULL
+    monto_total_entregas DECIMAL(12,2) NOT NULL
+    total_cancelaciones INT DEFAULT 0
+    
+    -- Beneficios aplicados
+    descuento_aplicado DECIMAL(10,2) DEFAULT 0.00
+    penalizaciones_aplicadas DECIMAL(10,2) DEFAULT 0.00
+    
+
+======================================
+FINANZAS Y LIQUIDACIONES
+======================================
+-- Períodos de liquidación
+PERIODO_LIQUIDACION
+    id_periodo (PK)
+    descripcion VARCHAR(100) NOT NULL
+    fecha_inicio DATE NOT NULL
+    fecha_fin DATE NOT NULL
+    estado ENUM('abierto','cerrado','liquidado') DEFAULT 'abierto'
+    total_comisiones DECIMAL(12,2) DEFAULT 0.00
+    total_bonificaciones DECIMAL(12,2) DEFAULT 0.00
+    total_deducciones DECIMAL(12,2) DEFAULT 0.00
+    total_neto DECIMAL(12,2) DEFAULT 0.00
+    
+  
+-- Comisiones por entrega
+COMISION_ENTREGA
+    id_comision (PK)
+    id_guia (FK)
+    id_repartidor (FK)
+    id_periodo_liquidacion (FK) NULL
+    
+    -- Cálculo de la comisión
+    monto_base_calculo DECIMAL(8,2) NOT NULL -- Sobre qué monto se calcula
+    tipo_comision ENUM('porcentaje','monto_fijo') NOT NULL
+    valor_comision DECIMAL(8,2) NOT NULL -- % o monto fijo
+    monto_comision DECIMAL(8,2) NOT NULL
+    
+    -- Bonificaciones y deducciones
+    bonificacion DECIMAL(8,2) DEFAULT 0.00
+    deduccion DECIMAL(8,2) DEFAULT 0.00
+    monto_neto DECIMAL(8,2) NOT NULL
+    
+    -- Control
+    fecha_calculo TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    estado ENUM('calculada','liquidada','pagada') DEFAULT 'calculada'
+    
+	
+-- Liquidación de pagos a repartidores
+LIQUIDACION_REPARTIDOR
+    id_liquidacion (PK)
+    id_periodo_liquidacion (FK)
+    id_repartidor (FK)
+    
+    -- Totales del período
+    total_entregas INT NOT NULL
+    total_comisiones DECIMAL(10,2) NOT NULL
+    total_bonificaciones DECIMAL(10,2) DEFAULT 0.00
+    total_deducciones DECIMAL(10,2) DEFAULT 0.00
+    subtotal DECIMAL(10,2) NOT NULL
+    
+    -- Descuentos laborales
+    descuento_igss DECIMAL(8,2) DEFAULT 0.00
+    descuento_isr DECIMAL(8,2) DEFAULT 0.00
+    otros_descuentos DECIMAL(8,2) DEFAULT 0.00
+    
+    total_descuentos DECIMAL(8,2) DEFAULT 0.00
+    total_neto DECIMAL(10,2) NOT NULL
+    
+    -- Control de pago
+    metodo_pago ENUM('efectivo','transferencia','cheque','deposito') NULL
+    referencia_pago VARCHAR(100)
+    fecha_pago TIMESTAMP NULL
+    estado_pago ENUM('pendiente','pagado','rechazado') DEFAULT 'pendiente'
+    
+
+
+-- Facturación a empresas
+FACTURA_EMPRESA
+    id_factura (PK)
+    id_empresa (FK)
+    numero_factura VARCHAR(50) UNIQUE NOT NULL
+    serie_factura VARCHAR(10) DEFAULT 'A'
+    
+    -- Período facturado
+    mes INT NOT NULL
+    anio INT NOT NULL
+    fecha_emision DATE NOT NULL
+    fecha_vencimiento DATE NOT NULL
+    
+    -- Montos
+    subtotal DECIMAL(12,2) NOT NULL
+    descuento_fidelizacion DECIMAL(12,2) DEFAULT 0.00
+    recargos DECIMAL(12,2) DEFAULT 0.00
+    penalizaciones DECIMAL(12,2) DEFAULT 0.00
+    base_imponible DECIMAL(12,2) NOT NULL
+    iva DECIMAL(12,2) DEFAULT 0.00
+    total DECIMAL(12,2) NOT NULL
+    
+    -- Estado y control
+    estado_factura ENUM('borrador','emitida','pagada','vencida','anulada') DEFAULT 'borrador'
+    moneda VARCHAR(3) DEFAULT 'GTQ'
+    tipo_cambio DECIMAL(10,4) DEFAULT 1.0000
+    
+    -- Información de pago
+    forma_pago ENUM('credito','contado','transferencia','cheque') DEFAULT 'credito'
+    dias_credito INT DEFAULT 30
+    fecha_pago TIMESTAMP NULL
+    referencia_pago VARCHAR(100)
+    
+
+
+-- Detalle de facturación (servicios facturados)
+FACTURA_DETALLE
+    id_detalle (PK)
+    id_factura (FK)
+    id_guia (FK) -- Referencia a la guía específica
+    
+    -- Descripción del servicio
+    descripcion TEXT NOT NULL
+    cantidad INT DEFAULT 1
+    precio_unitario DECIMAL(10,2) NOT NULL
+    descuento_unitario DECIMAL(10,2) DEFAULT 0.00
+    subtotal_linea DECIMAL(10,2) NOT NULL
+    
+
+-- Pagos recibidos de empresas
+PAGO_EMPRESA
+    id_pago (PK)
+    id_factura (FK) NULL -- Puede ser pago a cuenta
+    id_empresa (FK)
+    
+    -- Información del pago
+    numero_recibo VARCHAR(50) UNIQUE NOT NULL
+    monto_pago DECIMAL(12,2) NOT NULL
+    moneda VARCHAR(3) DEFAULT 'GTQ'
+    tipo_cambio DECIMAL(10,4) DEFAULT 1.0000
+    fecha_pago DATE NOT NULL
+    
+    -- Forma de pago
+    forma_pago ENUM('efectivo','transferencia','cheque','tarjeta','deposito') NOT NULL
+    referencia_pago VARCHAR(100) -- Número de cheque, transferencia, etc.
+    banco_origen VARCHAR(100)
+    cuenta_destino VARCHAR(50)
+    
+    -- Estado del pago
+    estado_pago ENUM('registrado','confirmado','conciliado','rechazado') DEFAULT 'registrado'
+    fecha_confirmacion TIMESTAMP NULL
+	
+
