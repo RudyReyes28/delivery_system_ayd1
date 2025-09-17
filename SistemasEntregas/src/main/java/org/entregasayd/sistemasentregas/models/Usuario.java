@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@Data
 @Entity
 @Table(name = "usuario")
 @NoArgsConstructor
@@ -62,6 +63,7 @@ public class Usuario {
     public void onUpdate() {
         fechaUltimaActualizacion = LocalDateTime.now();
     }
+
     public enum Estado {
         ACTIVO,
         INACTIVO,

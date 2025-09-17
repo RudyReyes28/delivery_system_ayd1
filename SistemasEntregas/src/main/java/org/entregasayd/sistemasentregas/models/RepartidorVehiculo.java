@@ -13,15 +13,6 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "repartidor_vehiculo")
 public class RepartidorVehiculo {
-    /*REPARTIDOR_VEHICULO
-    id_repartidor_vehiculo (PK)
-    id_repartidor (FK)
-    id_vehiculo (FK)
-    fecha_asignacion DATE DEFAULT (CURRENT_DATE)
-    fecha_desasignacion DATE NULL
-    es_vehiculo_principal BOOLEAN DEFAULT TRUE
-    activo BOOLEAN DEFAULT TRUE
-    */
     @Id
     @Column(name = "id_repartidor_vehiculo")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
