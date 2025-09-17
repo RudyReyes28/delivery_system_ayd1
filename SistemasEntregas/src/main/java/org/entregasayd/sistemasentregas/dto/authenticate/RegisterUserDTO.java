@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class registerUserDTO {
+public class RegisterUserDTO {
     //Direccion, Persona, Usuario
 
     //Direccion
