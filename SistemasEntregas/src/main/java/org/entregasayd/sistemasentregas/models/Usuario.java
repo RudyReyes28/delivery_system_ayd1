@@ -2,6 +2,7 @@ package org.entregasayd.sistemasentregas.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -10,10 +11,12 @@ import java.time.LocalDateTime;
 @Table(name = "usuario")
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_usuario")
+    private Long idUsuario;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_persona")
@@ -30,7 +33,7 @@ public class Usuario {
     private String contraseniaHash;
 
     @Column(name = "two_factor_enabled")
-    private boolean twoFactorEnable;
+    private boolean twoFactorEnable = false;
 
     @Column(name = "intentos_fallidos", nullable = false)
     private Integer intentosFallidos = 0;
@@ -52,6 +55,7 @@ public class Usuario {
     public void onCreate() {
         fechaCreacion = LocalDateTime.now();
         fechaUltimaActualizacion = LocalDateTime.now();
+        estado = Estado.ACTIVO;
     }
 
     @PreUpdate

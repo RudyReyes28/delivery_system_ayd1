@@ -30,7 +30,7 @@ public class Persona {
     @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
 
-    @Column(name = "dpi", length = 20)
+    @Column(name = "dpi", length = 20, unique = true)
     private String dpi;
 
     @Column(name = "correo", nullable = false, unique = true, length = 255)
