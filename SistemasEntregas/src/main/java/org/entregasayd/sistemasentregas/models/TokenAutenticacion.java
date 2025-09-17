@@ -13,44 +13,37 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TokenAutenticacion {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_token")
     private Long idToken;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_usuario", nullable = false)
-    private Usuario usuario;
+    @Column(name = "id_usuario", nullable = false)
+    private Long idUsuario;
 
-    @Column(name = "token_hash", nullable = false, length = 512)
+    @Column(name = "token_hash", nullable = false)
     private String tokenHash;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_token", nullable = false)
-    private TipoToken tipoToken;
+    private String tipoToken;
 
-    @Column(name = "fecha_creacion", nullable = false, updatable = false)
-    private LocalDateTime fechaCreacion;
-
-    @Column(name = "fecha_expiracion")
+    @Column(name = "fecha_expiracion", nullable = false)
     private LocalDateTime fechaExpiracion;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "estado", nullable = false)
-    private Estado estado = Estado.ACTIVO;
-
-    @Column(name = "codigo_verificacion", length = 20)
+    @Column(name = "codigo_verificacion")
     private String codigoVerificacion;
 
-    @PrePersist
-    protected void onCreate() {
-        fechaCreacion = LocalDateTime.now();
-        if (estado == null) {
-            estado = Estado.ACTIVO;
-        }
-    }
+    @Column(name = "fecha_creacion", updatable = false)
+    private LocalDateTime fechaCreacion;
 
+    @Column(name = "estado")
+    private String estado = "ACTIVO";
+
+    @PrePersist
+    public void onCreate() {
+        fechaCreacion = LocalDateTime.now();
+    }
+    
     public enum TipoToken {
         VERIFICACION_EMAIL,
         RESET_PASSWORD,
