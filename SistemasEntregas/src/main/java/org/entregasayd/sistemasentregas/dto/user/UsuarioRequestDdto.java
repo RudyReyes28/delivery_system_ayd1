@@ -5,20 +5,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class PersonaDTO {
+@AllArgsConstructor
+public class UsuarioRequestDdto {
+    private Long idUsuario;
     private Long idPersona;
+    private Long idRol;
+    private Long idDireccion;
+    private String nombreUsuario;
+    private String contrasena;
     private String nombre;
     private String apellido;
     private LocalDate fechaNacimiento;
     private String dpi;
     private String correo;
     private String telefono;
-    private Long idDireccion;
     private String estado;
-    private LocalDateTime fechaRegistro;
 }
