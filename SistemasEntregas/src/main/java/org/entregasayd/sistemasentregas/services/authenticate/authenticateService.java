@@ -87,8 +87,10 @@ public class authenticateService {
     @Transactional
     public LoginResponseDTO loginUser(LoginRequestDTO loginRequest) throws Exception {
         // Buscar el usuario por nombre de usuario
-        Usuario usuario = usuarioRepository.findByNombreUsuario(loginRequest.getNombreUsuario())
-                .orElseThrow(() -> new Exception("Nombre de usuario o contraseña incorrectos"));
+        Usuario usuario = usuarioRepository.findByNombreUsuario(loginRequest.getNombreUsuario());
+        if(usuario == null){
+            throw new Exception("Nombre de usuario o contraseña incorrectos");
+        }
 
         // Verificar la contraseña
         if (!passwordEncoder.matches(loginRequest.getContrasenia(), usuario.getContraseniaHash())) {
@@ -283,13 +285,12 @@ public class authenticateService {
         }
         
         // Buscar la persona por correo
-        Optional<Persona> personaOptional = personaRepository.findByCorreo(correo);
-        if (personaOptional.isEmpty()) {
+        Persona persona = personaRepository.findByCorreo(correo);
+        if (persona == null) {
             throw new Exception("Correo no registrado");
         }
         
-        Persona persona = personaOptional.get();
-        
+
         // Buscar el usuario asociado a la persona
         Optional<Usuario> usuarioOptional = usuarioRepository.findByPersona(persona);
         if (usuarioOptional.isEmpty()) {
