@@ -1,7 +1,7 @@
 package org.entregasayd.sistemasentregas.controllers;
 
-import org.entregasayd.sistemasentregas.dto.user.PersonaDto;
-import org.entregasayd.sistemasentregas.services.PersonaService;
+import org.entregasayd.sistemasentregas.models.Rol;
+import org.entregasayd.sistemasentregas.services.RolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/persona")
-public class PersonaController {
+@RequestMapping("/roles")
+public class RolController {
+
     @Autowired
-    private PersonaService personaService;
+    private RolService rolService;
 
     @GetMapping("/get-all")
-    public List<PersonaDto> getAll(){
-        return personaService.findAll();
+    public List<Rol> getAll(){
+        return rolService.findAll();
     }
-
 }
