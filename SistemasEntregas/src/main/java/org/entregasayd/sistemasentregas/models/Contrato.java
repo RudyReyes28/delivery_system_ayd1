@@ -87,9 +87,18 @@ public class Contrato {
     @Column(name = "incluye_vacaciones", nullable = false)
     private Boolean incluyeVacaciones = true;
 
+    @Column(name = "incluye_igss", nullable = false)
+    private Boolean incluyeIgss = true;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "estado_contrato", nullable = false)
     private EstadoContrato estadoContrato = EstadoContrato.BORRADOR;
+
+    @PrePersist
+    private void onCreate(){
+        this.estadoContrato = EstadoContrato.BORRADOR;
+        this.moneda = "GTQ";
+    }
 
     public enum TipoContrato {
         INDEFINIDO,

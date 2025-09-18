@@ -1,0 +1,304 @@
+.recover-password-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  .recover-card {
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    overflow: hidden;
+
+    mat-card-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px;
+      text-align: center;
+
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0;
+
+        mat-icon {
+          font-size: 28px;
+          width: 28px;
+          height: 28px;
+        }
+      }
+    }
+
+    mat-card-content {
+      padding: 32px 24px 24px;
+    }
+
+    mat-card-actions {
+      padding: 0 24px 24px;
+      margin: 0;
+    }
+  }
+}
+
+.step-container {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+  }
+
+  .step-description {
+    margin: 0 0 24px 0;
+    color: #666;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+}
+
+.recovery-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .full-width {
+    width: 100%;
+  }
+
+  mat-form-field {
+    .mat-mdc-form-field-subscript-wrapper {
+      margin-top: 4px;
+    }
+
+    .mat-mdc-form-field-icon-suffix {
+      color: #666;
+    }
+  }
+
+  .submit-button {
+    margin-top: 16px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    mat-spinner {
+      margin-right: 4px;
+    }
+  }
+
+  .button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 16px;
+
+    button {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+
+      mat-spinner {
+        margin-right: 4px;
+      }
+    }
+  }
+}
+
+.success-container {
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+
+  .success-icon {
+    margin-bottom: 16px;
+
+    mat-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      color: #4caf50;
+    }
+  }
+
+  h3 {
+    color: #4caf50;
+    margin-bottom: 16px;
+  }
+
+  .submit-button {
+    margin-top: 24px;
+    max-width: 200px;
+  }
+}
+
+// Stepper indicator
+.stepper-indicator {
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  justify-content: center;
+
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0;
+
+    .step {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: #e9ecef;
+      color: #6c757d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+
+      &.active {
+        background-color: #667eea;
+        color: white;
+      }
+
+      &.completed {
+        background-color: #28a745;
+        color: white;
+      }
+    }
+
+    .connector {
+      width: 40px;
+      height: 2px;
+      background-color: #e9ecef;
+      transition: all 0.3s ease;
+
+      &.completed {
+        background-color: #28a745;
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  .recover-password-container {
+    padding: 10px;
+
+    .recover-card {
+      max-width: 100%;
+      
+      mat-card-header {
+        padding: 20px;
+
+        mat-card-title {
+          font-size: 20px;
+
+          mat-icon {
+            font-size: 24px;
+            width: 24px;
+            height: 24px;
+          }
+        }
+      }
+
+      mat-card-content {
+        padding: 24px 20px 20px;
+      }
+
+      mat-card-actions {
+        padding: 0 20px 20px;
+      }
+    }
+  }
+
+  .step-container {
+    min-height: 250px;
+
+    h3 {
+      font-size: 18px;
+    }
+  }
+
+  .recovery-form {
+    .button-group {
+      flex-direction: column;
+
+      button {
+        flex: none;
+      }
+    }
+  }
+
+  .stepper-indicator .step-indicator {
+    .step {
+      width: 28px;
+      height: 28px;
+      font-size: 12px;
+    }
+
+    .connector {
+      width: 30px;
+    }
+  }
+}
+
+// Custom snackbar styles
+.success-snackbar {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+.error-snackbar {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+// Loading state improvements
+.mat-mdc-button:disabled {
+  opacity: 0.7;
+}
+
+// Form field improvements
+.mat-mdc-form-field-appearance-outline {
+  .mat-mdc-form-field-outline {
+    border-radius: 8px;
+  }
+}
+
+// Animation for step transitions
+.step-container {
+  animation: fadeInUp 0.4s ease-in-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

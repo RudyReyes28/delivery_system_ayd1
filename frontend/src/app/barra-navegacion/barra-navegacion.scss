@@ -1,0 +1,235 @@
+.sidenav-container {
+  position: static;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #f8f9fa;
+}
+
+.sidenav {
+  width: 320px;
+  background: linear-gradient(135deg, #fff237d2 0%, #003cff 100%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border-right: none;
+}
+
+.sidenav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 20px;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  h3 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 20px;
+    color: #000000;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .close-button {
+    border-radius: 25%;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background-color: rgba(182, 185, 167, 0.9)
+    }
+  }
+}
+
+.mat-mdc-nav-list {
+  padding-top: 0 !important;
+  
+  .mat-mdc-list-item {
+    margin: 8px 16px;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.9);
+    min-height: 56px;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.15) !important;
+      transform: translateX(8px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    &:active {
+      transform: translateX(4px) scale(0.98);
+    }
+    
+    .mat-icon {
+      color: rgba(0, 0, 0, 0.9);
+      margin-right: 16px;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+      transition: all 0.3s ease;
+    }
+    
+    .mdc-list-item__primary-text {
+      color: rgba(255, 255, 255, 0.9) !important;
+      font-weight: 500;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+    }
+    
+    &:hover .mat-icon {
+      color: #000000;
+      transform: scale(1.1);
+    }
+    
+    &:hover .mdc-list-item__primary-text {
+      color: #ffffff !important;
+    }
+  }
+}
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: linear-gradient(135deg, #fff237d2 0%, #003cff 100%) !important;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  border: none;
+  
+  .mat-toolbar-row {
+    padding: 0 16px;
+    height: 64px;
+  }
+  
+  button {
+    border-radius: 25%;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background-color: rgba(182, 185, 167, 0.9)
+    }
+  }
+  
+  span {
+    font-weight: 600;
+    font-size: 20px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.main-content {
+  padding: 32px;
+  min-height: calc(100vh - 64px);
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  
+  h1 {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 32px;
+    margin-bottom: 16px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  p {
+    color: #64748b;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+}
+
+.demo-card {
+  max-width: 600px;
+  margin: 24px 0;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  .mat-mdc-card-header {
+    padding: 24px 24px 16px 24px;
+    
+    .mat-mdc-card-title {
+      color: #2c3e50;
+      font-weight: 600;
+      font-size: 20px;
+    }
+  }
+  
+  .mat-mdc-card-content {
+    padding: 0 24px 24px 24px;
+    color: #64748b;
+    line-height: 1.6;
+  }
+}
+
+// Animaciones personalizadas
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.mat-drawer.mat-drawer-over {
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .sidenav {
+    width: 280px;
+  }
+  
+  .main-content {
+    padding: 20px;
+  }
+  
+  .main-content h1 {
+    font-size: 28px;
+  }
+  
+  .demo-card {
+    margin: 16px 0;
+  }
+}
+
+// Efecto de ondas en el hover
+.nav-item {
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  &:hover::after {
+    width: 300px;
+    height: 100%;
+  }
+}

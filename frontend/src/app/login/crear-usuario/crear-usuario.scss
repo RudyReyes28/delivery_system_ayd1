@@ -1,0 +1,277 @@
+// crear-usuario.scss
+.crear-usuario-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+  .usuario-card {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    overflow: hidden;
+
+    .mat-mdc-card-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+
+      .mat-mdc-card-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .mat-mdc-card-subtitle {
+        opacity: 0.9;
+        font-size: 1rem;
+      }
+    }
+
+    .mat-mdc-card-content {
+      padding: 2rem;
+    }
+  }
+}
+
+.usuario-form {
+  .form-section {
+    margin-bottom: 2.5rem;
+    
+    &:last-of-type {
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      color: #333;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e0e0e0;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 50px;
+        height: 2px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+    }
+  }
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 0;
+    }
+  }
+
+  .full-width {
+    flex: 1;
+    width: 100%;
+  }
+
+  .half-width {
+    flex: 1;
+    min-width: 280px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      min-width: auto;
+    }
+  }
+
+  // Estilos para mat-form-field
+  .mat-mdc-form-field {
+    &.mat-form-field-appearance-outline {
+      .mat-mdc-form-field-outline {
+        border-radius: 8px;
+      }
+
+      &:not(.mat-form-field-disabled) {
+        .mat-mdc-form-field-outline-thick {
+          .mat-mdc-form-field-outline-start,
+          .mat-mdc-form-field-outline-notch,
+          .mat-mdc-form-field-outline-end {
+            border-color: #667eea;
+          }
+        }
+      }
+
+      .mat-mdc-form-field-label {
+        color: #666;
+      }
+
+      &.mat-focused .mat-mdc-form-field-label {
+        color: #667eea;
+      }
+    }
+
+    .mat-mdc-input-element {
+      color: #333;
+    }
+
+    .mat-mdc-select-value {
+      color: #333;
+    }
+  }
+
+  // Estilos para textarea
+  textarea.mat-mdc-input-element {
+    resize: vertical;
+    min-height: 80px;
+  }
+}
+
+// Botones de acción
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+
+  @media (max-width: 480px) {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+
+  .cancel-button {
+    min-width: 120px;
+    border-color: #ccc;
+    color: #666;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: #999;
+      background-color: #f5f5f5;
+    }
+
+    .mat-icon {
+      margin-right: 0.5rem;
+    }
+  }
+
+  .submit-button {
+    min-width: 150px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: all 0.3s ease;
+
+    &:hover:not([disabled]) {
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      background: #ccc;
+      color: #666;
+    }
+
+    .mat-icon {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+// Estilos para mensajes de error
+.mat-mdc-form-field-error {
+  font-size: 0.875rem;
+  color: #f44336;
+}
+
+// Estilos para el datepicker
+.mat-mdc-form-field-subscript-wrapper {
+  margin-top: 0.25rem;
+}
+
+// Animaciones
+.usuario-form {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Estilos responsivos adicionales
+@media (max-width: 768px) {
+  .crear-usuario-container {
+    padding: 1rem 0.5rem;
+
+    .usuario-card {
+      .mat-mdc-card-header {
+        padding: 1.5rem;
+
+        .mat-mdc-card-title {
+          font-size: 1.5rem;
+        }
+      }
+
+      .mat-mdc-card-content {
+        padding: 1.5rem;
+      }
+    }
+  }
+
+  .usuario-form .form-section .section-title {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .crear-usuario-container {
+    padding: 0.5rem;
+
+    .usuario-card {
+      .mat-mdc-card-header {
+        padding: 1rem;
+
+        .mat-mdc-card-title {
+          font-size: 1.25rem;
+        }
+
+        .mat-mdc-card-subtitle {
+          font-size: 0.9rem;
+        }
+      }
+
+      .mat-mdc-card-content {
+        padding: 1rem;
+      }
+    }
+  }
+}
+
+// Clases globales para snackbar (agregar a styles.scss global)
+:host ::ng-deep {
+  .success-snackbar {
+    background-color: #4caf50 !important;
+    color: white !important;
+  }
+
+  .error-snackbar {
+    background-color: #f44336 !important;
+    color: white !important;
+  }
+}
