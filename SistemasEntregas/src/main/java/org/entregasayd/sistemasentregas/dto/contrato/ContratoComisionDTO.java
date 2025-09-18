@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContratoComisionRequestDTO {
-    private Integer idContratoComision;
-    private Integer idContrato;
+public class ContratoComisionDTO {
+    private Long idContratoComision;
+    private Long idContrato;
     private ContratoComision.TipoComision tipoComision;
     private Double porcentaje;
     private Double montoFijo;
