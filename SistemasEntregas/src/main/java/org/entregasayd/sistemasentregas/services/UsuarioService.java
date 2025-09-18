@@ -3,6 +3,7 @@ package org.entregasayd.sistemasentregas.services;
 import jakarta.transaction.Transactional;
 import org.entregasayd.sistemasentregas.dto.user.UsuarioResponseDto;
 import org.entregasayd.sistemasentregas.mapper.UsuarioMap;
+import org.entregasayd.sistemasentregas.models.Empleado;
 import org.entregasayd.sistemasentregas.models.Persona;
 import org.entregasayd.sistemasentregas.models.Usuario;
 import org.entregasayd.sistemasentregas.repositories.UsuarioRepository;
@@ -20,6 +21,8 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private PersonaService personaService;
+    @Autowired
+    private EmpleadoService empleadoService;
     @Autowired
     private UsuarioMap userMap;
     private Encriptation encriptation;
@@ -41,7 +44,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public UsuarioResponseDto create(Persona persona, Usuario usuario){
+    public UsuarioResponseDto create(Persona persona, Usuario usuario, Empleado empleado){
         try {
             if(findByUsername(usuario.getNombreUsuario()) != null){
                 throw new ErrorApi(400,"El nombre de usuario ya se encuentra en uso.");
@@ -57,9 +60,15 @@ public class UsuarioService {
             Persona personaSave = personaService.create(persona);
             usuario.setPersona(personaSave);
             usuario.setContraseniaHash(encriptation.encrypt(usuario.getContraseniaHash()));
-            return userMap.toDto(usuarioRepository.save(usuario));
+
+            Usuario usuarioSave = usuarioRepository.save(usuario);
+            //registrar empleado
+            empleado.setUsuario(usuarioSave);
+            empleadoService.create(empleado);
+
+            return userMap.toDto(usuarioRepository.save(usuarioSave));
         } catch (Exception e){
-            throw new ErrorApi(500,"Lo sentimos, hubo un error al crear el usuario");
+            throw new ErrorApi(500,"Lo sentimos, hubo un error al crear el usuario" + e.getMessage());
         }
     }
 

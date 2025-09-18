@@ -52,6 +52,11 @@ public class ContratoComision {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDate createdAt = LocalDate.now();
 
+    @PrePersist
+    private void onCreate(){
+        this.createdAt = LocalDate.now();
+    }
+
     public enum TipoComision {
         PORCENTAJE,
         FIJO_POR_ENTREGA,

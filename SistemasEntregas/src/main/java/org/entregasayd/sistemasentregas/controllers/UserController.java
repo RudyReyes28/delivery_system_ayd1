@@ -1,12 +1,11 @@
 package org.entregasayd.sistemasentregas.controllers;
 
 import jakarta.validation.Valid;
+import org.entregasayd.sistemasentregas.dto.user.EmpleadoRequestDTO;
+import org.entregasayd.sistemasentregas.dto.user.RegistroEmpleadoRequestDTO;
 import org.entregasayd.sistemasentregas.dto.user.UsuarioRequestDdto;
 import org.entregasayd.sistemasentregas.dto.user.UsuarioResponseDto;
-import org.entregasayd.sistemasentregas.models.Direccion;
-import org.entregasayd.sistemasentregas.models.Persona;
-import org.entregasayd.sistemasentregas.models.Rol;
-import org.entregasayd.sistemasentregas.models.Usuario;
+import org.entregasayd.sistemasentregas.models.*;
 import org.entregasayd.sistemasentregas.services.DireccionService;
 import org.entregasayd.sistemasentregas.services.PersonaService;
 import org.entregasayd.sistemasentregas.services.RolService;
@@ -31,7 +30,11 @@ public class UserController {
     private RolService rolService;
 
     @PostMapping("/create")
-    public UsuarioResponseDto createUser(@RequestBody UsuarioRequestDdto usuario) {
+    public UsuarioResponseDto createUser(@RequestBody RegistroEmpleadoRequestDTO register) {
+
+        UsuarioRequestDdto usuario = register.getUsuarioRequestDdto();
+        EmpleadoRequestDTO empleado = register.getEmpleadoRequestDdto();
+
         Persona personaSave = new Persona();
         personaSave.setNombre(usuario.getNombre());
         personaSave.setApellido(usuario.getApellido());
@@ -55,7 +58,21 @@ public class UserController {
         usuarioSave.setRol(rolSave);
         usuarioSave.setNombreUsuario(usuario.getNombreUsuario());
         usuarioSave.setContraseniaHash(usuario.getContrasena());
-        return usuarioService.create(personaSave, usuarioSave);
+
+        //Empleado
+        Empleado empleadoSave = new Empleado();
+        empleadoSave.setCodigoEmpleado(empleado.getCodigoEmpleado());
+        empleadoSave.setNumeroIgss(empleado.getNumeroIgss());
+        empleadoSave.setNumeroIrtra(empleado.getNumeroIrtra());
+        empleadoSave.setTipoSangre(empleado.getTipoSangre());
+        empleadoSave.setEstadoCivil(empleado.getEstadoCivil());
+        empleadoSave.setNumeroDependientes(empleado.getNumeroDependientes());
+        empleadoSave.setContactoEmergenciaNombre(empleado.getContactoEmergenciaNombre());
+        empleadoSave.setContactoEmergenciaTelefono(empleado.getContactoEmergenciaTelefono());
+        empleadoSave.setEstadoEmpleado(empleado.getEstadoEmpleado());
+        empleadoSave.setFechaIngreso(empleado.getFechaIngreso());
+
+        return usuarioService.create(personaSave, usuarioSave, empleadoSave);
     }
 
     @PutMapping("/update")
