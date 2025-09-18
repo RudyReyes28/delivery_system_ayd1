@@ -13,18 +13,10 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "sucursal_personal")
 public class SucursalPersonal {
-    /*SUCURSAL_PERSONAL
-    id_sucursal_personal (PK)
-    id_sucursal (FK)
-    id_usuario (FK) -- Usuario que trabaja en la sucursal
-    cargo VARCHAR(100)
-    es_encargado BOOLEAN DEFAULT FALSE
-    fecha_inicio DATE DEFAULT (CURRENT_DATE)
-    fecha_fin DATE NULL
-    activo BOOLEAN DEFAULT TRUE*/
 
     @Id
     @Column(name = "id_sucursal_personal")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idSucursalPersonal;
 
     @ManyToOne(fetch = FetchType.LAZY)

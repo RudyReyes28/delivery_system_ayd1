@@ -48,6 +48,7 @@ public class authenticateService {
 
     private Encriptation passwordEncoder = new Encriptation();
 
+    @Transactional
     public Usuario registerUser(RegisterUserDTO userDTO) {
         // Crear y guardar la dirección
         Direccion direccion = new Direccion();
