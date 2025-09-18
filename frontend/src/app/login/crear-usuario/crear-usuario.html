@@ -1,0 +1,202 @@
+<!-- crear-usuario.html -->
+<div class="crear-usuario-container">
+  <mat-card class="usuario-card">
+    <mat-card-header>
+      <mat-card-title>Crear Nuevo Usuario</mat-card-title>
+      <mat-card-subtitle>Complete todos los campos para registrar un nuevo usuario</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="usuarioForm" (ngSubmit)="enviarFormulario()" class="usuario-form">
+        
+        <!-- Sección de Dirección -->
+        <div class="form-section">
+          <h3 class="section-title">Información de Dirección</h3>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Tipo de Dirección</mat-label>
+              <mat-select formControlName="tipoDireccion">
+                <mat-option value="RESIDENCIA">Residencia</mat-option>
+                <mat-option value="TRABAJO">Trabajo</mat-option>
+                <mat-option value="ENTREGA">Entrega</mat-option>
+                <mat-option value="FISCAL">Fiscal</mat-option>
+              </mat-select>
+              <mat-error *ngIf="usuarioForm.get('tipoDireccion')?.hasError('required')">
+                El tipo de dirección es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Municipio</mat-label>
+              <input matInput formControlName="municipio" placeholder="Ingrese el municipio">
+              <mat-error *ngIf="usuarioForm.get('municipio')?.hasError('required')">
+                El municipio es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Departamento</mat-label>
+              <input matInput formControlName="departamento" placeholder="Ingrese el departamento">
+              <mat-error *ngIf="usuarioForm.get('departamento')?.hasError('required')">
+                El departamento es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>País</mat-label>
+              <input matInput formControlName="pais" placeholder="Ingrese el país">
+              <mat-error *ngIf="usuarioForm.get('pais')?.hasError('required')">
+                El país es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Código Postal</mat-label>
+              <input matInput formControlName="codigoPostal" placeholder="Ingrese el código postal">
+              <mat-error *ngIf="usuarioForm.get('codigoPostal')?.hasError('required')">
+                El código postal es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Referencias</mat-label>
+              <textarea matInput formControlName="referencias" 
+                        placeholder="Ingrese referencias de la dirección" 
+                        rows="3"></textarea>
+              <mat-error *ngIf="usuarioForm.get('referencias')?.hasError('required')">
+                Las referencias son requeridas
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Sección de Información Personal -->
+        <div class="form-section">
+          <h3 class="section-title">Información Personal</h3>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Nombre</mat-label>
+              <input matInput formControlName="nombre" placeholder="Ingrese el nombre">
+              <mat-error *ngIf="usuarioForm.get('nombre')?.hasError('required')">
+                El nombre es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Apellido</mat-label>
+              <input matInput formControlName="apellido" placeholder="Ingrese el apellido">
+              <mat-error *ngIf="usuarioForm.get('apellido')?.hasError('required')">
+                El apellido es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Fecha de Nacimiento</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento">
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+              <mat-error *ngIf="usuarioForm.get('fechaNacimiento')?.hasError('required')">
+                La fecha de nacimiento es requerida
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>DPI</mat-label>
+              <input matInput formControlName="dpi" 
+                     placeholder="Ingrese el DPI (13 dígitos)" 
+                     maxlength="13">
+              <mat-error *ngIf="usuarioForm.get('dpi')?.hasError('required')">
+                El DPI es requerido
+              </mat-error>
+              <mat-error *ngIf="usuarioForm.get('dpi')?.hasError('minlength')">
+                El DPI debe tener 13 dígitos
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Correo Electrónico</mat-label>
+              <input matInput type="email" formControlName="correo" 
+                     placeholder="correo@ejemplo.com">
+              <mat-error *ngIf="usuarioForm.get('correo')?.hasError('required')">
+                El correo es requerido
+              </mat-error>
+              <mat-error *ngIf="usuarioForm.get('correo')?.hasError('email')">
+                Ingrese un correo válido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Teléfono</mat-label>
+              <input matInput type="tel" formControlName="telefono" 
+                     placeholder="Ej: +502 1234-5678">
+              <mat-error *ngIf="usuarioForm.get('telefono')?.hasError('required')">
+                El teléfono es requerido
+              </mat-error>
+              <mat-error *ngIf="usuarioForm.get('telefono')?.hasError('pattern')">
+                Formato de teléfono inválido
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Sección de Credenciales -->
+        <div class="form-section">
+          <h3 class="section-title">Credenciales de Acceso</h3>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Nombre de Usuario</mat-label>
+              <input matInput formControlName="nombreUsuario" 
+                     placeholder="Ingrese el nombre de usuario">
+              <mat-error *ngIf="usuarioForm.get('nombreUsuario')?.hasError('required')">
+                El nombre de usuario es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Contraseña</mat-label>
+              <input matInput [type]="hidePassword ? 'password' : 'text'" 
+                     formControlName="contraseniaHash" 
+                     placeholder="Mínimo 6 caracteres">
+              <button mat-icon-button matIconSuffix 
+                      (click)="hidePassword = !hidePassword" 
+                      [attr.aria-label]="'Hide password'" 
+                      [attr.aria-pressed]="hidePassword"
+                      type="button">
+                <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </button>
+              <mat-error *ngIf="usuarioForm.get('contraseniaHash')?.hasError('required')">
+                La contraseña es requerida
+              </mat-error>
+              <mat-error *ngIf="usuarioForm.get('contraseniaHash')?.hasError('minlength')">
+                La contraseña debe tener al menos 6 caracteres
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="form-actions">
+          <button mat-stroked-button type="button" class="cancel-button" (click)="limpiarFormulario()">
+            <mat-icon>cancel</mat-icon>
+            Cancelar
+          </button>
+          <button mat-raised-button color="primary" type="submit" 
+                  [disabled]="!usuarioForm.valid" class="submit-button">
+            <mat-icon>person_add</mat-icon>
+            Crear Usuario
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

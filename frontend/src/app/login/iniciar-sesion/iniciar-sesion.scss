@@ -1,0 +1,376 @@
+@use 'sass:color'; // Importar el módulo color para usar las funciones modernas
+
+// Variables
+$primary-color: #3f51b5;
+$accent-color: #ff4081;
+$warn-color: #f44336;
+$background-color: #f5f5f5;
+$card-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: $background-color;
+  padding: 20px;
+  box-sizing: border-box;
+
+  // Fondo con gradiente opcional
+  //background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  box-shadow: $card-shadow;
+  border-radius: 12px;
+  overflow: hidden;
+
+  ::ng-deep mat-card-header {
+    background-color: $primary-color;
+    color: white;
+    padding: 24px;
+    text-align: center;
+
+    .mat-mdc-card-title {
+      font-size: 24px;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .mat-mdc-card-subtitle {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+      margin: 8px 0 0 0;
+    }
+  }
+
+  ::ng-deep mat-card-content {
+    padding: 32px 24px 24px;
+  }
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .full-width {
+    width: 100%;
+  }
+
+  ::ng-deep mat-form-field {
+    .mat-mdc-form-field {
+      margin-bottom: 8px;
+    }
+
+    // Personalizar iconos
+    mat-icon {
+      color: rgba(0, 0, 0, 0.54);
+    }
+  }
+
+  .remember-checkbox {
+    margin: 8px 0;
+    
+    ::ng-deep .mat-mdc-checkbox-label {
+      font-size: 14px;
+    }
+  }
+
+  .login-button {
+    margin-top: 16px;
+    height: 48px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    &:disabled {
+      background-color: rgba(0, 0, 0, 0.12) !important;
+      color: rgba(0, 0, 0, 0.26) !important;
+    }
+
+    ::ng-deep mat-spinner {
+      margin-right: 8px;
+    }
+
+    // Efecto hover mejorado
+    &:not(:disabled) {
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+      }
+    }
+  }
+
+  .additional-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 16px;
+    gap: 8px;
+
+    a {
+      font-size: 14px;
+      text-decoration: none;
+      color: $primary-color;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: color.adjust($primary-color, $lightness: -10%);
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.error-card {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 16px;
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+
+  .error-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: $warn-color;
+
+    mat-icon {
+      color: $warn-color;
+    }
+
+    span {
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 480px) {
+  .login-container {
+    padding: 16px;
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+
+  .login-card {
+    max-width: 100%;
+    margin: 0;
+    box-shadow: none;
+    border-radius: 8px;
+
+    ::ng-deep mat-card-header {
+      padding: 20px;
+
+      .mat-mdc-card-title {
+        font-size: 20px;
+      }
+    }
+
+    ::ng-deep mat-card-content {
+      padding: 24px 16px 16px;
+    }
+  }
+
+  .login-form {
+    gap: 12px;
+
+    .login-button {
+      height: 44px;
+      font-size: 14px;
+    }
+  }
+}
+
+// Animaciones
+.login-card {
+  animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Personalización de Material Design con ::ng-deep
+::ng-deep .mat-mdc-form-field {
+  &.mat-focused {
+    .mat-mdc-floating-label {
+      color: $primary-color;
+    }
+  }
+}
+
+// Estilo para el spinner de carga
+::ng-deep mat-spinner {
+  circle {
+    stroke: white;
+  }
+}
+
+
+.token-card {
+  width: 100%;
+  max-width: 450px;
+  box-shadow: $card-shadow;
+  border-radius: 12px;
+  overflow: hidden;
+  animation: slideInUp 0.4s ease-out;
+
+  .token-header {
+    background-color: #1976d2;
+    color: white;
+    padding: 24px;
+    text-align: center;
+
+    ::ng-deep .mat-mdc-card-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 22px;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    ::ng-deep .mat-mdc-card-subtitle {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      margin: 8px 0 0 0;
+    }
+  }
+
+  ::ng-deep mat-card-content {
+    padding: 32px 24px 24px;
+  }
+}
+
+.token-info {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  
+  p {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #495057;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    strong {
+      color: #212529;
+    }
+  }
+}
+
+.token-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .full-width {
+    width: 100%;
+  }
+
+  .dialog-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background-color: #e3f2fd;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+  }
+
+  .token-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+
+    .verify-button {
+      flex: 1;
+      height: 48px;
+      font-size: 16px;
+      font-weight: 500;
+      border-radius: 8px;
+    }
+
+    button:not(.verify-button) {
+      min-width: 100px;
+      height: 48px;
+    }
+  }
+
+  .resend-section {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    
+    p {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    button {
+      font-size: 14px;
+    }
+  }
+}
+
+// Responsive para el diálogo de token
+@media (max-width: 480px) {
+  .token-card {
+    max-width: 100%;
+    margin: 0;
+    box-shadow: none;
+    border-radius: 8px;
+
+    .token-header {
+      padding: 20px;
+
+      ::ng-deep .mat-mdc-card-title {
+        font-size: 20px;
+      }
+    }
+
+    ::ng-deep mat-card-content {
+      padding: 24px 16px 16px;
+    }
+  }
+
+  .token-form .token-actions {
+    flex-direction: column;
+    
+    .verify-button {
+      order: 1;
+    }
+    
+    button:not(.verify-button) {
+      order: 2;
+      height: 44px;
+    }
+  }
+}
