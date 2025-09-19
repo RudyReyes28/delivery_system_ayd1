@@ -34,8 +34,8 @@ export class BarraNavegacion {
   menuItems = [
     { icon: 'home', label: 'Inicio', route: '/login' },
     { icon: 'person', label: 'Crear Usuario', route: '/crear-usuario' },
-    //{ icon: 'settings', label: 'Configuración', route: '/settings' },
-    //{ icon: 'analytics', label: 'Analytics', route: '/analytics' },
+    { icon: 'business_center', label: 'Gestión Empresas', route: '/info-empresa' },
+    { icon: 'store', label: 'Gestión Surcusales', route: '/info-sucursal' },
     //{ icon: 'help', label: 'Ayuda', route: '/help' },
     { icon: 'logout', label: 'Cerrar Sesión', route: '/logout' }
   ];

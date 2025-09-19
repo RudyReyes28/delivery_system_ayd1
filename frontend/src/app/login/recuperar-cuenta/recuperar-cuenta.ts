@@ -12,7 +12,6 @@ import { Router, RouterModule } from '@angular/router';
 // Importación de Servicios
 import { AuthService } from '../../../services/auth.service';
 
-
 @Component({
   selector: 'app-recuperar-cuenta',
   imports: [
