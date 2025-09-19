@@ -7,5 +7,5 @@ import java.util.ArrayList;
 
 public interface SucursalPersonalRepository extends JpaRepository<SucursalPersonal, Long> {
     ArrayList<SucursalPersonal> findBySucursalIdSucursal(Long idSucursal);
-
+    SucursalPersonal findByUsuarioIdUsuario(Long idUsuario);
 }
