@@ -37,4 +37,10 @@ public class RepartidorVehiculo {
 
     @Column(name = "activo", nullable = false)
     private Boolean activo = true;
+
+    @PrePersist
+    public void prePersist() {
+        this.fechaAsignacion = LocalDate.now();
+        this.activo = true;
+    }
 }
