@@ -74,4 +74,14 @@ class CompanyController {
         }
     }
 
+    //Obtener personas
+    @GetMapping("/personas-empresa")
+    public ResponseEntity<?> getPersonsForCompany() {
+        try {
+            return ResponseEntity.ok(companyService.getPersonas());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error al obtener las personas: " + e.getMessage());
+        }
+    }
+
 }

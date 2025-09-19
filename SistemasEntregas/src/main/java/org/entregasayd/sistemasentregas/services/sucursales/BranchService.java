@@ -138,6 +138,13 @@ public class BranchService {
             SucursalPersonal branchStaff = new SucursalPersonal();
             Usuario user = usuarioRepository.findById(branchDTO.getIdUsuario())
                     .orElseThrow(() -> new Exception("Usuario no encontrado con ID: " + branchDTO.getIdUsuario()));
+
+            //Como politica de la empresa, un usuario solo puede estar asignado a una sucursal
+            SucursalPersonal existingStaff = branchStaffRepository.findByUsuarioIdUsuario(branchDTO.getIdUsuario());
+            if (existingStaff != null) {
+                throw new Exception("El usuario con ID " + branchDTO.getIdUsuario() + " ya está asignado a otra sucursal.");
+            }
+
             branchStaff.setUsuario(user);
             branchStaff.setSucursal(savedBranch);
             branchStaff.setCargo(branchDTO.getCargo());

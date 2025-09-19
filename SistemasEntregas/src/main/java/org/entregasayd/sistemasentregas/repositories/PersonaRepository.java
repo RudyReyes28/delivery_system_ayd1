@@ -4,10 +4,12 @@ import org.entregasayd.sistemasentregas.models.Persona;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Repository
 public interface PersonaRepository extends JpaRepository<Persona, Long> {
     Persona findByDpi(String dpi);
     Persona findByCorreo(String correo);
+    ArrayList<Persona> findByEstado(Persona.Estado estado);
 }

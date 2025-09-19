@@ -1,6 +1,7 @@
 package org.entregasayd.sistemasentregas.services.companys;
 import lombok.extern.slf4j.Slf4j;
 import org.entregasayd.sistemasentregas.dto.authenticate.RegisterUserDTO;
+import org.entregasayd.sistemasentregas.repositories.PersonaRepository;
 import org.entregasayd.sistemasentregas.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,9 @@ public class CompanyService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PersonaRepository personaRepository;
 
     // Metodo para crear una empresa junto con su contacto
     @Transactional
@@ -211,6 +215,26 @@ public class CompanyService {
         }
         return sucursalDTOs;
 
+    }
+
+    //Obtener personas
+    public ArrayList<PersonaDTO> getPersonas() {
+        //Personas activas
+        ArrayList<Persona> personas = personaRepository.findByEstado(Persona.Estado.ACTIVO);
+        ArrayList<PersonaDTO> personaDTOs = new ArrayList<>();
+        for (Persona persona : personas) {
+            PersonaDTO personaDTO = PersonaDTO.builder()
+                    .idPersona(persona.getIdPersona())
+                    .nombre(persona.getNombre())
+                    .apellido(persona.getApellido())
+                    .dpi(persona.getDpi())
+                    .correo(persona.getCorreo())
+                    .telefono(persona.getTelefono())
+                    .estado(persona.getEstado().name())
+                    .build();
+            personaDTOs.add(personaDTO);
+        }
+        return personaDTOs;
     }
 
 
