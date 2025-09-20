@@ -12,10 +12,16 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { getTipoDireccionOptions, TipoDireccion } from '../../../models/enums';
 
 // Importando Servicios
 import { AuthService } from '../../../services/auth.service';
+
+enum TipoDireccion {
+  RESIDENCIA = 'RESIDENCIA',
+  TRABAJO = 'TRABAJO',
+  ENTREGA = 'ENTREGA',
+  FISCAL = 'FISCAL'
+}
 
 @Component({
   selector: 'app-crear-usuario',
@@ -40,7 +46,7 @@ export class CrearUsuario implements OnInit {
   hidePassword = true;
   
   // Opciones para el select
-  tipoDireccionOptions = getTipoDireccionOptions();
+  tipoDireccionOptions = this.getTipoDireccionOptions();
 
   constructor(
     private authService: AuthService,
@@ -149,6 +155,15 @@ export class CrearUsuario implements OnInit {
       horizontalPosition: 'center',
       verticalPosition: 'top'
     });
+  }
+
+  getTipoDireccionOptions() {
+    return [
+      { value: TipoDireccion.RESIDENCIA, label: 'Residencia' },
+      { value: TipoDireccion.TRABAJO, label: 'Trabajo' },
+      { value: TipoDireccion.ENTREGA, label: 'Entrega' },
+      { value: TipoDireccion.FISCAL, label: 'Fiscal' }
+    ];
   }
 
   ngOnInit(): void {}

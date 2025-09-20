@@ -82,7 +82,6 @@ export interface SucursalFormData {
   horarioCierre: string;
   diasOperacion: string;
   estado: string;
-  // Dirección
   tipoDireccion: string;
   municipio: string;
   departamento: string;
@@ -90,7 +89,6 @@ export interface SucursalFormData {
   codigoPostal: string;
   referencias: string;
   activa: boolean;
-  // Personal
   idUsuario: number;
   cargo: string;
   esEncargado: boolean;

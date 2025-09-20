@@ -18,8 +18,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 
 // Importando Servicios y Modelos
-import { EmpresaService } from '../../services/empresa.service';
-import { UsuarioSucursal, Empresa, EmpresaItem, CambiarEstadoRequest,EmpresaFormData } from '../../models/empresa.model';
+import { EmpresaService } from '../../../services/empresa.service';
+import { UsuarioSucursal, Empresa as EmpresaModel, EmpresaItem, CambiarEstadoRequest,EmpresaFormData } from '../../../models/empresa.model';
 
 @Component({
   selector: 'app-info-empresa',
@@ -40,10 +40,10 @@ import { UsuarioSucursal, Empresa, EmpresaItem, CambiarEstadoRequest,EmpresaForm
     MatCheckboxModule,
     ReactiveFormsModule
   ],
-  templateUrl: './info-empresa.html',
-  styleUrl: './info-empresa.scss'
+  templateUrl: './empresa.html',
+  styleUrl: './empresa.scss'
 })
-export class InfoEmpresa implements OnInit {
+export class Empresa implements OnInit {
   usuariosSucursal: UsuarioSucursal[] = [];
   empresas: EmpresaItem[] = [];
   loadingEmpresas = false;
@@ -51,7 +51,7 @@ export class InfoEmpresa implements OnInit {
   selectedTabIndex = 0;
   modoEdicion = false;
   empresaForm: FormGroup;
-  empresaEditando: Empresa | null = null;
+  empresaEditando: EmpresaModel | null = null;
   
   private cambioProgmatico = false;
 
@@ -144,7 +144,7 @@ export class InfoEmpresa implements OnInit {
     this.selectedTabIndex = 0;
   }
 
-  editarEmpresa(empresa: Empresa): void {
+  editarEmpresa(empresa: EmpresaModel): void {
     this.modoEdicion = true;
     this.empresaEditando = empresa;
     

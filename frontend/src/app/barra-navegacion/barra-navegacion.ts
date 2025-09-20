@@ -34,9 +34,10 @@ export class BarraNavegacion {
   menuItems = [
     { icon: 'home', label: 'Inicio', route: '/login' },
     { icon: 'person', label: 'Crear Usuario', route: '/crear-usuario' },
-    { icon: 'business_center', label: 'Gestión Empresas', route: '/info-empresa' },
-    { icon: 'store', label: 'Gestión Surcusales', route: '/info-sucursal' },
-    //{ icon: 'help', label: 'Ayuda', route: '/help' },
+    { icon: 'business_center', label: 'Gestión Empresas', route: '/empresa' },
+    { icon: 'store', label: 'Gestión Surcusales', route: '/sucursal' },
+    { icon: 'grade', label: 'Fidelización', route: '/fidelizacion' },
+    { icon: 'settings', label: 'General', route: 'general-sucursal' },
     { icon: 'logout', label: 'Cerrar Sesión', route: '/logout' }
   ];
 

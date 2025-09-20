@@ -2,12 +2,14 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { CredencialResquest, CredencialResponse, UsuarioRequest, UsuarioResponse, VerificacionResquest, VerificacionResponse, RecuperarResquest, RecuperarResponse, ActualizarAutetificacionResponse, SolicitarRequest, SolicitarResponse, ActualizarResquest, ActualizarResponse } from "../models/auth.model";
+import { environment } from "../environments/environment";
 
 
 @Injectable({providedIn: "root"})
 export class AuthService {
 
-    readonly DIRECCION_API = "http://localhost:8081/login";
+    private readonly DIRECCION_API = `${environment.apiUrl}/login`;
+    //readonly DIRECCION_API = "http://localhost:8081/login";
 
     constructor(private httpClient: HttpClient) {}
 

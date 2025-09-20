@@ -1,27 +1,35 @@
 import { Routes } from '@angular/router';
-import { IniciarSesion } from './login/iniciar-sesion/iniciar-sesion';
-import { CrearUsuario } from './login/crear-usuario/crear-usuario';
-import { RecuperarCuenta } from './login/recuperar-cuenta/recuperar-cuenta';
-import { InfoEmpresa } from './info-empresa/info-empresa';
-import { InfoSucursal } from './info-sucursal/info-sucursal';
+import { IniciarSesion } from './auth/iniciar-sesion/iniciar-sesion';
+import { CrearUsuario } from './auth/crear-usuario/crear-usuario';
+import { RecuperarCuenta } from './auth/recuperar-cuenta/recuperar-cuenta';
+import { Empresa } from './views_admin/empresa/empresa';
+import { Sucursal } from './views_admin/sucursal/sucursal';
+import { Fidelizacion } from './views_admin/fidelizacion/fidelizacion';
+import { GeneralSucursal } from './views_sucursal/general-sucursal/general-sucursal';
 
 export const routes: Routes = [
     { 
-        path: 'login', component: IniciarSesion 
+        path: 'login', component: IniciarSesion, title: "Iniciar Sesión"
     },
     { 
         path: '', redirectTo: '/login', pathMatch: 'full' 
     },
     {
-        path: "crear-usuario", component: CrearUsuario
+        path: "crear-usuario", component: CrearUsuario, title: "Crear Usuario"
     },
     {
-        path: "recuperar-cuenta", component: RecuperarCuenta
+        path: "recuperar-cuenta", component: RecuperarCuenta, title: "Recuperar Cuenta"
     },
     {
-        path: "info-empresa", component: InfoEmpresa
+        path: "empresa", component: Empresa, title: "Gestión Empresas"
     },
     {
-        path: "info-sucursal", component: InfoSucursal
+        path: "sucursal", component: Sucursal, title: "Gestión Surcusales"
+    },
+    {
+        path: "fidelizacion", component: Fidelizacion, title: "Fidelización"
+    },
+    {
+        path: "general-sucursal", component: GeneralSucursal, title: "Información General"
     }
 ];

@@ -18,8 +18,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 
 // Importando Servicios y Modelos
-import { SucursalService } from '../../services/sucursal.service';
-import { SucursalItem, EmpresaItem, UsuarioSucursal, SucursalFormData, CambiarEstadoSucursalRequest } from '../../models/sucursal.model';
+import { SucursalService } from '../../../services/sucursal.service';
+import { SucursalItem, EmpresaItem, UsuarioSucursal, SucursalFormData, CambiarEstadoSucursalRequest } from '../../../models/sucursal.model';
 
 @Component({
   selector: 'app-info-sucursal',
@@ -40,10 +40,10 @@ import { SucursalItem, EmpresaItem, UsuarioSucursal, SucursalFormData, CambiarEs
     MatCheckboxModule,
     ReactiveFormsModule
   ],
-  templateUrl: './info-sucursal.html',
-  styleUrl: './info-sucursal.scss'
+  templateUrl: './sucursal.html',
+  styleUrl: './sucursal.scss'
 })
-export class InfoSucursal implements OnInit {
+export class Sucursal implements OnInit {
   sucursales: SucursalItem[] = [];
   empresas: EmpresaItem[] = [];
   usuariosSucursal: UsuarioSucursal[] = [];

@@ -2,12 +2,13 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { UsuarioSucursal, EmpresaItem, CambiarEstadoRequest, CambiarEstadoResponse, EmpresaFormData } from "../models/empresa.model";
+import { environment } from "../environments/environment";
 
 @Injectable({providedIn: "root"})
 export class EmpresaService {
 
-    readonly DIRECCION_API = "http://localhost:8081/empresa";
-    
+    private readonly DIRECCION_API = `${environment.apiUrl}/empresa`;
+    //readonly DIRECCION_API = "http://localhost:8081/empresa";
 
     constructor(private httpClient: HttpClient) {}
 
