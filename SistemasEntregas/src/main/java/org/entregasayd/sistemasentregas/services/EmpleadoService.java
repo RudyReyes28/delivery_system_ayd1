@@ -18,4 +18,8 @@ public class EmpleadoService {
         return empleadoRepository.save(empleado);
     }
 
+    public Empleado findById(Long id){
+        return empleadoRepository.findById(id).orElse(null);
+    }
+
 }

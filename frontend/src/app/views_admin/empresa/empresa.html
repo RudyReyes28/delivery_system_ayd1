@@ -1,0 +1,325 @@
+<!-- empresa-usuarios.component.html -->
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Gestión de Empresas y Usuarios</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <!-- Botón para crear nueva empresa -->
+      <div class="create-button-section">
+        <button mat-raised-button color="primary" 
+                (click)="crearNuevaEmpresa()"
+                class="create-button">
+          <mat-icon>add</mat-icon>
+          Crear Empresa
+        </button>
+      </div>
+
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
+        <!-- Tab para Formulario de Empresa -->
+        <mat-tab label="{{ modoEdicion ? 'Editar Empresa' : 'Nueva Empresa' }}">
+          <div class="tab-content">
+            <div class="header-section">
+              <h3>{{ modoEdicion ? 'Editar Empresa' : 'Crear Nueva Empresa' }}</h3>
+              <mat-spinner *ngIf="guardandoEmpresa" diameter="30"></mat-spinner>
+            </div>
+            
+            <form [formGroup]="empresaForm" (ngSubmit)="guardarEmpresa()" class="empresa-form">
+              <div class="form-section">
+                <h4>Información de la Empresa</h4>
+                
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Tipo de Empresa</mat-label>
+                    <mat-select formControlName="tipoEmpresa" required>
+                      <mat-option value="COMERCIO_AFILIADO">Comercio Afiliado</mat-option>
+                      <mat-option value="EMPRESA_LOGISTICA">Empresa Logística</mat-option>
+                      <mat-option value="PROVEEDOR">Proveedor</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="empresaForm.get('tipoEmpresa')?.hasError('required')">
+                      El tipo de empresa es requerido
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Nombre Comercial</mat-label>
+                    <input matInput formControlName="nombreComercial" required>
+                    <mat-error *ngIf="empresaForm.get('nombreComercial')?.hasError('required')">
+                      El nombre comercial es requerido
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Razón Social</mat-label>
+                    <input matInput formControlName="razonSocial" required>
+                    <mat-error *ngIf="empresaForm.get('razonSocial')?.hasError('required')">
+                      La razón social es requerida
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>NIT</mat-label>
+                    <input matInput formControlName="nit" required>
+                    <mat-error *ngIf="empresaForm.get('nit')?.hasError('required')">
+                      El NIT es requerido
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Registro Mercantil</mat-label>
+                    <input matInput formControlName="registroMercantil" required>
+                    <mat-error *ngIf="empresaForm.get('registroMercantil')?.hasError('required')">
+                      El registro mercantil es requerido
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha de Constitución</mat-label>
+                    <input matInput type="date" formControlName="fechaConstitucion" required>
+                    <mat-error *ngIf="empresaForm.get('fechaConstitucion')?.hasError('required')">
+                      La fecha de constitución es requerida
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha de Afiliación</mat-label>
+                    <input matInput type="date" formControlName="fechaAfiliacion" required>
+                    <mat-error *ngIf="empresaForm.get('fechaAfiliacion')?.hasError('required')">
+                      La fecha de afiliación es requerida
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha de Vencimiento de Afiliación</mat-label>
+                    <input matInput type="date" formControlName="fechaVencimientoAfiliacion" required>
+                    <mat-error *ngIf="empresaForm.get('fechaVencimientoAfiliacion')?.hasError('required')">
+                      La fecha de vencimiento es requerida
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="form-section">
+                <h4>Información del Contacto</h4>
+                
+                <div class="usuario-selection">
+                  <mat-form-field appearance="outline" class="form-field full-width">
+                    <mat-label>Seleccionar Usuario</mat-label>
+                    <mat-select formControlName="idPersona" required>
+                      <mat-option *ngFor="let usuario of usuariosSucursal" [value]="usuario.idPersona">
+                        {{ usuario.nombreUsuario }} (ID: {{ usuario.idUsuario }})
+                      </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="empresaForm.get('idPersona')?.hasError('required')">
+                      Debe seleccionar un usuario
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Cargo</mat-label>
+                    <input matInput formControlName="cargo" required>
+                    <mat-error *ngIf="empresaForm.get('cargo')?.hasError('required')">
+                      El cargo es requerido
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha de Inicio</mat-label>
+                    <input matInput type="date" formControlName="fechaInicio" required>
+                    <mat-error *ngIf="empresaForm.get('fechaInicio')?.hasError('required')">
+                      La fecha de inicio es requerida
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha de Fin (Opcional)</mat-label>
+                    <input matInput type="date" formControlName="fechaFin">
+                  </mat-form-field>
+
+                  <div class="checkbox-field">
+                    <mat-checkbox formControlName="activo">
+                      Contacto Activo
+                    </mat-checkbox>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button mat-button type="button" color="warn" 
+                        (click)="cancelarFormulario()"
+                        [disabled]="guardandoEmpresa">
+                  Cancelar
+                </button>
+                <button mat-raised-button type="submit" color="primary" 
+                        [disabled]="empresaForm.invalid || guardandoEmpresa">
+                  <mat-spinner *ngIf="guardandoEmpresa" diameter="20" style="margin-right: 8px;"></mat-spinner>
+                  {{ modoEdicion ? 'Actualizar Empresa' : 'Crear Empresa' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+        
+        <!-- Tab para Lista de Empresas -->
+        <mat-tab label="Lista de Empresas">
+          <div class="tab-content">
+            <div class="header-section">
+              <h3>Lista de Empresas</h3>
+              <mat-spinner *ngIf="loadingEmpresas" diameter="30"></mat-spinner>
+            </div>
+            
+            <div *ngIf="!loadingEmpresas && empresas.length > 0" class="items-container">
+              <div *ngFor="let item of empresas" class="list-item empresa-item">
+                <div class="item-content">
+                  <!-- Información básica siempre visible -->
+                  <div class="basic-info">
+                    <div class="primary-text">
+                      <strong>{{ item.empresa.nombreComercial }}</strong>
+                      <mat-chip class="status-chip" 
+                               [ngClass]="{'active': item.empresa.estado === 'ACTIVA', 'suspended': item.empresa.estado === 'SUSPENDIDA', 'inactive': item.empresa.estado === 'INACTIVA', 'morosa': item.empresa.estado === 'MOROSA'}">
+                        {{ item.empresa.estado }}
+                      </mat-chip>
+                    </div>
+                    <div class="secondary-text">
+                      NIT: {{ item.empresa.nit }} | Tipo: {{ item.empresa.tipoEmpresa }}
+                    </div>
+                    <div class="secondary-text" *ngIf="item.empresa.contacto">
+                      Contacto: {{ item.empresa.contacto.cargo }}
+                    </div>
+                    <div class="secondary-text" *ngIf="!item.empresa.contacto">
+                      Sin contacto asignado
+                    </div>
+                  </div>
+                  
+                  <!-- Información expandible -->
+                  <div class="expanded-info" *ngIf="item.expanded">
+                    <mat-divider></mat-divider>                    
+
+                    <!-- Información de la empresa -->
+                    <div class="section-title">
+                      <mat-icon>business</mat-icon>
+                      Información de la Empresa
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Razón Social:</span>
+                        <span class="value">{{ item.empresa.razonSocial }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Registro Mercantil:</span>
+                        <span class="value">{{ item.empresa.registroMercantil }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Fecha Constitución:</span>
+                        <span class="value">{{ item.empresa.fechaConstitucion | date:'dd/MM/yyyy' }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Fecha Afiliación:</span>
+                        <span class="value">{{ item.empresa.fechaAfiliacion | date:'dd/MM/yyyy' }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Vence Afiliación:</span>
+                        <span class="value">{{ item.empresa.fechaVencimientoAfiliacion | date:'dd/MM/yyyy' }}</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Información del contacto -->
+                    <div class="section-title" *ngIf="item.empresa.contacto">
+                      <mat-icon>contact_phone</mat-icon>
+                      Información del Contacto
+                    </div>
+                    <div class="details-grid" *ngIf="item.empresa.contacto">
+                      <div class="detail-item">
+                        <span class="label">Cargo:</span>
+                        <span class="value">{{ item.empresa.contacto.cargo }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Fecha Inicio:</span>
+                        <span class="value">{{ item.empresa.contacto.fechaInicio | date:'dd/MM/yyyy' }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Fecha Fin:</span>
+                        <span class="value">{{ item.empresa.contacto.fechaFin | date:'dd/MM/yyyy' }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Activo:</span>
+                        <span class="value">
+                          <mat-icon class="status-icon" [ngClass]="{'active': item.empresa.contacto.activo}">
+                            {{ item.empresa.contacto.activo ? 'check_circle' : 'cancel' }}
+                          </mat-icon>
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <!-- Mensaje cuando no hay contacto -->
+                    <div class="no-contact-info" *ngIf="!item.empresa.contacto">
+                      <div class="section-title">
+                        <mat-icon>contact_phone_off</mat-icon>
+                        Sin información de contacto
+                      </div>
+                      <p class="no-contact-message">Esta empresa no tiene un contacto asignado actualmente.</p>
+                    </div>
+                  </div>
+                  
+                  <!-- Botones de acción -->
+                  <div class="action-buttons">
+                    <!-- Sección para cambiar estado -->
+                    <div class="estado-section">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Estado de la Empresa</mat-label>
+                        <mat-select [value]="item.empresa.estado" 
+                                   (selectionChange)="onEstadoChange(item, $event.value)"
+                                   [disabled]="item.actualizandoEstado">
+                          <mat-option value="ACTIVA">Activa</mat-option>
+                          <mat-option value="INACTIVA">Inactiva</mat-option>
+                          <mat-option value="SUSPENDIDA">Suspendida</mat-option>
+                          <mat-option value="MOROSA">Morosa</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      
+                      <!-- Spinner para indicar que se está actualizando -->
+                      <mat-spinner *ngIf="item.actualizandoEstado" diameter="20"></mat-spinner>
+                    </div>
+                    
+                    <mat-divider></mat-divider>
+
+                    <div class="button-group">
+                      <button mat-button color="primary" 
+                              (click)="toggleExpanded('empresa', item.empresa.idEmpresa)">
+                        {{ item.expanded ? 'Ver Menos' : 'Ver Más' }}
+                      </button>
+                      <button mat-raised-button color="accent" 
+                              (click)="editarEmpresa(item.empresa)">
+                        <mat-icon>edit</mat-icon>
+                        Editar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Mensaje cuando no hay datos -->
+            <div *ngIf="!loadingEmpresas && empresas.length === 0" class="no-data">
+              <mat-icon>business_center</mat-icon>
+              <p>No se encontraron empresas</p>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

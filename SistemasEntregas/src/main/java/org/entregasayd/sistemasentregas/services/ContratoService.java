@@ -112,6 +112,15 @@ public class ContratoService {
         return repository.findAll();
     }
 
+    /**
+     * Lista todos los contratos
+     *
+     * @return
+     */
+    public List<ContratoResponseDTO> getAll(){
+        return repository.findAll().stream().map(contratoMap::toDTO).collect(Collectors.toList());
+    }
+
     public List<ContratoResponseDTO> contratosPorEmpleado(Long idEmpleado){
         //return repository.findByEmpleado_IdEmpleado(idEmpleado).stream().map(contrato -> contratoMap.toDTO(contrato)).collect(Collectors.toList());
         return repository.findByEmpleado_IdEmpleado(idEmpleado).stream().map(contratoMap::toDTO).collect(Collectors.toList());
