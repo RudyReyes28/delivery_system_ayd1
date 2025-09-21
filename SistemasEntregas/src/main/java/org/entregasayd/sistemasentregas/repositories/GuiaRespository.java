@@ -7,4 +7,6 @@ import java.util.ArrayList;
 
 public interface GuiaRespository extends CrudRepository<Guia, Long> {
     ArrayList<Guia> findBySucursalOrigenIdSucursal(Long sucursal);
+
+    Guia findByNumeroGuia(String numeroGuia);
 }
