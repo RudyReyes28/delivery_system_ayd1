@@ -38,6 +38,7 @@ export class BarraNavegacion {
     { icon: 'store', label: 'Gestión Surcusales', route: '/sucursal' },
     { icon: 'grade', label: 'Fidelización', route: '/fidelizacion' },
     { icon: 'settings', label: 'General', route: 'general-sucursal' },
+    { icon: 'local_shipping', label: 'Gestión Guías', route: '/guia-sucursal' },
     { icon: 'logout', label: 'Cerrar Sesión', route: '/logout' }
   ];
 

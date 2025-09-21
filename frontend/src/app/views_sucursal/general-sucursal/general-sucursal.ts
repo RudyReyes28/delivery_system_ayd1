@@ -32,7 +32,7 @@ export class GeneralSucursal implements OnInit, OnDestroy {
   empresaFidelizacion: Empresa | null = null;
   loading = true;
   error = '';
-  idUsuario = 1;
+  idUsuario = Number(sessionStorage.getItem('idUsuario'));
 
   private destroy$ = new Subject<void>();
 

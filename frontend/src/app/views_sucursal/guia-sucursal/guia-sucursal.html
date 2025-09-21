@@ -1,0 +1,787 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Gestión de Guías</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <!-- Botón para crear nueva guía -->
+      <div class="create-button-section">
+        <button mat-raised-button color="primary" 
+                (click)="crearNuevaGuia()"
+                class="create-button">
+          <mat-icon>add</mat-icon>
+          Crear Guía
+        </button>
+      </div>
+
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
+        <!-- Tab para Formularios de Guía con diseño mejorado -->
+        <mat-tab label="Crear Guía">
+          <div class="tab-content">
+            <div class="header-section">
+              <h3>Crear Nueva Guía</h3>
+              <mat-spinner *ngIf="guardandoGuia" diameter="30"></mat-spinner>
+            </div>
+
+            <!-- Nuevo diseño con botones laterales y formulario -->
+            <div class="crear-guia-layout">
+              <!-- Panel izquierdo con botones de opciones -->
+              <div class="opciones-panel">
+                <h4>Tipo de Cliente</h4>
+                
+                <button mat-raised-button 
+                        [color]="tipoClienteSeleccionado === 'nuevo' ? 'primary' : ''"
+                        [class.selected]="tipoClienteSeleccionado === 'nuevo'"
+                        class="opcion-button"
+                        (click)="seleccionarTipoCliente('nuevo')">
+                  <mat-icon>person_add</mat-icon>
+                  <div class="button-content">
+                    <span class="button-title">Cliente Nuevo</span>
+                    <span class="button-description">Registrar nuevo cliente con dirección</span>
+                  </div>
+                </button>
+
+                <button mat-raised-button 
+                        [color]="tipoClienteSeleccionado === 'existente' ? 'primary' : ''"
+                        [class.selected]="tipoClienteSeleccionado === 'existente'"
+                        class="opcion-button"
+                        (click)="seleccionarTipoCliente('existente')">
+                  <mat-icon>person</mat-icon>
+                  <div class="button-content">
+                    <span class="button-title">Cliente Existente</span>
+                    <span class="button-description">Seleccionar cliente registrado</span>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Panel derecho con formulario -->
+              <div class="formulario-panel">
+                <!-- Mensaje cuando no se ha seleccionado opción -->
+                <div *ngIf="!tipoClienteSeleccionado" class="no-selection">
+                  <mat-icon>arrow_back</mat-icon>
+                  <h4>Selecciona el tipo de cliente</h4>
+                  <p>Elige una opción del panel izquierdo para comenzar a crear la guía</p>
+                </div>
+                <!-- Formulario para Cliente Nuevo -->
+                <div *ngIf="tipoClienteSeleccionado === 'nuevo'" class="formulario-container">
+                  <form [formGroup]="guiaClienteNuevoForm" (ngSubmit)="guardarGuiaClienteNuevo()" class="empresa-form">
+                    
+                    <!-- Información del Cliente -->
+                    <div class="form-section">
+                      <h4>Información del Cliente</h4>
+                      
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Nombre Completo</mat-label>
+                          <input matInput formControlName="nombreCompleto" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('nombreCompleto')?.hasError('required')">
+                            El nombre completo es requerido
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Teléfono</mat-label>
+                          <input matInput formControlName="telefono" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('telefono')?.hasError('required')">
+                            El teléfono es requerido
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Email</mat-label>
+                          <input matInput type="email" formControlName="email" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('email')?.hasError('required')">
+                            El email es requerido
+                          </mat-error>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('email')?.hasError('email')">
+                            El email debe tener un formato válido
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Persona que Recibe</mat-label>
+                          <input matInput formControlName="personaRecibe" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('personaRecibe')?.hasError('required')">
+                            La persona que recibe es requerida
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Horario Preferido Inicio</mat-label>
+                          <input matInput type="time" formControlName="horarioPreferidoInicio" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('horarioPreferidoInicio')?.hasError('required')">
+                            El horario de inicio es requerido
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Horario Preferido Fin</mat-label>
+                          <input matInput type="time" formControlName="horarioPreferidoFin" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('horarioPreferidoFin')?.hasError('required')">
+                            El horario de fin es requerido
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field full-width">
+                          <mat-label>Instrucciones de Entrega</mat-label>
+                          <textarea matInput formControlName="instruccionesEntrega" rows="3"></textarea>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <div class="checkbox-group">
+                          <mat-checkbox formControlName="aceptaEntregasVecinos" class="checkbox-field">
+                            Acepta Entregas a Vecinos
+                          </mat-checkbox>
+                          <mat-checkbox formControlName="requiereIdentificacion" class="checkbox-field">
+                            Requiere Identificación
+                          </mat-checkbox>
+                        </div>
+                      </div>
+                    </div>
+
+                    <mat-divider></mat-divider>
+
+                    <!-- Información de Dirección de Entrega -->
+                    <div class="form-section">
+                      <h4>Dirección de Entrega</h4>
+                      
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>País</mat-label>
+                          <input matInput formControlName="pais" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('pais')?.hasError('required')">
+                            El país es requerido
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Departamento</mat-label>
+                          <input matInput formControlName="departamento" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('departamento')?.hasError('required')">
+                            El departamento es requerido
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Municipio</mat-label>
+                          <input matInput formControlName="municipio" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('municipio')?.hasError('required')">
+                            El municipio es requerido
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Código Postal</mat-label>
+                          <input matInput formControlName="codigoPostal" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('codigoPostal')?.hasError('required')">
+                            El código postal es requerido
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Alias de Dirección</mat-label>
+                          <input matInput formControlName="aliasDireccion" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('aliasDireccion')?.hasError('required')">
+                            El alias de dirección es requerido
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Punto de Referencia</mat-label>
+                          <input matInput formControlName="puntoReferencia" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('puntoReferencia')?.hasError('required')">
+                            El punto de referencia es requerido
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field full-width">
+                          <mat-label>Referencias</mat-label>
+                          <textarea matInput formControlName="referencias" required rows="3"></textarea>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('referencias')?.hasError('required')">
+                            Las referencias son requeridas
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field full-width">
+                          <mat-label>Instrucciones Específicas</mat-label>
+                          <textarea matInput formControlName="instruccionesEspecificas" rows="3"></textarea>
+                        </mat-form-field>
+                      </div>
+                    </div>
+
+                    <mat-divider></mat-divider>
+                    <!-- Información del Servicio -->
+                    <div class="form-section">
+                      <h4>Información del Servicio</h4>
+                      
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Tipo de Servicio</mat-label>
+                          <mat-select formControlName="idTipoServicio" required (selectionChange)="onTipoServicioChange($event.value)">
+                            <mat-option *ngFor="let tipo of tiposServicio" [value]="tipo.idTipoServicio">
+                              {{ tipo.nombreServicio }} - {{ tipo.codigoServicio }}
+                            </mat-option>
+                          </mat-select>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('idTipoServicio')?.hasError('required')">
+                            El tipo de servicio es requerido
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Prioridad</mat-label>
+                          <mat-select formControlName="prioridad" required>
+                            <mat-option value="NORMAL">Normal</mat-option>
+                            <mat-option value="ALTA">Alta</mat-option>
+                            <mat-option value="URGENTE">Urgente</mat-option>
+                          </mat-select>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('prioridad')?.hasError('required')">
+                            La prioridad es requerida
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <!-- Información del Tipo de Servicio Seleccionado -->
+                      <div *ngIf="tipoServicioSeleccionado" class="service-info">
+                        <div class="details-grid">
+                          <div class="detail-item">
+                            <span class="label">Descripción:</span>
+                            <span class="value">{{ tipoServicioSeleccionado.descripcion }}</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Tiempo de Entrega:</span>
+                            <span class="value">{{ tipoServicioSeleccionado.tiempoEntregaHoras }} horas</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Precio Base:</span>
+                            <span class="value">Q{{ tipoServicioSeleccionado.precioBase | number:'1.2-2' }}</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Peso Máximo:</span>
+                            <span class="value">{{ tipoServicioSeleccionado.pesoMaximoKg }} kg</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Volumen Máximo:</span>
+                            <span class="value">{{ tipoServicioSeleccionado.volumenMaximoM3 }} m³</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Fecha Programada Recolección</mat-label>
+                          <input matInput type="date" formControlName="fechaProgramadaRecoleccion" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('fechaProgramadaRecoleccion')?.hasError('required')">
+                            La fecha de recolección es requerida
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Peso (KG)</mat-label>
+                          <input matInput type="number" step="0.01" formControlName="pesoKG" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('pesoKG')?.hasError('required')">
+                            El peso es requerido
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Valor Declarado</mat-label>
+                          <input matInput type="number" step="0.01" formControlName="valorDeclarado" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('valorDeclarado')?.hasError('required')">
+                            El valor declarado es requerido
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Dimensiones</mat-label>
+                          <input matInput formControlName="dimensiones" placeholder="Largo x Ancho x Alto" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('dimensiones')?.hasError('required')">
+                            Las dimensiones son requeridas
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field full-width">
+                          <mat-label>Descripción del Contenido</mat-label>
+                          <textarea matInput formControlName="descripcionContenido" required rows="3"></textarea>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('descripcionContenido')?.hasError('required')">
+                            La descripción del contenido es requerida
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field full-width">
+                          <mat-label>Observaciones</mat-label>
+                          <textarea matInput formControlName="observaciones" rows="3"></textarea>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <div class="checkbox-field">
+                          <mat-checkbox formControlName="esFragil">
+                            Es Frágil
+                          </mat-checkbox>
+                        </div>
+                      </div>
+                    </div>
+
+                    <mat-divider></mat-divider>
+
+                    <!-- Información de Facturación -->
+                    <div class="form-section">
+                      <h4>Información de Facturación</h4>
+                      
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Subtotal</mat-label>
+                          <input matInput type="number" step="0.01" formControlName="subtotal" required>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('subtotal')?.hasError('required')">
+                            El subtotal es requerido
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Descuentos</mat-label>
+                          <input matInput type="number" step="0.01" formControlName="descuentos">
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Recargos</mat-label>
+                          <input matInput type="number" step="0.01" formControlName="recargos">
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Forma de Pago</mat-label>
+                          <mat-select formControlName="formaPago" required>
+                            <mat-option value="CONTADO">Contado</mat-option>
+                            <mat-option value="CREDITO">Crédito</mat-option>
+                            <mat-option value="CONTRA_ENTREGA">Contra Entrega</mat-option>
+                          </mat-select>
+                          <mat-error *ngIf="guiaClienteNuevoForm.get('formaPago')?.hasError('required')">
+                            La forma de pago es requerida
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+                    </div>
+
+                    <div class="form-actions">
+                      <button mat-button type="button" color="warn" 
+                              (click)="cancelarFormulario()"
+                              [disabled]="guardandoGuia">
+                        Cancelar
+                      </button>
+                      <button mat-raised-button type="submit" color="primary" 
+                              [disabled]="guiaClienteNuevoForm.invalid || guardandoGuia">
+                        <mat-spinner *ngIf="guardandoGuia" diameter="20" style="margin-right: 8px;"></mat-spinner>
+                        Crear Guía
+                      </button>
+                    </div>
+                  </form>
+                </div>
+                <!-- Formulario para Cliente Existente -->
+                <div *ngIf="tipoClienteSeleccionado === 'existente'" class="formulario-container">
+                  <form [formGroup]="guiaClienteExistenteForm" (ngSubmit)="guardarGuiaClienteExistente()" class="empresa-form">
+                    
+                    <!-- Selección del Cliente -->
+                    <div class="form-section">
+                      <h4>Selección del Cliente</h4>
+                      
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field full-width">
+                          <mat-label>Cliente</mat-label>
+                          <mat-select formControlName="idCliente" required>
+                            <mat-option *ngFor="let cliente of clientes" [value]="cliente.idCliente">
+                              {{ cliente.nombreCompleto }} ({{ cliente.codigoCliente }})
+                            </mat-option>
+                          </mat-select>
+                          <mat-error *ngIf="guiaClienteExistenteForm.get('idCliente')?.hasError('required')">
+                            El cliente es requerido
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+                    </div>
+
+                    <mat-divider></mat-divider>
+
+                    <!-- Información del Servicio -->
+                    <div class="form-section">
+                      <h4>Información del Servicio</h4>
+                      
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Tipo de Servicio</mat-label>
+                          <mat-select formControlName="idTipoServicio" required (selectionChange)="onTipoServicioChangeExistente($event.value)">
+                            <mat-option *ngFor="let tipo of tiposServicio" [value]="tipo.idTipoServicio">
+                              {{ tipo.nombreServicio }} - {{ tipo.codigoServicio }}
+                            </mat-option>
+                          </mat-select>
+                          <mat-error *ngIf="guiaClienteExistenteForm.get('idTipoServicio')?.hasError('required')">
+                            El tipo de servicio es requerido
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Prioridad</mat-label>
+                          <mat-select formControlName="prioridad" required>
+                            <mat-option value="NORMAL">Normal</mat-option>
+                            <mat-option value="ALTA">Alta</mat-option>
+                            <mat-option value="URGENTE">Urgente</mat-option>
+                          </mat-select>
+                          <mat-error *ngIf="guiaClienteExistenteForm.get('prioridad')?.hasError('required')">
+                            La prioridad es requerida
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <!-- Información del Tipo de Servicio Seleccionado -->
+                      <div *ngIf="tipoServicioSeleccionadoExistente" class="service-info">
+                        <div class="details-grid">
+                          <div class="detail-item">
+                            <span class="label">Descripción:</span>
+                            <span class="value">{{ tipoServicioSeleccionadoExistente.descripcion }}</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Tiempo de Entrega:</span>
+                            <span class="value">{{ tipoServicioSeleccionadoExistente.tiempoEntregaHoras }} horas</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Precio Base:</span>
+                            <span class="value">Q{{ tipoServicioSeleccionadoExistente.precioBase | number:'1.2-2' }}</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Peso Máximo:</span>
+                            <span class="value">{{ tipoServicioSeleccionadoExistente.pesoMaximoKg }} kg</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Volumen Máximo:</span>
+                            <span class="value">{{ tipoServicioSeleccionadoExistente.volumenMaximoM3 }} m³</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Fecha Programada Recolección</mat-label>
+                          <input matInput type="date" formControlName="fechaProgramadaRecoleccion" required>
+                          <mat-error *ngIf="guiaClienteExistenteForm.get('fechaProgramadaRecoleccion')?.hasError('required')">
+                            La fecha de recolección es requerida
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Peso (KG)</mat-label>
+                          <input matInput type="number" step="0.01" formControlName="pesoKG" required>
+                          <mat-error *ngIf="guiaClienteExistenteForm.get('pesoKG')?.hasError('required')">
+                            El peso es requerido
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Valor Declarado</mat-label>
+                          <input matInput type="number" step="0.01" formControlName="valorDeclarado" required>
+                          <mat-error *ngIf="guiaClienteExistenteForm.get('valorDeclarado')?.hasError('required')">
+                            El valor declarado es requerido
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Dimensiones</mat-label>
+                          <input matInput formControlName="dimensiones" placeholder="Largo x Ancho x Alto" required>
+                          <mat-error *ngIf="guiaClienteExistenteForm.get('dimensiones')?.hasError('required')">
+                            Las dimensiones son requeridas
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field full-width">
+                          <mat-label>Descripción del Contenido</mat-label>
+                          <textarea matInput formControlName="descripcionContenido" required rows="3"></textarea>
+                          <mat-error *ngIf="guiaClienteExistenteForm.get('descripcionContenido')?.hasError('required')">
+                            La descripción del contenido es requerida
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field full-width">
+                          <mat-label>Observaciones</mat-label>
+                          <textarea matInput formControlName="observaciones" rows="3"></textarea>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <div class="checkbox-field">
+                          <mat-checkbox formControlName="esFragil">
+                            Es Frágil
+                          </mat-checkbox>
+                        </div>
+                      </div>
+                    </div>
+
+                    <mat-divider></mat-divider>
+
+                    <!-- Información de Facturación -->
+                    <div class="form-section">
+                      <h4>Información de Facturación</h4>
+                      
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Subtotal</mat-label>
+                          <input matInput type="number" step="0.01" formControlName="subtotal" required>
+                          <mat-error *ngIf="guiaClienteExistenteForm.get('subtotal')?.hasError('required')">
+                            El subtotal es requerido
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Descuentos</mat-label>
+                          <input matInput type="number" step="0.01" formControlName="descuentos">
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Recargos</mat-label>
+                          <input matInput type="number" step="0.01" formControlName="recargos">
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-field">
+                          <mat-label>Forma de Pago</mat-label>
+                          <mat-select formControlName="formaPago" required>
+                            <mat-option value="CONTADO">Contado</mat-option>
+                            <mat-option value="CREDITO">Crédito</mat-option>
+                            <mat-option value="CONTRA_ENTREGA">Contra Entrega</mat-option>
+                          </mat-select>
+                          <mat-error *ngIf="guiaClienteExistenteForm.get('formaPago')?.hasError('required')">
+                            La forma de pago es requerida
+                          </mat-error>
+                        </mat-form-field>
+                      </div>
+                    </div>
+
+                    <div class="form-actions">
+                      <button mat-button type="button" color="warn" 
+                              (click)="cancelarFormulario()"
+                              [disabled]="guardandoGuia">
+                        Cancelar
+                      </button>
+                      <button mat-raised-button type="submit" color="primary" 
+                              [disabled]="guiaClienteExistenteForm.invalid || guardandoGuia">
+                        <mat-spinner *ngIf="guardandoGuia" diameter="20" style="margin-right: 8px;"></mat-spinner>
+                        Crear Guía
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        <!-- Tab para Lista de Guías -->
+        <mat-tab label="Lista de Guías">
+          <div class="tab-content">
+            <div class="header-section">
+              <h3>Lista de Guías</h3>
+              <mat-spinner *ngIf="loadingGuias" diameter="30"></mat-spinner>
+            </div>
+            
+            <div *ngIf="!loadingGuias && guias.length > 0" class="items-container">
+              <div *ngFor="let item of guias" class="list-item empresa-item">
+                <div class="item-content">
+                  <!-- Información básica siempre visible -->
+                  <div class="basic-info">
+                    <div class="primary-text">
+                      <strong>{{ item.guia.numeroGuia }}</strong>
+                      <mat-chip class="status-chip" 
+                               [ngClass]="{'normal': item.guia.prioridad === 'NORMAL', 'alta': item.guia.prioridad === 'ALTA', 'urgente': item.guia.prioridad === 'URGENTE'}">
+                        {{ item.guia.prioridad }}
+                      </mat-chip>
+                    </div>
+                    <div class="secondary-text">
+                      Cliente: {{ item.guia.cliente.nombreCompleto }} | Teléfono: {{ item.guia.cliente.telefono }}
+                    </div>
+                    <div class="secondary-text">
+                      Estado: {{ item.guia.estadoActual }} | Peso: {{ item.guia.pesoKg }} kg
+                    </div>
+                    <div class="secondary-text">
+                      Total: Q{{ item.guia.total | number:'1.2-2' }} | Intentos: {{ item.guia.intentosEntrega }}
+                    </div>
+                  </div>
+                  
+                  <!-- Información expandible -->
+                  <div class="expanded-info" *ngIf="item.expanded">
+                    <mat-divider></mat-divider>                    
+
+                    <!-- Información de la guía -->
+                    <div class="section-title">
+                      <mat-icon>local_shipping</mat-icon>
+                      Información de la Guía
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Número de Guía:</span>
+                        <span class="value">{{ item.guia.numeroGuia }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Código Interno:</span>
+                        <span class="value">{{ item.guia.codigoInterno }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Fecha Creación:</span>
+                        <span class="value">{{ item.guia.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Fecha Recolección Real:</span>
+                        <span class="value">{{ item.guia.fechaRecoleccionReal | date:'dd/MM/yyyy HH:mm' }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Descripción:</span>
+                        <span class="value">{{ item.guia.descripcionContenido }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Dimensiones:</span>
+                        <span class="value">{{ item.guia.dimensiones }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Valor Declarado:</span>
+                        <span class="value">Q{{ item.guia.valorDeclarado | number:'1.2-2' }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Observaciones:</span>
+                        <span class="value">{{ item.guia.observaciones || 'Sin observaciones' }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Información del cliente -->
+                    <div class="section-title">
+                      <mat-icon>person</mat-icon>
+                      Información del Cliente
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Nombre:</span>
+                        <span class="value">{{ item.guia.cliente.nombreCompleto }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Email:</span>
+                        <span class="value">{{ item.guia.cliente.email }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Teléfono:</span>
+                        <span class="value">{{ item.guia.cliente.telefono }}</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Información de dirección de entrega -->
+                    <div class="section-title">
+                      <mat-icon>location_on</mat-icon>
+                      Dirección de Entrega
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">País:</span>
+                        <span class="value">{{ item.guia.direccionEntrega.pais }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Departamento:</span>
+                        <span class="value">{{ item.guia.direccionEntrega.departamento }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Municipio:</span>
+                        <span class="value">{{ item.guia.direccionEntrega.municipio }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Código Postal:</span>
+                        <span class="value">{{ item.guia.direccionEntrega.codigoPostal }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Referencias:</span>
+                        <span class="value">{{ item.guia.direccionEntrega.referencias }}</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Historial de estados -->
+                    <div class="section-title">
+                      <mat-icon>timeline</mat-icon>
+                      Historial de Estados
+                    </div>
+                    <div *ngIf="item.guia.estadosEntregas && item.guia.estadosEntregas.length > 0">
+                      <div *ngFor="let estado of item.guia.estadosEntregas" class="staff-item">
+                        <div class="details-grid">
+                          <div class="detail-item">
+                            <span class="label">Estado Anterior:</span>
+                            <span class="value">{{ estado.estadoAnterior }}</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Estado Nuevo:</span>
+                            <span class="value">{{ estado.estadoNuevo }}</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Fecha Cambio:</span>
+                            <span class="value">{{ estado.fechaCambio | date:'dd/MM/yyyy HH:mm' }}</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Motivo:</span>
+                            <span class="value">{{ estado.motivoCambio }}</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Comentarios:</span>
+                            <span class="value">{{ estado.comentarios || 'Sin comentarios' }}</span>
+                          </div>
+                        </div>
+                        <mat-divider></mat-divider>
+                      </div>
+                    </div>
+                    <div *ngIf="!item.guia.estadosEntregas || item.guia.estadosEntregas.length === 0" class="no-contact-info">
+                      <p class="no-contact-message">Esta guía no tiene historial de estados disponible.</p>
+                    </div>
+                  </div>
+                  
+                  <!-- Botones de acción -->
+                  <div class="action-buttons">
+                    <div class="button-group">
+                      <button mat-button color="primary" 
+                              (click)="toggleExpanded(item.guia.idGuia)">
+                        {{ item.expanded ? 'Ver Menos' : 'Ver Más' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Mensaje cuando no hay datos -->
+            <div *ngIf="!loadingGuias && guias.length === 0" class="no-data">
+              <mat-icon>local_shipping</mat-icon>
+              <p>No se encontraron guías</p>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>
