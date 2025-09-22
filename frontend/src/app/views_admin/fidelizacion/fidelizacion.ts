@@ -76,7 +76,7 @@ export class Fidelizacion implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error al cargar empresas:', error);
-          this.mostrarMensaje('Error al cargar las empresas');
+          this.mostrarMensaje("Error al cargar las empresas", "error-snackbar");
           this.loading = false;
         }
       });
@@ -89,7 +89,7 @@ export class Fidelizacion implements OnInit, OnDestroy {
 
   asignarFidelizacion(empresa: Empresa): void {
     if (!this.fidelizacionService.puedeAsignar(empresa)) {
-      this.mostrarMensaje('Esta empresa ya tiene un programa de fidelización asignado');
+      this.mostrarMensaje("Esta empresa ya tiene un programa de fidelización asignado", "info-snackbar");
       return;
     }
 
@@ -101,7 +101,7 @@ export class Fidelizacion implements OnInit, OnDestroy {
 
   cambiarFidelizacion(empresa: Empresa): void {
     if (!this.fidelizacionService.puedeCambiar(empresa)) {
-      this.mostrarMensaje('Esta empresa no tiene un programa de fidelización para cambiar');
+      this.mostrarMensaje("Esta empresa no tiene un programa de fidelización para cambiar", "info-snackbar");
       return;
     }
 
@@ -113,7 +113,7 @@ export class Fidelizacion implements OnInit, OnDestroy {
 
   confirmarAccion(): void {
     if (!this.empresaSeleccionada || !this.nivelSeleccionado) {
-      this.mostrarMensaje('Por favor selecciona un nivel de fidelización');
+      this.mostrarMensaje("Por favor selecciona un nivel de fidelización", "info-snackbar");
       return;
     }
 
@@ -121,7 +121,7 @@ export class Fidelizacion implements OnInit, OnDestroy {
       this.empresaSeleccionada.idEmpresa, 
       this.nivelSeleccionado
     )) {
-      this.mostrarMensaje('Datos inválidos para la operación');
+      this.mostrarMensaje("Datos inválidos para la operación", "warning-snackbar");
       return;
     }
 
@@ -138,16 +138,15 @@ export class Fidelizacion implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           const mensaje = this.fidelizacionService.generarMensajeResultado(response, this.accionActual);
-          this.mostrarMensaje(mensaje, 8000);
-          this.cargarEmpresas(); // Recargar lista
+          this.mostrarMensaje(mensaje, "success-snackbar");
+          this.cargarEmpresas();
           this.cancelarSeleccion();
           this.procesandoAccion = false;
           this.procesando = null;
         },
         error: (error) => {
-          console.error('Error en la operación:', error);
           const accionTexto = this.accionActual === 'asignar' ? 'asignar' : 'cambiar';
-          this.mostrarMensaje(`Error al ${accionTexto} fidelización`);
+          this.mostrarMensaje("Error al realizar la Fidelización", "error-snackbar");
           this.procesandoAccion = false;
           this.procesando = null;
         }
@@ -166,61 +165,40 @@ export class Fidelizacion implements OnInit, OnDestroy {
     this.empresaDetalleSeleccionada = null;
   }
 
-  /**
-   * Verifica si una empresa puede asignar programa usando el servicio
-   */
   puedeAsignar(empresa: Empresa): boolean {
     return this.fidelizacionService.puedeAsignar(empresa);
   }
 
-  /**
-   * Verifica si una empresa puede cambiar nivel usando el servicio
-   */
   puedeCambiar(empresa: Empresa): boolean {
     return this.fidelizacionService.puedeCambiar(empresa);
   }
 
-  /**
-   * Obtiene el estado del programa usando el servicio
-   */
   obtenerEstadoPrograma(empresa: Empresa): string {
     return this.fidelizacionService.obtenerEstadoPrograma(empresa);
   }
 
-  /**
-   * Formatea moneda usando el servicio
-   */
   formatearMoneda(cantidad: number): string {
     return this.fidelizacionService.formatearMoneda(cantidad);
   }
 
-  /**
-   * Formatea fecha usando el servicio
-   */
   formatearFecha(fecha: string): string {
     return this.fidelizacionService.formatearFecha(fecha);
   }
 
-  /**
-   * Obtiene nombre del mes usando el servicio
-   */
   obtenerNombreMes(mes: number): string {
     return this.fidelizacionService.obtenerNombreMes(mes);
   }
 
-  /**
-   * Reintenta la carga de datos
-   */
   reintentar(): void {
     this.cargarEmpresas();
   }
 
-  private mostrarMensaje(mensaje: string, duration = 4000): void {
+  private mostrarMensaje(mensaje: string, tipo: string): void {
     this.snackBar.open(mensaje, 'Cerrar', {
-      duration: duration,
+      duration: 3000,
+      panelClass: [tipo],
       horizontalPosition: 'center',
-      verticalPosition: 'top',
-      panelClass: ['custom-snackbar']
+      verticalPosition: 'top'
     });
   }
 }

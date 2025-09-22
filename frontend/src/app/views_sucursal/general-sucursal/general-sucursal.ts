@@ -3,6 +3,7 @@ import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { MatChip } from '@angular/material/chips';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -36,7 +37,7 @@ export class GeneralSucursal implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private empresaService: EmpresaService) {}
+  constructor(private empresaService: EmpresaService, private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
     this.cargarDatos();
@@ -60,11 +61,19 @@ export class GeneralSucursal implements OnInit, OnDestroy {
           this.loading = false;
         },
         error: (error) => {
-          this.error = 'Error al cargar la información de la empresa';
+          this.mostrarMensaje(error.error?.message || "Error al cargar la información de la empresa", "error-snackbar");
           this.loading = false;
-          console.error('Error:', error);
         }
       });
+  }
+
+  private mostrarMensaje(mensaje: string, tipo: string): void {
+    this.snackBar.open(mensaje, 'Cerrar', {
+      duration: 3000,
+      panelClass: [tipo],
+      horizontalPosition: 'center',
+      verticalPosition: 'top'
+    });
   }
 
   formatearDiasOperacion(dias: string): string {

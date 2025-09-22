@@ -46,8 +46,8 @@ export class IniciarSesion implements OnInit {
   mostrarDialogToken = false;
   isVerificandoToken = false;
   isReenviandoCodigo = false;
-  usuarioActual = '';
-
+  nombreRolActual: string = "";
+  
   constructor(
     private formBuilder: FormBuilder, 
     private router: Router, 
@@ -62,7 +62,6 @@ export class IniciarSesion implements OnInit {
     this.mensajeError = '';
   }
 
-  // Especificaciones de los formularios
   private createLoginForm(): FormGroup {
     return this.formBuilder.group({
       username: ['', [Validators.required]],
@@ -90,7 +89,6 @@ export class IniciarSesion implements OnInit {
         next: (response) => {
           if (!response.autenticacion.autenticacion) {
             this.guardarInformacionUsuario(response,true);
-            this.router.navigate(['/login']);
           } else {
             this.guardarInformacionUsuario(response,false);
             this.mostrarDialogToken = true;
@@ -103,7 +101,7 @@ export class IniciarSesion implements OnInit {
       this.isLoading = false;
     } else {
       this.marcarToqueDelFormulario();
-      this.mostrarMensaje("Por favor, completa todos los campos correctamente", "warning-snackbar");
+      this.mostrarMensaje("Por favor, completa todos los campos correctamente", "info-snackbar");
     }
   }
 
@@ -126,7 +124,7 @@ export class IniciarSesion implements OnInit {
         },
         error: (error) => {
           this.isVerificandoToken = false;
-          this.mostrarMensaje("Código incorrecto o expirado", "error-snackbar")
+          this.mostrarMensaje(error.error?.message || "Código incorrecto o expirado", "error-snackbar")
           this.tokenForm.get('token')?.setErrors({ 'incorrect': true });
         }
       });
@@ -142,7 +140,8 @@ export class IniciarSesion implements OnInit {
   private guardarInformacionUsuario(response: any, guardar: boolean): void {
     this.mostrarMensaje("¡Login exitoso! Bienvenido", "success-snackbar" );
     sessionStorage.setItem('idUsuario', response.credenciales.idUsuario.toString());  
-    
+    this.nombreRolActual =  response.credenciales.nombreRol;
+
     if (guardar) {
       sessionStorage.setItem('rol', response.credenciales.rol?.toString() ?? ""); 
       sessionStorage.setItem('nombreRol', response.credenciales.nombreRol || "");
@@ -150,6 +149,17 @@ export class IniciarSesion implements OnInit {
     } else {
       sessionStorage.setItem('token', response.credenciales.token || "");
     } 
+    this.mostrarVista();
+  }
+
+  private mostrarVista() {
+    if (this.nombreRolActual === "ADMINISTRADOR") {
+      this.router.navigate(['/']);
+    } else if (this.nombreRolActual === "CLIENTE") {
+      this.router.navigate(['/']);
+    } else if (this.nombreRolActual === "SUCURSAL") {
+      this.router.navigate(['/general-sucursal']);
+    }
   }
 
   private mostrarMensaje(mensaje: string, tipo: string): void {

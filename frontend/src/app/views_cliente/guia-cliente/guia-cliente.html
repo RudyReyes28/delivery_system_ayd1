@@ -1,0 +1,284 @@
+<div class="container">
+  
+  <!-- Barra de búsqueda -->
+  <mat-card class="search-card">
+    <mat-card-content>
+      <div class="search-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Número de Guía</mat-label>
+          <input 
+            matInput 
+            type="number" 
+            [(ngModel)]="numeroGuia"
+            placeholder="Ingrese el número de guía"
+            (keyup.enter)="buscarGuia()">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="buscarGuia()"
+          [disabled]="cargando"
+          class="search-button">
+          <mat-icon *ngIf="!cargando">search</mat-icon>
+          <mat-spinner *ngIf="cargando" diameter="20"></mat-spinner>
+          {{ cargando ? 'Buscando...' : 'Buscar' }}
+        </button>
+        
+        <button 
+          mat-stroked-button 
+          color="accent"
+          (click)="limpiarBusqueda()"
+          *ngIf="buscandoGuia"
+          class="clear-button">
+          <mat-icon>clear</mat-icon>
+          Limpiar
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Información de la empresa (se muestra cuando no se ha buscado nada) -->
+  <div *ngIf="mostrarInfoEmpresa" class="empresa-info">
+    
+    <!-- Hero Section -->
+    <mat-card class="hero-card">
+      <mat-card-content>
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1>{{ infoEmpresa.nombre }}</h1>
+            <p class="hero-subtitle">Tu socio confiable en servicios de transporte y logística</p>
+            <button mat-raised-button color="primary" class="cta-button">
+              <mat-icon>local_shipping</mat-icon>
+              Rastrea tu envío
+            </button>
+          </div>
+          <div class="hero-image">
+            <mat-icon class="large-icon">local_shipping</mat-icon>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Misión, Visión y Valores -->
+    <div class="info-grid">
+      
+      <!-- Misión -->
+      <mat-card class="info-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon color="primary">flag</mat-icon>
+            Misión
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ infoEmpresa.mision }}</p>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Visión -->
+      <mat-card class="info-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon color="primary">visibility</mat-icon>
+            Visión
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ infoEmpresa.vision }}</p>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Valores -->
+      <mat-card class="info-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon color="primary">star</mat-icon>
+            Valores
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-chip-set>
+            <mat-chip *ngFor="let valor of infoEmpresa.valores">
+              {{ valor }}
+            </mat-chip>
+          </mat-chip-set>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Información de contacto -->
+    <mat-card class="contact-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon color="primary">contact_phone</mat-icon>
+          Información de Contacto
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="contact-grid">
+          <div class="contact-item">
+            <mat-icon>phone</mat-icon>
+            <span>{{ infoEmpresa.contacto.telefono }}</span>
+          </div>
+          <div class="contact-item">
+            <mat-icon>email</mat-icon>
+            <span>{{ infoEmpresa.contacto.email }}</span>
+          </div>
+          <div class="contact-item">
+            <mat-icon>location_on</mat-icon>
+            <span>{{ infoEmpresa.contacto.direccion }}</span>
+          </div>
+          <div class="contact-item">
+            <mat-icon>schedule</mat-icon>
+            <span>{{ infoEmpresa.contacto.horarios }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Información de la guía (se muestra cuando se busca) -->
+  <div *ngIf="buscandoGuia && guiaDetalle" class="guia-info">
+    
+    <!-- Información principal -->
+    <mat-card class="main-info-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon color="primary">description</mat-icon>
+          Guía: {{ guiaDetalle.numeroGuia || 'No disponible' }}
+        </mat-card-title>
+        <mat-card-subtitle>
+          Creada el {{ guiaDetalle.fechaCreacion ? (guiaDetalle.fechaCreacion | date:'dd/MM/yyyy HH:mm') : 'Fecha no disponible' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-row">
+          <div class="info-item">
+            <strong>Estado Actual:</strong>
+            <mat-chip [color]="obtenerColorEstado(guiaDetalle.estadoActual)" selected>
+              {{ guiaDetalle.estadoActual || 'Sin estado' }}
+            </mat-chip>
+          </div>
+          <div class="info-item">
+            <strong>Prioridad:</strong>
+            <mat-chip [color]="obtenerColorPrioridad(guiaDetalle.prioridad)" selected>
+              {{ guiaDetalle.prioridad || 'Sin prioridad' }}
+            </mat-chip>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <div class="info-item">
+            <strong>Contenido:</strong>
+            <span>{{ guiaDetalle.descripcionContenido || 'No especificado' }}</span>
+          </div>
+          <div class="info-item">
+            <strong>Peso:</strong>
+            <span>{{ guiaDetalle.pesoKg || '0' }} Kg</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-item">
+            <strong>Dimensiones:</strong>
+            <span>{{ guiaDetalle.dimensiones || 'No especificadas' }}</span>
+          </div>
+          <div class="info-item">
+            <strong>Valor Declarado:</strong>
+            <span>Q{{ guiaDetalle.valorDeclarado || 0 }}</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-item">
+            <strong>Total:</strong>
+            <span class="total-amount">Q{{ guiaDetalle.total || 0 }}</span>
+          </div>
+          <div class="info-item">
+            <strong>Intentos de Entrega:</strong>
+            <span>{{ guiaDetalle.intentosEntrega || 0 }}</span>
+          </div>
+        </div>
+
+        <div class="info-row" *ngIf="guiaDetalle.fechaRecoleccionReal && guiaDetalle.fechaRecoleccionReal !== 'No ha sido recolectada'">
+          <div class="info-item full-width">
+            <strong>Fecha de Recolección:</strong>
+            <span>{{ guiaDetalle.fechaRecoleccionReal | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        </div>
+
+        <div class="info-row" *ngIf="!guiaDetalle.fechaRecoleccionReal || guiaDetalle.fechaRecoleccionReal === 'No ha sido recolectada'">
+          <div class="info-item full-width">
+            <strong>Fecha de Recolección:</strong>
+            <span class="pending-text">{{ guiaDetalle.fechaRecoleccionReal || 'Pendiente de recolección' }}</span>
+          </div>
+        </div>
+
+        <div class="info-row" *ngIf="guiaDetalle.observaciones && guiaDetalle.observaciones !== 'No aplica'">
+          <div class="info-item full-width">
+            <strong>Observaciones:</strong>
+            <span>{{ guiaDetalle.observaciones }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Información del repartidor -->
+    <mat-card class="repartidor-card" *ngIf="guiaDetalle.repartidor">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon color="primary">person</mat-icon>
+          Repartidor Asignado
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="repartidor-info">
+          <div class="info-item">
+            <strong>Nombre:</strong>
+            <span>{{ guiaDetalle.repartidor.nombreCompleto }}</span>
+          </div>
+          <div class="info-item">
+            <strong>Email:</strong>
+            <span>{{ guiaDetalle.repartidor.email }}</span>
+          </div>
+          <div class="info-item">
+            <strong>Teléfono:</strong>
+            <span>{{ guiaDetalle.repartidor.telefono }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Historial de estados -->
+    <mat-card class="estados-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon color="primary">timeline</mat-icon>
+          Historial de Estados
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="guiaDetalle.estadosEntregas && guiaDetalle.estadosEntregas.length > 0; else noEstados">
+          <mat-vertical-stepper [linear]="false" class="estados-stepper">
+            <mat-step *ngFor="let estado of guiaDetalle.estadosEntregas; let i = index">
+              <ng-template matStepLabel>
+                {{ estado.estadoNuevo || 'Estado desconocido' }}
+              </ng-template>
+              <div class="estado-content">
+                <p><strong>Fecha:</strong> {{ estado.fechaCambio ? (estado.fechaCambio | date:'dd/MM/yyyy HH:mm') : 'Fecha no disponible' }}</p>
+                <p *ngIf="estado.estadoAnterior"><strong>Estado Anterior:</strong> {{ estado.estadoAnterior }}</p>
+                <p><strong>Motivo:</strong> {{ estado.motivoCambio || 'Sin motivo especificado' }}</p>
+                <p *ngIf="estado.comentarios && estado.comentarios !== 'Guía creada'"><strong>Comentarios:</strong> {{ estado.comentarios }}</p>
+              </div>
+            </mat-step>
+          </mat-vertical-stepper>
+        </div>
+        <ng-template #noEstados>
+          <p class="no-data">No hay historial de estados disponible</p>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

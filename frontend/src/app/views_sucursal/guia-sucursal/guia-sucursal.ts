@@ -261,7 +261,7 @@ export class GuiaSucursal implements OnInit {
 
   guardarGuiaClienteNuevo(): void {
     if (this.guiaClienteNuevoForm.invalid) {
-      this.mostrarMensaje('Por favor complete todos los campos requeridos', "error-snackbar");
+      this.mostrarMensaje("Por favor complete todos los campos requeridos", "info-snackbar");
       return;
     }
 
@@ -290,7 +290,7 @@ export class GuiaSucursal implements OnInit {
 
   guardarGuiaClienteExistente(): void {
     if (this.guiaClienteExistenteForm.invalid) {
-      this.mostrarMensaje('Por favor complete todos los campos requeridos', "error-snackbar");
+      this.mostrarMensaje("Por favor complete todos los campos requeridos", "info-snackbar");
       return;
     }
 
@@ -311,7 +311,7 @@ export class GuiaSucursal implements OnInit {
       },
       error: (error) => {
         console.error('Error al crear guía para cliente existente:', error);
-        this.mostrarMensaje(error.error?.message || 'Error al crear la guía', "error-snackbar");
+        this.mostrarMensaje(error.error?.message || "Error al crear la guía", "error-snackbar");
         this.guardandoGuia = false;
       }
     });
@@ -347,7 +347,6 @@ export class GuiaSucursal implements OnInit {
     this.cargarGuias();
   }
 
-  // Método para calcular el total de la guía
   calcularTotal(form: FormGroup): number {
     const subtotal = form.get('subtotal')?.value || 0;
     const descuentos = form.get('descuentos')?.value || 0;
@@ -356,7 +355,6 @@ export class GuiaSucursal implements OnInit {
     return subtotal - descuentos + recargos;
   }
 
-  // Método para validar que la fecha de recolección sea futura
   private validarFechaFutura(control: any): any {
     const fecha = new Date(control.value);
     const ahora = new Date();
