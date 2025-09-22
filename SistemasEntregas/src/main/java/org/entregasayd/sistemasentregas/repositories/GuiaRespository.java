@@ -9,4 +9,8 @@ public interface GuiaRespository extends CrudRepository<Guia, Long> {
     ArrayList<Guia> findBySucursalOrigenIdSucursal(Long sucursal);
 
     Guia findByNumeroGuia(String numeroGuia);
+
+    ArrayList<Guia> findByRepartidorIsNull();
+
+    ArrayList<Guia> findByRepartidor_IdRepartidor(Long idRepartidor);
 }
