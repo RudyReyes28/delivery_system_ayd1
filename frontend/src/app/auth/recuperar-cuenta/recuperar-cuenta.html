@@ -46,7 +46,7 @@
         <h3>Verificar Código</h3>
         <p class="step-description">Ingresa el código que enviamos a {{ userEmail }}</p>
         
-        <form [formGroup]="verificationForm" (ngSubmit)="verifyCode()" class="recovery-form">
+        <form [formGroup]="verificationForm" (ngSubmit)="verificaCodigoDeSeguridad()" class="recovery-form">
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Código de verificación</mat-label>
             <input matInput 

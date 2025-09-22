@@ -110,7 +110,7 @@ export class Empresa implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar usuarios de sucursal:', error);
-        this.mostrarMensaje('Error al cargar los usuarios de sucursal', "error-snackbar");
+        this.mostrarMensaje("Error al cargar los usuarios de sucursal", "error-snackbar");
       }
     });
   }
@@ -129,7 +129,7 @@ export class Empresa implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar empresas:', error);
-        this.mostrarMensaje('Error al cargar las empresas', "error-snackbar");
+        this.mostrarMensaje("Error al cargar las empresas", "error-snackbar");
         this.loadingEmpresas = false;
       }
     });
@@ -170,20 +170,18 @@ export class Empresa implements OnInit {
 
   guardarEmpresa(): void {
     if (this.empresaForm.invalid) {
-      this.mostrarMensaje('Por favor complete todos los campos requeridos', "error-snackbar");
+      this.mostrarMensaje("Por favor complete todos los campos requeridos", "error-snackbar");
       return;
     }
 
     this.guardandoEmpresa = true;
     const formData: EmpresaFormData = this.empresaForm.value;
     
-    // Convertir fechaFin a null si está vacía
     if (!formData.fechaFin) {
       formData.fechaFin = null;
     }
 
     if (this.modoEdicion && this.empresaEditando) {
-      // Modo edición
       this.empresaService.editarEmpresa(this.empresaEditando.idEmpresa, formData).subscribe({
         next: (response) => {
           this.mostrarMensaje('Empresa actualizada exitosamente', "success-snackbar");
@@ -219,7 +217,6 @@ export class Empresa implements OnInit {
     this.modoEdicion = false;
     this.empresaEditando = null;
     this.guardandoEmpresa = false;
-    
     this.cambioProgmatico = true;
     this.selectedTabIndex = 1;
   }
@@ -236,9 +233,7 @@ export class Empresa implements OnInit {
       return;
     }
 
-    const confirmacion = confirm(
-      `¿Está seguro de que desea cambiar el estado de "${empresaItem.empresa.nombreComercial}" a ${nuevoEstado}?`
-    );
+    const confirmacion = confirm(`¿Está seguro de que desea cambiar el estado de "${empresaItem.empresa.nombreComercial}" a ${nuevoEstado}?`);
 
     if (!confirmacion) {
       return;
@@ -268,17 +263,13 @@ export class Empresa implements OnInit {
           empresaItem.empresa.fechaAfiliacion = response.fechaAfiliacion;
           empresaItem.empresa.fechaVencimientoAfiliacion = response.fechaVencimientoAfiliacion;
 
-          empresaItem.actualizandoEstado = false;
-          
+          empresaItem.actualizandoEstado = false; 
           this.mostrarMensaje(`Estado de la empresa "${empresaItem.empresa.nombreComercial}" actualizado a: ${response.estado}`, "success-snackbar");
 
         },
         error: (error) => {
-          console.error('Error al cambiar estado de la empresa:', error);
           empresaItem.actualizandoEstado = false;
-          
-          const mensajeError = error.error?.message || 'Error al cambiar el estado de la empresa';
-          this.mostrarMensaje(mensajeError, "error-snackbar");
+          this.mostrarMensaje(error.error?.message || "Error al cambiar el estado de la empresa", "error-snackbar");
         }
       });
   }

@@ -72,7 +72,6 @@ export class Sucursal implements OnInit {
 
   private crearFormulario(): FormGroup {
     return this.formBuilder.group({
-      // Información de la sucursal
       idEmpresa: ['', [Validators.required]],
       codigoSucursal: ['', [Validators.required]],
       nombreSucursal: ['', [Validators.required]],
@@ -80,8 +79,6 @@ export class Sucursal implements OnInit {
       horarioCierre: ['', [Validators.required]],
       diasOperacion: ['', [Validators.required]],
       estado: ['ACTIVA'],
-      
-      // Información de dirección
       tipoDireccion: ['', [Validators.required]],
       municipio: ['', [Validators.required]],
       departamento: ['', [Validators.required]],
@@ -89,8 +86,6 @@ export class Sucursal implements OnInit {
       codigoPostal: ['', [Validators.required]],
       referencias: ['', [Validators.required]],
       activa: [true],
-      
-      // Información del personal
       idUsuario: ['', [Validators.required]],
       cargo: ['', [Validators.required]],
       esEncargado: [true],
@@ -127,8 +122,7 @@ export class Sucursal implements OnInit {
         this.empresas = data;
       },
       error: (error) => {
-        console.error('Error al cargar empresas:', error);
-        this.mostrarMensaje('Error al cargar las empresas', "error-snackbar");
+        this.mostrarMensaje(error.error?.message || "Error al cargar las empresas", "error-snackbar");
       }
     });
   }
@@ -139,8 +133,7 @@ export class Sucursal implements OnInit {
         this.usuariosSucursal = data;
       },
       error: (error) => {
-        console.error('Error al cargar usuarios de sucursal:', error);
-        this.mostrarMensaje('Error al cargar los usuarios de sucursal', "error-snackbar");
+        this.mostrarMensaje(error.error?.message || "Error al cargar los usuarios de sucursal", "error-snackbar");
       }
     });
   }
@@ -158,8 +151,7 @@ export class Sucursal implements OnInit {
         this.loadingSucursales = false;
       },
       error: (error) => {
-        console.error('Error al cargar sucursales:', error);
-        this.mostrarMensaje('Error al cargar las sucursales', "error-snackbar");
+        this.mostrarMensaje(error.error?.message || "Error al cargar las sucursales", "error-snackbar");
         this.loadingSucursales = false;
       }
     });
@@ -173,7 +165,7 @@ export class Sucursal implements OnInit {
 
   guardarSucursal(): void {
     if (this.sucursalForm.invalid) {
-      this.mostrarMensaje('Por favor complete todos los campos requeridos', "error-snackbar");
+      this.mostrarMensaje("Por favor complete todos los campos requeridos", "error-snackbar");
       return;
     }
 
@@ -186,12 +178,11 @@ export class Sucursal implements OnInit {
 
     this.sucursalService.crearSucursal(formData).subscribe({
       next: (response) => {
-        this.mostrarMensaje('Sucursal creada exitosamente', "success-snackbar");
+        this.mostrarMensaje("Sucursal creada exitosamente", "success-snackbar");
         this.cargarSucursales();
         this.cancelarFormulario();
       },
       error: (error) => {
-        console.error('Error al crear sucursal:', error);
         this.mostrarMensaje(error.error?.message || 'Error al crear la sucursal', "error-snackbar");
         this.guardandoSucursal = false;
       }
@@ -217,9 +208,7 @@ export class Sucursal implements OnInit {
       return;
     }
 
-    const confirmacion = confirm(
-      `¿Está seguro de que desea cambiar el estado de "${sucursalItem.branch.nombreSucursal}" a ${nuevoEstado}?`
-    );
+    const confirmacion = confirm(`¿Está seguro de que desea cambiar el estado de "${sucursalItem.branch.nombreSucursal}" a ${nuevoEstado}?`);
 
     if (!confirmacion) {
       return;
@@ -241,15 +230,11 @@ export class Sucursal implements OnInit {
         next: (response) => {
           sucursalItem.branch.estado = nuevoEstado;
           sucursalItem.actualizandoEstado = false;
-          
           this.mostrarMensaje(`Estado de la sucursal "${sucursalItem.branch.nombreSucursal}" actualizado a: ${nuevoEstado}`, "success-snackbar");
         },
         error: (error) => {
-          console.error('Error al cambiar estado de la sucursal:', error);
           sucursalItem.actualizandoEstado = false;
-          
-          const mensajeError = error.error?.message || 'Error al cambiar el estado de la sucursal';
-          this.mostrarMensaje(mensajeError, "error-snackbar");
+          this.mostrarMensaje(error.error?.message || "Error al cambiar el estado de la sucursal", "error-snackbar");
         }
       });
   }

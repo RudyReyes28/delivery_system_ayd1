@@ -62,16 +62,14 @@ export class RecuperarCuenta implements OnInit{
   }
 
   ngOnInit(): void {
-    this.initializeForms();
+    this.inicializarForms();
   }
 
-  private initializeForms(): void {
-    // Formulario de email
+  private inicializarForms(): void {
     this.emailForm = this.fb.group({
       correo: ['', [Validators.required, Validators.email]]
     });
 
-    // Formulario de verificación
     this.verificationForm = this.fb.group({
       codigoVerificacion: ['', [
         Validators.required, 
@@ -79,18 +77,16 @@ export class RecuperarCuenta implements OnInit{
       ]]
     });
 
-    // Formulario de contraseña con validador personalizado
     this.passwordForm = this.fb.group({
       nuevaContrasenia: ['', [
         Validators.required, 
         Validators.minLength(8)
       ]],
       confirmarContrasenia: ['', [Validators.required]]
-    }, { validators: this.passwordMatchValidator });
+    }, { validators: this.validaContrasenia });
   }
 
-  // Validador personalizado para confirmar contraseñas
-  private passwordMatchValidator(control: AbstractControl): {[key: string]: any} | null {
+  private validaContrasenia(control: AbstractControl): {[key: string]: any} | null {
     const password = control.get('nuevaContrasenia');
     const confirmPassword = control.get('confirmarContrasenia');
     
@@ -117,19 +113,18 @@ export class RecuperarCuenta implements OnInit{
           this.recoveryToken = response.token;
           
           sessionStorage.setItem('token', this.recoveryToken);
-          
-          this.showSuccessMessage(response.mensaje);
+          this.mostrarMensaje(response.mensaje, "info-snackbar");
           this.currentStep = 2;
         },
         error: (error) => {
-          // Manejar Error
+          this.mostrarMensaje(error.error?.message || "Error al Solicitar Recuperación de Contraseña", "error-snackbar");
         }
       });
     }
   }
 
   // Paso 2: Verificar código de seguridad
-  verifyCode(): void {
+  verificaCodigoDeSeguridad(): void {
     if (this.verificationForm.valid) {
       this.isLoading = true;
       
@@ -148,11 +143,11 @@ export class RecuperarCuenta implements OnInit{
           sessionStorage.setItem('idUsuario', this.userId.toString());
           sessionStorage.setItem('token', this.recoveryToken);
           
-          this.showSuccessMessage(response.mensaje);
+          this.mostrarMensaje(response.mensaje, "info-snackbar");
           this.currentStep = 3;
         },
         error: (error) => {
-          // Manejar Errores
+          this.mostrarMensaje(error.error?.message || "Error al Solicitar Cambio de Contraseña", "error-snackbar");
         }
       });
     }
@@ -175,11 +170,11 @@ export class RecuperarCuenta implements OnInit{
       this.authService.cambiarContrasenia(requestData).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.showSuccessMessage(response.message);
+          this.mostrarMensaje(response.message, "success-snackbar");
           this.currentStep = 4;
         },
         error: (error) => {
-          // Manejar Errores
+          this.mostrarMensaje(error.error?.message || "Error al Cambiar la Contraseña", "error-snackbar");
         }
       });
     }
@@ -197,10 +192,12 @@ export class RecuperarCuenta implements OnInit{
     this.router.navigate(['/login']);
   }
 
-  private showSuccessMessage(message: string): void {
-    this.snackBar.open(message, 'Cerrar', {
-      duration: 4000,
-      panelClass: ['success-snackbar']
+  private mostrarMensaje(mensaje: string, tipo: string): void {
+    this.snackBar.open(mensaje, 'Cerrar', {
+      duration: 3000,
+      panelClass: [tipo],
+      horizontalPosition: 'center',
+      verticalPosition: 'top'
     });
   }
 

@@ -80,7 +80,6 @@
     <mat-card-content>
       <div class="token-info">
         <p>Se ha enviado un código de verificación de 6 dígitos</p>
-        <p><strong>Usuario:</strong> {{ usuarioActual }}</p>
       </div>
 
       <form [formGroup]="tokenForm" (ngSubmit)="verificarToken()" class="token-form">
