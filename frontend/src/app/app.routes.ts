@@ -38,6 +38,7 @@ export const routes: Routes = [
     {
         path: "gestion-empleados", component: Empleados, title: "Empleados"
     },
+    {
         path: "guia-sucursal",  component: GuiaSucursal, title: "Guia"
     },
     {
