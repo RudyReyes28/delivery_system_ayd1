@@ -34,14 +34,19 @@ export class BarraNavegacion {
   menuItems = [
     { icon: 'home', label: 'Inicio', route: '/login' },
     { icon: 'person', label: 'Crear Usuario', route: '/crear-usuario' },
+    { icon: 'group', label: 'Gestión Empleados', route: '/gestion-empleados' },
     { icon: 'business_center', label: 'Gestión Empresas', route: '/empresa' },
     { icon: 'store', label: 'Gestión Surcusales', route: '/sucursal' },
     { icon: 'grade', label: 'Fidelización', route: '/fidelizacion' },
     { icon: 'settings', label: 'General', route: 'general-sucursal' },
-    { icon: 'logout', label: 'Cerrar Sesión', route: '/logout' }
+    { icon: 'logout', label: 'Cerrar Sesión', route: '/logout' },
   ];
 
-  constructor(private router: Router, private authService: AuthService, private snackBar: MatSnackBar) { }
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private snackBar: MatSnackBar
+  ) {}
 
   onMenuItemClick(item: any) {
     console.log('Navegando a:', item.route);
@@ -50,15 +55,15 @@ export class BarraNavegacion {
 
   quitarVerificacionDosPasos() {
     const idUsuario = sessionStorage.getItem('idUsuario');
-    
+
     if (idUsuario) {
       this.authService.desactivarAutetificacion(Number(idUsuario)).subscribe({
         next: (response) => {
-          this.mostrarMensaje(response.message, "success-snackbar");
+          this.mostrarMensaje(response.message, 'success-snackbar');
         },
         error: (error) => {
-          this.mostrarMensaje("Error al cambiar Autetificación", "error-snackbar");
-        }
+          this.mostrarMensaje('Error al cambiar Autetificación', 'error-snackbar');
+        },
       });
     } else {
       console.error('No se encontró ID de usuario en sessionStorage');
@@ -70,7 +75,7 @@ export class BarraNavegacion {
       duration: 3000,
       panelClass: [tipo],
       horizontalPosition: 'center',
-      verticalPosition: 'top'
+      verticalPosition: 'top',
     });
   }
 }

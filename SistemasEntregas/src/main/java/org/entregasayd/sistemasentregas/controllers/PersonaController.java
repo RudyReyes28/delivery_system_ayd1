@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/persona")
+@RequestMapping("/api/personas")
 public class PersonaController {
     @Autowired
     private PersonaService personaService;
@@ -27,5 +27,10 @@ public class PersonaController {
     @GetMapping("/get-by-dpi/{dpi}")
     public PersonaDto getByDpi(@PathVariable String dpi){
         return personaMap.toDto(personaService.findByDpi(dpi));
+    }
+
+    @GetMapping("/get-by-id/{id}")
+    public PersonaDto getById(@PathVariable Long id){
+        return personaMap.toDto(personaService.findById(id));
     }
 }

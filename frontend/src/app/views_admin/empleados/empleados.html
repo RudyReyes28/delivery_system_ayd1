@@ -1,0 +1,678 @@
+<!-- empleado.component.html -->
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Gestión de Empleados</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Botón para crear nuevo empleado -->
+      <div class="create-button-section">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="crearNuevoEmpleado()"
+          class="create-button"
+        >
+          <mat-icon>add</mat-icon>
+          Crear Empleado
+        </button>
+      </div>
+
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
+        <!-- Tab para Formulario de Empleado -->
+        <mat-tab label="{{ modoEdicion ? 'Editar Empleado' : 'Nuevo Empleado' }}">
+          <div class="tab-content">
+            <div class="header-section">
+              <h3>{{ modoEdicion ? 'Editar Empleado' : 'Registrar Nuevo Empleado' }}</h3>
+              @if (guardandoEmpleado) {
+              <mat-spinner diameter="30"></mat-spinner>
+              }
+            </div>
+
+            <form [formGroup]="empleadoForm" (ngSubmit)="guardarEmpleado()" class="empresa-form">
+              <!-- Información del Usuario -->
+              <div class="form-section">
+                <h4>Información de Usuario</h4>
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Nombre de Usuario</mat-label>
+                    <input matInput formControlName="nombreUsuario" required />
+                  </mat-form-field>
+
+                  @if(!modoEdicion){
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Contraseña</mat-label>
+                    <input matInput type="password" formControlName="password" required />
+                  </mat-form-field>
+                  }
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Rol</mat-label>
+                    <mat-select
+                      formControlName="idRol"
+                      required
+                      (selectionChange)="onChancheRol($event.value)"
+                    >
+                      @for (item of roles; track $index) {
+                      <mat-option [value]="item.idRol">
+                        {{ item.nombre }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Nombre</mat-label>
+                    <input matInput formControlName="nombre" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Apellido</mat-label>
+                    <input matInput formControlName="apellido" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha de Nacimiento</mat-label>
+                    <input matInput type="date" formControlName="fechaNacimiento" required />
+                  </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>DPI</mat-label>
+                    <input matInput formControlName="dpi" minlength="13" maxlength="13" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Correo</mat-label>
+                    <input matInput type="email" formControlName="correo" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Teléfono</mat-label>
+                    <input
+                      matInput
+                      formControlName="telefono"
+                      required
+                      minlength="8"
+                      maxlength="8"
+                    />
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <mat-divider></mat-divider>
+              <!-- Información sobre la dirección -->
+              <div class="form-section">
+                <h4>Información sobre su dirección</h4>
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Departamento</mat-label>
+                    <mat-select
+                      formControlName="departamento"
+                      (selectionChange)="onChangeDepartamento($event.value)"
+                      required
+                    >
+                      @for (item of departamentos; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Municipio</mat-label>
+                    <mat-select formControlName="municipio" required>
+                      @for (municipio of municipios; track municipio) {
+                      <mat-option [value]="municipio">
+                        {{ municipio }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Código postal</mat-label>
+                    <input matInput formControlName="codigoPostal" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Tipo de dirección</mat-label>
+                    <mat-select formControlName="tipoDireccion" required>
+                      @for (item of tiposDireccion; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field col-start-2 col-end-4">
+                    <mat-label>Referencias</mat-label>
+                    <input matInput formControlName="referencias" required />
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <!-- Información del Empleado -->
+              <div class="form-section">
+                <h4>Información de Empleado</h4>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Código Empleado</mat-label>
+                    <input matInput formControlName="codigoEmpleado" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Número IGSS</mat-label>
+                    <input matInput formControlName="numeroIgss" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Número IRTRA</mat-label>
+                    <input matInput formControlName="numeroIrtra" required />
+                  </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Tipo de Sangre</mat-label>
+                    <input matInput formControlName="tipoSangre" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Estado Civil</mat-label>
+                    <mat-select formControlName="estadoCivil" required>
+                      @for (item of estadosCivil; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Número Dependientes</mat-label>
+                    <input matInput type="number" formControlName="numeroDependientes" required />
+                  </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Contacto Emergencia</mat-label>
+                    <input
+                      matInput
+                      type="text"
+                      formControlName="contactoEmergenciaNombre"
+                      required
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Teléfono Emergencia</mat-label>
+                    <input
+                      matInput
+                      minlength="8"
+                      maxlength="8"
+                      formControlName="contactoEmergenciaTelefono"
+                      required
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Estado Empleado</mat-label>
+                    <mat-select formControlName="estadoEmpleado" required>
+                      @for (item of estadosEmpleado; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha Ingreso</mat-label>
+                    <input matInput type="date" formControlName="fechaIngreso" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha Salida</mat-label>
+                    <input matInput type="date" formControlName="fechaSalida" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Motivo Salida</mat-label>
+                    <input matInput formControlName="motivoSalida" />
+                  </mat-form-field>
+                </div>
+              </div>
+
+              @if(!modoEdicion){
+              <mat-divider></mat-divider>
+              <!-- Información sobre el contrato inicial -->
+              <div class="form-section">
+                <h4>Información de Contrato</h4>
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Número de Contrato</mat-label>
+                    <input matInput type="text" formControlName="numeroContrato" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Tipo de Contrato</mat-label>
+                    <mat-select formControlName="tipoContrato" required>
+                      @for (item of tipos; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Modalidad de trabajo</mat-label>
+                    <mat-select formControlName="modalidadTrabajo" required>
+                      @for (item of modalidades; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha de inicio</mat-label>
+                    <input matInput type="date" formControlName="fechaInicio" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha de finalización</mat-label>
+                    <input matInput type="date" formControlName="fechaFin" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Estado del contrato</mat-label>
+                    <mat-select formControlName="estadoContrato" required>
+                      @for (item of estadosContrato; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Salario base</mat-label>
+                    <input matInput type="number" min="1" formControlName="salarioBase" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Frecuencia de pago</mat-label>
+                    <mat-select formControlName="frecuenciaPago" required>
+                      @for (item of frecuencias; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <!-- switch-->
+                  <mat-slide-toggle formControlName="renovacionAutomatica"
+                    >¿Renovacion automática?</mat-slide-toggle
+                  >
+                </div>
+
+                <div class="grid grid-cols-4 gap-4">
+                  <!-- switch-->
+                  <mat-slide-toggle formControlName="incluyeAguinaldo"
+                    >¿Incluye Aguinaldo?</mat-slide-toggle
+                  >
+                  <!-- switch-->
+                  <mat-slide-toggle formControlName="incluyeBono14"
+                    >¿Incluye Bono 14?</mat-slide-toggle
+                  >
+                  <mat-slide-toggle formControlName="incluyeVacaciones"
+                    >¿Incluye vacaciones?</mat-slide-toggle
+                  >
+                  <mat-slide-toggle formControlName="incluyeIgss">¿Incluye Igss?</mat-slide-toggle>
+                </div>
+              </div>
+
+              <mat-divider></mat-divider>
+              <!-- Información la comision del contrato -->
+              <div class="form-section">
+                <h4>Detalles de la comisión</h4>
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Tipo de de comisión</mat-label>
+                    <mat-select formControlName="tipoComision" required>
+                      @for (item of tiposComision; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Porcentaje</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      min="0"
+                      max="1"
+                      formControlName="porcentaje"
+                      required
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Monto fijo (Q.)</mat-label>
+                    <input matInput type="number" formControlName="montoFijo" required />
+                  </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Aplicable desde</mat-label>
+                    <input matInput type="date" formControlName="fechaDesde" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Aplicable hasta</mat-label>
+                    <input matInput type="date" formControlName="fechaHasta" required />
+                  </mat-form-field>
+
+                  <!-- switch-->
+                  <mat-slide-toggle formControlName="comisionActiva"
+                    >¿Comisión Activa?</mat-slide-toggle
+                  >
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Mínimo de entregas al mes</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      min="1"
+                      formControlName="minimoEntregasMes"
+                      required
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Máximo de entregas al mes</mat-label>
+                    <input matInput type="number" formControlName="maximoEntregasMes" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Factor multiplicador de la comisión</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      min="0"
+                      formControlName="factorMultiplicador"
+                      required
+                    />
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <mat-divider></mat-divider>
+              <!-- Información adicional sobre el repartidor -->
+              @if (isRepartidor) {
+              <div class="form-section">
+                <h4>Datos sobre del repartidor</h4>
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Disponibilidad del repartidor</mat-label>
+                    <mat-select formControlName="disponibilidad" required>
+                      @for (item of disponibilidadRepartidor; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Numero de licencia</mat-label>
+                    <input matInput type="text" formControlName="numeroLicencia" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Tipo de licencia</mat-label>
+                    <mat-select formControlName="tipoLicencia" required>
+                      @for (item of tiposLicencia; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha vencimiento de la licencia</mat-label>
+                    <input matInput type="date" formControlName="fechaVenLicencia" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Zona asignada</mat-label>
+                    <input matInput type="text" formControlName="zonaAsignada" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Radio de cobertura (km)</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      min="0.1"
+                      formControlName="radioCobertura"
+                      required
+                    />
+                  </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field col-start-1 col-end-4">
+                    <mat-label>Asignación de vehículo</mat-label>
+                    <mat-select formControlName="vehiculosAsignados" multiple required>
+                      @for (item of vehiculos; track $index) {
+                      <mat-option [value]="item.idVehiculo">
+                        {{ item.placa }} | {{ item.modelo }} | {{ item.marca }} | {{ item.color }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+              } }
+
+              <div class="form-actions">
+                <button
+                  mat-button
+                  type="button"
+                  color="warn"
+                  (click)="cancelarFormulario()"
+                  [disabled]="guardandoEmpleado"
+                >
+                  Cancelar
+                </button>
+                <!-- [disabled]="empleadoForm.invalid || guardandoEmpleado" -->
+                <button
+                  mat-raised-button
+                  type="submit"
+                  color="primary"
+                  [disabled]="empleadoForm.invalid"
+                >
+                  @if(guardandoEmpleado){
+                  <mat-spinner diameter="20" style="margin-right: 8px"></mat-spinner>
+                  }
+                  {{ modoEdicion ? 'Actualizar Empleado' : 'Registrar Empleado' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+
+        <!-- Tab para Lista de Empleados -->
+        <mat-tab label="Lista de Empleados">
+          <div class="tab-content">
+            <div class="header-section">
+              <h2>Lista de Empleados</h2>
+              @if(loadingEmpleados){
+              <mat-spinner diameter="30"></mat-spinner>
+              }
+            </div>
+
+            @if (!loadingEmpleados && empleados.length > 0) {
+            <div class="items-container">
+              @for (item of empleados; track $index) {
+              <div class="list-item empleado-item">
+                <div class="item-content">
+                  <!-- Información básica -->
+                  <div class="basic-info">
+                    <div class="primary-text">
+                      <strong>{{ item.usuario.nombre }} {{ item.usuario.apellido }}</strong>
+                      <mat-chip
+                        class="status-chip"
+                        [ngClass]="
+                          item.empleado
+                            ? {
+                                active: item.usuario.estado === 'ACTIVO',
+                                inactive: item.usuario.estado === 'INACTIVO',
+                                suspended: item.usuario.estado === 'SUSPENDIDO'
+                              }
+                            : {}
+                        "
+                      >
+                        {{ item.usuario.estado }}
+                      </mat-chip>
+                    </div>
+                    <div class="secondary-text">
+                      Código: {{ item.empleado.codigoEmpleado }} | Usuario:
+                      {{ item.usuario.nombreUsuario }} | Rol de usuario:
+                      {{ item.usuario.nombreRol }}
+                    </div>
+                  </div>
+
+                  <!-- Expandible -->
+                  <div class="expanded-info" *ngIf="item.expanded">
+                    <mat-divider></mat-divider>
+
+                    <div class="section-title">
+                      <mat-icon>badge</mat-icon>
+                      Información del Empleado
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">IGSS:</span>
+                        <span class="value">{{ item.empleado.numeroIgss }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">IRTRA:</span>
+                        <span class="value">{{ item.empleado.numeroIrtra }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Tipo Sangre:</span>
+                        <span class="value">{{ item.empleado.tipoSangre }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Estado Civil:</span>
+                        <span class="value">{{ item.empleado.estadoCivil }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Dependientes:</span>
+                        <span class="value">{{ item.empleado.numeroDependientes }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Ingreso:</span>
+                        <span class="value">{{
+                          item.empleado.fechaIngreso | date : 'dd/MM/yyyy'
+                        }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Salida:</span>
+                        <span class="value">{{
+                          item.empleado.fechaSalida | date : 'dd/MM/yyyy'
+                        }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Motivo:</span>
+                        <span class="value">{{ item.empleado.motivoSalida }}</span>
+                      </div>
+                    </div>
+
+                    <div class="section-title">
+                      <mat-icon>person</mat-icon>
+                      Información de Usuario
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Correo:</span>
+                        <span class="value">{{ item.usuario.correo }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Teléfono:</span>
+                        <span class="value">{{ item.usuario.telefono }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">DPI:</span>
+                        <span class="value">{{ item.usuario.dpi }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Botones -->
+                  <div class="action-buttons">
+                    <div class="button-group">
+                      <button mat-button color="primary" (click)="toggleExpanded(item)">
+                        {{ item.expanded ? 'Ver Menos' : 'Ver Más' }}
+                      </button>
+                      <button mat-raised-button color="accent" (click)="darDeAltaEmpleado(item)">
+                        <mat-icon>person</mat-icon>
+                        Dar de alta
+                      </button>
+                      <button mat-raised-button color="accent" (click)="suspenderEmpleado(item)">
+                        <mat-icon>person_off</mat-icon>
+                        Suspender empleado
+                      </button>
+                      <button mat-raised-button color="accent" (click)="editarEmpleado(item)">
+                        <mat-icon>edit</mat-icon>
+                        Editar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+            } @if(!loadingEmpleados && empleados.length === 0){
+            <div class="no-data">
+              <mat-icon>group_off</mat-icon>
+              <p>No se encontraron empleados</p>
+            </div>
+            }
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

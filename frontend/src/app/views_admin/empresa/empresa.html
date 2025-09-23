@@ -4,11 +4,11 @@
     <mat-card-header>
       <mat-card-title>Gestión de Empresas y Usuarios</mat-card-title>
     </mat-card-header>
-    
+
     <mat-card-content>
       <!-- Botón para crear nueva empresa -->
       <div class="create-button-section">
-        <button mat-raised-button color="primary" 
+        <button mat-raised-button color="primary"
                 (click)="crearNuevaEmpresa()"
                 class="create-button">
           <mat-icon>add</mat-icon>
@@ -24,11 +24,11 @@
               <h3>{{ modoEdicion ? 'Editar Empresa' : 'Crear Nueva Empresa' }}</h3>
               <mat-spinner *ngIf="guardandoEmpresa" diameter="30"></mat-spinner>
             </div>
-            
+
             <form [formGroup]="empresaForm" (ngSubmit)="guardarEmpresa()" class="empresa-form">
               <div class="form-section">
                 <h4>Información de la Empresa</h4>
-                
+
                 <div class="form-row">
                   <mat-form-field appearance="outline" class="form-field">
                     <mat-label>Tipo de Empresa</mat-label>
@@ -110,7 +110,7 @@
 
               <div class="form-section">
                 <h4>Información del Contacto</h4>
-                
+
                 <div class="usuario-selection">
                   <mat-form-field appearance="outline" class="form-field full-width">
                     <mat-label>Seleccionar Usuario</mat-label>
@@ -158,12 +158,12 @@
               </div>
 
               <div class="form-actions">
-                <button mat-button type="button" color="warn" 
+                <button mat-button type="button" color="warn"
                         (click)="cancelarFormulario()"
                         [disabled]="guardandoEmpresa">
                   Cancelar
                 </button>
-                <button mat-raised-button type="submit" color="primary" 
+                <button mat-raised-button type="submit" color="primary"
                         [disabled]="empresaForm.invalid || guardandoEmpresa">
                   <mat-spinner *ngIf="guardandoEmpresa" diameter="20" style="margin-right: 8px;"></mat-spinner>
                   {{ modoEdicion ? 'Actualizar Empresa' : 'Crear Empresa' }}
@@ -172,7 +172,7 @@
             </form>
           </div>
         </mat-tab>
-        
+
         <!-- Tab para Lista de Empresas -->
         <mat-tab label="Lista de Empresas">
           <div class="tab-content">
@@ -180,7 +180,7 @@
               <h3>Lista de Empresas</h3>
               <mat-spinner *ngIf="loadingEmpresas" diameter="30"></mat-spinner>
             </div>
-            
+
             <div *ngIf="!loadingEmpresas && empresas.length > 0" class="items-container">
               <div *ngFor="let item of empresas" class="list-item empresa-item">
                 <div class="item-content">
@@ -188,7 +188,7 @@
                   <div class="basic-info">
                     <div class="primary-text">
                       <strong>{{ item.empresa.nombreComercial }}</strong>
-                      <mat-chip class="status-chip" 
+                      <mat-chip class="status-chip"
                                [ngClass]="{'active': item.empresa.estado === 'ACTIVA', 'suspended': item.empresa.estado === 'SUSPENDIDA', 'inactive': item.empresa.estado === 'INACTIVA', 'morosa': item.empresa.estado === 'MOROSA'}">
                         {{ item.empresa.estado }}
                       </mat-chip>
@@ -203,10 +203,10 @@
                       Sin contacto asignado
                     </div>
                   </div>
-                  
+
                   <!-- Información expandible -->
                   <div class="expanded-info" *ngIf="item.expanded">
-                    <mat-divider></mat-divider>                    
+                    <mat-divider></mat-divider>
 
                     <!-- Información de la empresa -->
                     <div class="section-title">
@@ -235,7 +235,7 @@
                         <span class="value">{{ item.empresa.fechaVencimientoAfiliacion | date:'dd/MM/yyyy' }}</span>
                       </div>
                     </div>
-                    
+
                     <!-- Información del contacto -->
                     <div class="section-title" *ngIf="item.empresa.contacto">
                       <mat-icon>contact_phone</mat-icon>
@@ -263,7 +263,7 @@
                         </span>
                       </div>
                     </div>
-                    
+
                     <!-- Mensaje cuando no hay contacto -->
                     <div class="no-contact-info" *ngIf="!item.empresa.contacto">
                       <div class="section-title">
@@ -273,14 +273,14 @@
                       <p class="no-contact-message">Esta empresa no tiene un contacto asignado actualmente.</p>
                     </div>
                   </div>
-                  
+
                   <!-- Botones de acción -->
                   <div class="action-buttons">
                     <!-- Sección para cambiar estado -->
                     <div class="estado-section">
                       <mat-form-field appearance="outline">
                         <mat-label>Estado de la Empresa</mat-label>
-                        <mat-select [value]="item.empresa.estado" 
+                        <mat-select [value]="item.empresa.estado"
                                    (selectionChange)="onEstadoChange(item, $event.value)"
                                    [disabled]="item.actualizandoEstado">
                           <mat-option value="ACTIVA">Activa</mat-option>
@@ -289,19 +289,19 @@
                           <mat-option value="MOROSA">Morosa</mat-option>
                         </mat-select>
                       </mat-form-field>
-                      
+
                       <!-- Spinner para indicar que se está actualizando -->
                       <mat-spinner *ngIf="item.actualizandoEstado" diameter="20"></mat-spinner>
                     </div>
-                    
+
                     <mat-divider></mat-divider>
 
                     <div class="button-group">
-                      <button mat-button color="primary" 
+                      <button mat-button color="primary"
                               (click)="toggleExpanded('empresa', item.empresa.idEmpresa)">
                         {{ item.expanded ? 'Ver Menos' : 'Ver Más' }}
                       </button>
-                      <button mat-raised-button color="accent" 
+                      <button mat-raised-button color="accent"
                               (click)="editarEmpresa(item.empresa)">
                         <mat-icon>edit</mat-icon>
                         Editar
@@ -311,7 +311,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Mensaje cuando no hay datos -->
             <div *ngIf="!loadingEmpresas && empresas.length === 0" class="no-data">
               <mat-icon>business_center</mat-icon>

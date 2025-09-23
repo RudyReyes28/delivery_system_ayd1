@@ -30,7 +30,7 @@ public class UserController {
     private RolService rolService;
 
     @PostMapping("/create")
-    public UsuarioResponseDto createUser(@RequestBody RegistroEmpleadoRequestDTO register) {
+    public EmpleadoRequestDTO createUser(@RequestBody RegistroEmpleadoRequestDTO register) {
 
         UsuarioRequestDdto usuario = register.getUsuarioRequestDdto();
         EmpleadoRequestDTO empleado = register.getEmpleadoRequestDdto();

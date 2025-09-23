@@ -6,12 +6,12 @@
       <mat-icon>close</mat-icon>
       </button>
     </div>
-    
+
     <mat-divider></mat-divider>
-    
+
     <mat-nav-list>
-      <mat-list-item 
-        *ngFor="let item of menuItems" 
+      <mat-list-item
+        *ngFor="let item of menuItems"
         (click)="onMenuItemClick(item)"
         class="nav-item">
         <mat-icon matListItemIcon>{{item.icon}}</mat-icon>
@@ -27,9 +27,9 @@
         <mat-icon>menu</mat-icon>
       </button>
       <span>Sistema Integral de Entregas</span>
-      
+
       <span class="toolbar-spacer"></span>
-      
+
       <button mat-icon-button aria-label="Notificaciones" (click)="quitarVerificacionDosPasos()">
         <mat-icon>notifications</mat-icon>
       </button>

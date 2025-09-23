@@ -1,9 +1,11 @@
 package org.entregasayd.sistemasentregas.services;
 
 import org.entregasayd.sistemasentregas.dto.user.RepartidorDTO;
+import org.entregasayd.sistemasentregas.enums.Rol;
 import org.entregasayd.sistemasentregas.mapper.RepartidorMap;
 import org.entregasayd.sistemasentregas.models.Empleado;
 import org.entregasayd.sistemasentregas.models.Repartidor;
+import org.entregasayd.sistemasentregas.models.Usuario;
 import org.entregasayd.sistemasentregas.repositories.RepartidorRepository;
 import org.entregasayd.sistemasentregas.utils.ErrorApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ public class RepartidorService {
     private RepartidorRepository repartidorRepository;
     @Autowired
     private EmpleadoService empleadoService;
+    @Autowired
+    private UsuarioService usuarioService;
     @Autowired
     private RepartidorMap repartidorMap;
 
@@ -51,13 +55,20 @@ public class RepartidorService {
     }
 
     public RepartidorDTO findById(Long id) {
-        return repartidorRepository.findById(id).map(repartidorMap::toDTO).orElse(null);
+        return repartidorRepository.findById(id).map(repartidorMap::toDTO).orElseThrow(() -> new ErrorApi(400, "El repartidor no existe"));
     }
 
     public RepartidorDTO save(RepartidorDTO repartidorDTO) {
         Empleado empleado = empleadoService.findById(repartidorDTO.getIdEmpleado());
         if (empleado == null) {
             throw new ErrorApi(400, "El empleado no existe");
+        }
+        Usuario usuarioRepartidor = usuarioService.findById(empleado.getUsuario().getIdUsuario());
+        if(usuarioRepartidor == null) {
+            throw new ErrorApi(400, "El usuario no existe");
+        }
+        if(!usuarioRepartidor.getRol().getNombre().equalsIgnoreCase("REPARTIDOR")){
+            throw new ErrorApi(400, String.format("El usuario no es un repartidor es un  %s", usuarioRepartidor.getRol().getNombre().toLowerCase()));
         }
         Repartidor repartidor = new Repartidor();
         repartidor.setEmpleado(empleado);

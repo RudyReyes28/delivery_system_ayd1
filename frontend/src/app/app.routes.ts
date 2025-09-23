@@ -6,13 +6,14 @@ import { Empresa } from './views_admin/empresa/empresa';
 import { Sucursal } from './views_admin/sucursal/sucursal';
 import { Fidelizacion } from './views_admin/fidelizacion/fidelizacion';
 import { GeneralSucursal } from './views_sucursal/general-sucursal/general-sucursal';
+import { Empleados } from './views_admin/empleados/empleados';
 
 export const routes: Routes = [
-    { 
+    {
         path: 'login', component: IniciarSesion, title: "Iniciar Sesión"
     },
-    { 
-        path: '', redirectTo: '/login', pathMatch: 'full' 
+    {
+        path: '', redirectTo: '/login', pathMatch: 'full'
     },
     {
         path: "crear-usuario", component: CrearUsuario, title: "Crear Usuario"
@@ -31,5 +32,8 @@ export const routes: Routes = [
     },
     {
         path: "general-sucursal", component: GeneralSucursal, title: "Información General"
+    },
+    {
+        path: "gestion-empleados", component: Empleados, title: "Empleados"
     }
 ];
