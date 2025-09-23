@@ -9,7 +9,7 @@ import { environment } from '../environments/environment';
 })
 export class SucursalService {
 
-  private readonly DIRECCION_API = `${environment.apiUrl}/empresa/sucursalr`;
+  private readonly DIRECCION_API = `${environment.apiUrl}/empresa/sucursal`;
   //private baseUrl = 'http://localhost:8081/empresa/sucursal';
 
   constructor(private http: HttpClient) { }

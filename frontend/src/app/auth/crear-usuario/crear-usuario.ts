@@ -90,11 +90,11 @@ export class CrearUsuario implements OnInit {
           this.limpiarFormulario();
         },
         error: (error: any) => {
-          this.mostrarMensaje(error, "error-snackbar");
+          this.mostrarMensaje(error.error?.message || "Error al Registrar el Usuario", "error-snackbar");
         }
       });
     } else {
-      this.mostrarMensaje("Por favor complete todos los campos requeridos", "error-snackbar");
+      this.mostrarMensaje("Por favor complete todos los campos requeridos", "info-snackbar");
     }
   }
 

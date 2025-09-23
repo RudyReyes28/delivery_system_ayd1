@@ -7,6 +7,8 @@ import { Sucursal } from './views_admin/sucursal/sucursal';
 import { Fidelizacion } from './views_admin/fidelizacion/fidelizacion';
 import { GeneralSucursal } from './views_sucursal/general-sucursal/general-sucursal';
 import { Empleados } from './views_admin/empleados/empleados';
+import { GuiaSucursal } from './views_sucursal/guia-sucursal/guia-sucursal';
+import { GuiaCliente } from './views_cliente/guia-cliente/guia-cliente';
 
 export const routes: Routes = [
     {
@@ -35,5 +37,10 @@ export const routes: Routes = [
     },
     {
         path: "gestion-empleados", component: Empleados, title: "Empleados"
+    },
+        path: "guia-sucursal",  component: GuiaSucursal, title: "Guia"
+    },
+    {
+        path: "", component: GuiaCliente, title: "Guía"
     }
 ];

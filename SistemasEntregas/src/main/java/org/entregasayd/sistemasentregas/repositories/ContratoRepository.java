@@ -11,4 +11,5 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
     Contrato findByNumeroContrato(String numeroContrato);
 
     List<Contrato> findByEmpleado_IdEmpleado(Long idEmpleado);
+
 }

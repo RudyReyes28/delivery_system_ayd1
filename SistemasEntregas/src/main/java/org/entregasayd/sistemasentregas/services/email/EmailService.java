@@ -76,4 +76,58 @@ public class EmailService {
 
         Transport.send(message);
     }
+
+    public void sendNotificationEmailEstadoGuia(String to, String numeroGuia, String estado, String nombreEmpresa) throws MessagingException {
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.host", host);
+        properties.put("mail.smtp.port", port);
+
+        Session session = Session.getInstance(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(username));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+        message.setSubject("Actualización del estado de su guía: " + numeroGuia);
+        message.setText("Estimado cliente,\n\n"
+                + "Le informamos que el estado de su guía con número " + numeroGuia + " ha sido actualizado a: " + estado + ".\n\n"
+                + "Gracias por confiar en nuestros servicios.\n\n"
+                + "Atentamente,\n"
+                + "El equipo de " + nombreEmpresa);
+
+        Transport.send(message);
+    }
+
+    public void enviarEmailAsignacionRepartidor(String to, String asunto, String mensaje){
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.host", host);
+        properties.put("mail.smtp.port", port);
+
+        Session session = Session.getInstance(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(username));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            message.setSubject(asunto);
+            message.setText(mensaje);
+
+            Transport.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
 }
