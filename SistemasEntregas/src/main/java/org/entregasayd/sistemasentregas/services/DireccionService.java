@@ -14,7 +14,6 @@ public class DireccionService {
     private DireccionRepository direccionRepository;
 
     public Direccion create(Direccion direccion) {
-        System.out.println("hola qeu tal "+direccion);
         direccion.setIdDireccion(null);
         return direccionRepository.save(direccion);
     }

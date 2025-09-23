@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/direccion")
+@RequestMapping("api/direcciones")
 public class DireccionController {
     @Autowired
     private DireccionService direccionService;
@@ -30,5 +30,10 @@ public class DireccionController {
     @PutMapping("/update")
     public Direccion update(@Valid @RequestBody  Direccion direccion){
         return direccionService.update(direccion);
+    }
+
+    @GetMapping("get-by-id/{id}")
+    public Direccion getById(@PathVariable Long id){
+        return direccionService.findById(id);
     }
 }
