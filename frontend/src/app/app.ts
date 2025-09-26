@@ -4,7 +4,10 @@ import { BarraNavegacion } from "./barra-navegacion/barra-navegacion";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, BarraNavegacion],
+  imports: [
+    RouterOutlet, 
+    BarraNavegacion 
+  ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

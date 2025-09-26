@@ -1,0 +1,426 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Gestión de Sucursales</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <!-- Botón para crear nueva sucursal -->
+      <div class="create-button-section">
+        <button mat-raised-button color="primary" 
+                (click)="crearNuevaSucursal()"
+                class="create-button">
+          <mat-icon>add</mat-icon>
+          Crear Sucursal
+        </button>
+      </div>
+
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
+        <!-- Tab para Formulario de Sucursal -->
+        <mat-tab label="Nueva Sucursal">
+          <div class="tab-content">
+            <div class="header-section">
+              <h3>Crear Nueva Sucursal</h3>
+              <mat-spinner *ngIf="guardandoSucursal" diameter="30"></mat-spinner>
+            </div>
+            
+            <form [formGroup]="sucursalForm" (ngSubmit)="guardarSucursal()" class="empresa-form">
+              <!-- Información de la Sucursal -->
+              <div class="form-section">
+                <h4>Información de la Sucursal</h4>
+                
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Empresa</mat-label>
+                    <mat-select formControlName="idEmpresa" required>
+                      <mat-option *ngFor="let empresaItem of empresas" [value]="empresaItem.empresa.idEmpresa">
+                        {{ empresaItem.empresa.nombreComercial }} ({{ empresaItem.empresa.nit }})
+                      </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="sucursalForm.get('idEmpresa')?.hasError('required')">
+                      La empresa es requerida
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Código de Sucursal</mat-label>
+                    <input matInput formControlName="codigoSucursal" required>
+                    <mat-error *ngIf="sucursalForm.get('codigoSucursal')?.hasError('required')">
+                      El código de sucursal es requerido
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Nombre de Sucursal</mat-label>
+                    <input matInput formControlName="nombreSucursal" required>
+                    <mat-error *ngIf="sucursalForm.get('nombreSucursal')?.hasError('required')">
+                      El nombre de sucursal es requerido
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Días de Operación</mat-label>
+                    <input matInput formControlName="diasOperacion" placeholder="LMMJVSD" required>
+                    <mat-hint>Ejemplo: LMMJVSD (Lunes a Domingo)</mat-hint>
+                    <mat-error *ngIf="sucursalForm.get('diasOperacion')?.hasError('required')">
+                      Los días de operación son requeridos
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Horario de Apertura</mat-label>
+                    <input matInput type="time" formControlName="horarioApertura" required>
+                    <mat-error *ngIf="sucursalForm.get('horarioApertura')?.hasError('required')">
+                      El horario de apertura es requerido
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Horario de Cierre</mat-label>
+                    <input matInput type="time" formControlName="horarioCierre" required>
+                    <mat-error *ngIf="sucursalForm.get('horarioCierre')?.hasError('required')">
+                      El horario de cierre es requerido
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <!-- Información de Dirección -->
+              <div class="form-section">
+                <h4>Información de Dirección</h4>
+                
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Tipo de Dirección</mat-label>
+                    <mat-select formControlName="tipoDireccion" required>
+                      <mat-option value="RESIDENCIA">Residencia</mat-option>
+                      <mat-option value="TRABAJO">Trabajo</mat-option>
+                      <mat-option value="ENTREGA">Entrega</mat-option>
+                      <mat-option value="FISCAL">Fiscal</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="sucursalForm.get('tipoDireccion')?.hasError('required')">
+                      El tipo de dirección es requerido
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>País</mat-label>
+                    <input matInput formControlName="pais" required>
+                    <mat-error *ngIf="sucursalForm.get('pais')?.hasError('required')">
+                      El país es requerido
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Departamento</mat-label>
+                    <input matInput formControlName="departamento" required>
+                    <mat-error *ngIf="sucursalForm.get('departamento')?.hasError('required')">
+                      El departamento es requerido
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Municipio</mat-label>
+                    <input matInput formControlName="municipio" required>
+                    <mat-error *ngIf="sucursalForm.get('municipio')?.hasError('required')">
+                      El municipio es requerido
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Código Postal</mat-label>
+                    <input matInput formControlName="codigoPostal" required>
+                    <mat-error *ngIf="sucursalForm.get('codigoPostal')?.hasError('required')">
+                      El código postal es requerido
+                    </mat-error>
+                  </mat-form-field>
+
+                  <div class="checkbox-field">
+                    <mat-checkbox formControlName="activa">
+                      Dirección Activa
+                    </mat-checkbox>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field full-width">
+                    <mat-label>Referencias</mat-label>
+                    <textarea matInput formControlName="referencias" required rows="3"></textarea>
+                    <mat-error *ngIf="sucursalForm.get('referencias')?.hasError('required')">
+                      Las referencias son requeridas
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <!-- Información del Personal -->
+              <div class="form-section">
+                <h4>Asignación de Personal</h4>
+                
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Usuario</mat-label>
+                    <mat-select formControlName="idUsuario" required>
+                      <mat-option *ngFor="let usuario of usuariosSucursal" [value]="usuario.idUsuario">
+                        {{ usuario.nombreUsuario }} ({{ usuario.nombreRol }})
+                      </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="sucursalForm.get('idUsuario')?.hasError('required')">
+                      El usuario es requerido
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Cargo</mat-label>
+                    <input matInput formControlName="cargo" required>
+                    <mat-error *ngIf="sucursalForm.get('cargo')?.hasError('required')">
+                      El cargo es requerido
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha de Fin (Opcional)</mat-label>
+                    <input matInput type="date" formControlName="fechaFin">
+                  </mat-form-field>
+
+                  <div class="checkbox-group">
+                    <mat-checkbox formControlName="esEncargado" class="checkbox-field">
+                      Es Encargado
+                    </mat-checkbox>
+                    <mat-checkbox formControlName="activo" class="checkbox-field">
+                      Personal Activo
+                    </mat-checkbox>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button mat-button type="button" color="warn" 
+                        (click)="cancelarFormulario()"
+                        [disabled]="guardandoSucursal">
+                  Cancelar
+                </button>
+                <button mat-raised-button type="submit" color="primary" 
+                        [disabled]="sucursalForm.invalid || guardandoSucursal">
+                  <mat-spinner *ngIf="guardandoSucursal" diameter="20" style="margin-right: 8px;"></mat-spinner>
+                  Crear Sucursal
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+        
+        <!-- Tab para Lista de Sucursales -->
+        <mat-tab label="Lista de Sucursales">
+          <div class="tab-content">
+            <div class="header-section">
+              <h3>Lista de Sucursales</h3>
+              <mat-spinner *ngIf="loadingSucursales" diameter="30"></mat-spinner>
+            </div>
+            
+            <div *ngIf="!loadingSucursales && sucursales.length > 0" class="items-container">
+              <div *ngFor="let item of sucursales" class="list-item empresa-item">
+                <div class="item-content">
+                  <!-- Información básica siempre visible -->
+                  <div class="basic-info">
+                    <div class="primary-text">
+                      <strong>{{ item.branch.nombreSucursal }}</strong>
+                      <mat-chip class="status-chip" 
+                               [ngClass]="{'active': item.branch.estado === 'ACTIVA', 'inactive': item.branch.estado === 'INACTIVA', 'temporal': item.branch.estado === 'TEMPORAL', 'mantenimiento': item.branch.estado === 'MANTENIMIENTO'}">
+                        {{ item.branch.estado }}
+                      </mat-chip>
+                    </div>
+                    <div class="secondary-text">
+                      Código: {{ item.branch.codigoSucursal }} | Empresa: {{ item.branch.company.nombreComercial }}
+                    </div>
+                    <div class="secondary-text">
+                      Horario: {{ item.branch.horarioApertura }} - {{ item.branch.horarioCierre }}
+                    </div>
+                    <div class="secondary-text">
+                      Personal: {{ item.branch.staff.length }} asignado(s)
+                    </div>
+                  </div>
+                  
+                  <!-- Información expandible -->
+                  <div class="expanded-info" *ngIf="item.expanded">
+                    <mat-divider></mat-divider>                    
+
+                    <!-- Información de la empresa -->
+                    <div class="section-title">
+                      <mat-icon>business</mat-icon>
+                      Información de la Empresa
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Empresa:</span>
+                        <span class="value">{{ item.branch.company.nombreComercial }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">NIT:</span>
+                        <span class="value">{{ item.branch.company.nit }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Tipo:</span>
+                        <span class="value">{{ item.branch.company.tipoEmpresa }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Estado Empresa:</span>
+                        <span class="value">{{ item.branch.company.estado }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Información de la sucursal -->
+                    <div class="section-title">
+                      <mat-icon>store</mat-icon>
+                      Información de la Sucursal
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Días de Operación:</span>
+                        <span class="value">{{ item.branch.diasOperacion }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Horario:</span>
+                        <span class="value">{{ item.branch.horarioApertura }} - {{ item.branch.horarioCierre }}</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Información de dirección -->
+                    <div class="section-title">
+                      <mat-icon>location_on</mat-icon>
+                      Dirección
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Tipo:</span>
+                        <span class="value">{{ item.branch.address.tipoDireccion }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">País:</span>
+                        <span class="value">{{ item.branch.address.pais }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Departamento:</span>
+                        <span class="value">{{ item.branch.address.departamento }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Municipio:</span>
+                        <span class="value">{{ item.branch.address.municipio }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Código Postal:</span>
+                        <span class="value">{{ item.branch.address.codigoPostal }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Referencias:</span>
+                        <span class="value">{{ item.branch.address.referencias }}</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Información del personal -->
+                    <div class="section-title">
+                      <mat-icon>people</mat-icon>
+                      Personal Asignado
+                    </div>
+                    <div *ngIf="item.branch.staff && item.branch.staff.length > 0">
+                      <div *ngFor="let personal of item.branch.staff" class="staff-item">
+                        <div class="details-grid">
+                          <div class="detail-item">
+                            <span class="label">Usuario:</span>
+                            <span class="value">{{ personal.nombreUsuario }}</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Cargo:</span>
+                            <span class="value">{{ personal.cargo }}</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Encargado:</span>
+                            <span class="value">
+                              <mat-icon class="status-icon" [ngClass]="{'active': personal.esEncargado}">
+                                {{ personal.esEncargado ? 'check_circle' : 'cancel' }}
+                              </mat-icon>
+                            </span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Fecha Asignación:</span>
+                            <span class="value">{{ personal.fechaAsignacion | date:'dd/MM/yyyy' }}</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Fecha Fin:</span>
+                            <span class="value">{{ personal.fechaFin | date:'dd/MM/yyyy' }}</span>
+                          </div>
+                          <div class="detail-item">
+                            <span class="label">Activo:</span>
+                            <span class="value">
+                              <mat-icon class="status-icon" [ngClass]="{'active': personal.activo}">
+                                {{ personal.activo ? 'check_circle' : 'cancel' }}
+                              </mat-icon>
+                            </span>
+                          </div>
+                        </div>
+                        <mat-divider></mat-divider>
+                      </div>
+                    </div>
+                    <div *ngIf="!item.branch.staff || item.branch.staff.length === 0" class="no-contact-info">
+                      <p class="no-contact-message">Esta sucursal no tiene personal asignado actualmente.</p>
+                    </div>
+                  </div>
+                  
+                  <!-- Botones de acción -->
+                  <div class="action-buttons">
+                    <!-- Sección para cambiar estado -->
+                    <div class="estado-section">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Estado de la Sucursal</mat-label>
+                        <mat-select [value]="item.branch.estado" 
+                                   (selectionChange)="onEstadoChange(item, $event.value)"
+                                   [disabled]="item.actualizandoEstado">
+                          <mat-option value="ACTIVA">Activa</mat-option>
+                          <mat-option value="INACTIVA">Inactiva</mat-option>
+                          <mat-option value="TEMPORAL">Temporal</mat-option>
+                          <mat-option value="MANTENIMIENTO">Mantenimiento</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      
+                      <!-- Spinner para indicar que se está actualizando -->
+                      <mat-spinner *ngIf="item.actualizandoEstado" diameter="20"></mat-spinner>
+                    </div>
+                    
+                    <mat-divider></mat-divider>
+
+                    <div class="button-group">
+                      <button mat-button color="primary" 
+                              (click)="toggleExpanded(item.branch.idSucursal)">
+                        {{ item.expanded ? 'Ver Menos' : 'Ver Más' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Mensaje cuando no hay datos -->
+            <div *ngIf="!loadingSucursales && sucursales.length === 0" class="no-data">
+              <mat-icon>store</mat-icon>
+              <p>No se encontraron sucursales</p>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

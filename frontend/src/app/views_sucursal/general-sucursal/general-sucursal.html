@@ -1,0 +1,408 @@
+<div class="contenedor-principal">
+  
+  <!-- Indicador de carga -->
+  <div *ngIf="loading" class="contenedor-carga">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="texto-carga">Cargando información...</p>
+  </div>
+
+  <!-- Mensaje de error -->
+  <mat-card *ngIf="error && !loading" class="tarjeta-error">
+    <mat-card-content>
+      <div class="contenido-error">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <span>{{ error }}</span>
+        <button mat-raised-button color="primary" (click)="cargarDatos()">
+          <mat-icon>refresh</mat-icon>
+          Reintentar
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Contenido principal -->
+  <div *ngIf="!loading && !error && empresa" class="contenido-principal">
+    
+    <!-- SECCIÓN 1: INFORMACIÓN DE LA EMPRESA Y SUCURSAL -->
+    <mat-card class="tarjeta-informacion">
+      <mat-card-header class="encabezado-tarjeta">
+        <div mat-card-avatar class="avatar-empresa">
+          <mat-icon>business</mat-icon>
+        </div>
+        <mat-card-title>Información de la Empresa</mat-card-title>
+        <mat-card-subtitle>Datos generales y de sucursal</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="rejilla-informacion">
+          
+          <!-- Datos Generales de la Empresa -->
+          <div class="seccion-datos">
+            <div class="titulo-seccion">
+              <mat-icon>store</mat-icon>
+              <h3>Datos de la Empresa</h3>
+            </div>
+            
+            <div class="lista-datos">
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>business_center</mat-icon>
+                  <span>Nombre Comercial</span>
+                </div>
+                <div class="valor-dato destacado">{{ empresa.nombreComercial || 'N/A' }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>domain</mat-icon>
+                  <span>Razón Social</span>
+                </div>
+                <div class="valor-dato">{{ empresa.razonSocial || 'N/A' }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>receipt_long</mat-icon>
+                  <span>NIT</span>
+                </div>
+                <div class="valor-dato">{{ empresa.nit || 'N/A' }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>description</mat-icon>
+                  <span>Registro Mercantil</span>
+                </div>
+                <div class="valor-dato">{{ empresa.registroMercantil || 'N/A' }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>category</mat-icon>
+                  <span>Tipo de Empresa</span>
+                </div>
+                <div class="valor-dato">{{ empresa.tipoEmpresa.replace('_', ' ') || 'N/A' }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>info</mat-icon>
+                  <span>Estado</span>
+                </div>
+                <div class="valor-dato">
+                  <mat-chip class="chip-estado" [color]="obtenerColorEstado(empresa.estado || '')">
+                    {{ empresa.estado || 'N/A' }}
+                  </mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fechas Importantes -->
+          <div class="seccion-datos">
+            <div class="titulo-seccion">
+              <mat-icon>calendar_today</mat-icon>
+              <h3>Fechas Importantes</h3>
+            </div>
+            
+            <div class="lista-datos">
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>event</mat-icon>
+                  <span>Constitución</span>
+                </div>
+                <div class="valor-dato">{{ formatearFecha(empresa.fechaConstitucion || '') }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>how_to_reg</mat-icon>
+                  <span>Afiliación</span>
+                </div>
+                <div class="valor-dato">{{ formatearFecha(empresa.fechaAfiliacion || '') }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>event_available</mat-icon>
+                  <span>Vencimiento Afiliación</span>
+                </div>
+                <div class="valor-dato vencimiento">{{ formatearFecha(empresa.fechaVencimientoAfiliacion || '') }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información del Contacto -->
+          <div class="seccion-datos" *ngIf="empresa.contacto">
+            <div class="titulo-seccion">
+              <mat-icon>person</mat-icon>
+              <h3>Contacto Empresarial</h3>
+            </div>
+            
+            <div class="lista-datos">
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>work</mat-icon>
+                  <span>Cargo</span>
+                </div>
+                <div class="valor-dato destacado">{{ empresa.contacto.cargo || 'N/A' }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>play_arrow</mat-icon>
+                  <span>Inicio</span>
+                </div>
+                <div class="valor-dato">{{ formatearFecha(empresa.contacto.fechaInicio || '') }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>stop</mat-icon>
+                  <span>Fin</span>
+                </div>
+                <div class="valor-dato">{{ formatearFecha(empresa.contacto.fechaFin || '') }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>verified</mat-icon>
+                  <span>Estado</span>
+                </div>
+                <div class="valor-dato">
+                  <mat-chip class="chip-estado" [color]="empresa.contacto.activo ? 'primary' : 'warn'">
+                    {{ empresa.contacto.activo ? 'Activo' : 'Inactivo' }}
+                  </mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de la Sucursal -->
+          <div class="seccion-datos" *ngIf="empresa.sucursal">
+            <div class="titulo-seccion">
+              <mat-icon>location_on</mat-icon>
+              <h3>Sucursal</h3>
+            </div>
+            
+            <div class="lista-datos">
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>store_mall_directory</mat-icon>
+                  <span>Nombre</span>
+                </div>
+                <div class="valor-dato destacado">{{ empresa.sucursal.nombreSucursal || 'N/A' }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>tag</mat-icon>
+                  <span>Código</span>
+                </div>
+                <div class="valor-dato">{{ empresa.sucursal.codigoSucursal || 'N/A' }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>schedule</mat-icon>
+                  <span>Horario</span>
+                </div>
+                <div class="valor-dato">{{ (empresa.sucursal.horarioApertura || '') + ' - ' + (empresa.sucursal.horarioCierre || '') }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>date_range</mat-icon>
+                  <span>Días de Operación</span>
+                </div>
+                <div class="valor-dato">{{ formatearDiasOperacion(empresa.sucursal.diasOperacion || '') }}</div>
+              </div>
+              
+              <div class="item-dato">
+                <div class="etiqueta-dato">
+                  <mat-icon>info</mat-icon>
+                  <span>Estado</span>
+                </div>
+                <div class="valor-dato">
+                  <mat-chip class="chip-estado" [color]="obtenerColorEstado(empresa.sucursal.estado || '')">
+                    {{ empresa.sucursal.estado || 'N/A' }}
+                  </mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- SECCIÓN 2: PROGRAMA DE FIDELIZACIÓN -->
+    <mat-card class="tarjeta-fidelizacion" *ngIf="empresaFidelizacion && empresaFidelizacion.empresaFidelizacion">
+      <mat-card-header class="encabezado-tarjeta">
+        <div mat-card-avatar class="avatar-fidelizacion">
+          <mat-icon>loyalty</mat-icon>
+        </div>
+        <mat-card-title>Programa de Fidelización</mat-card-title>
+        <mat-card-subtitle>
+          Período: {{ obtenerNombreMes(empresaFidelizacion.empresaFidelizacion.mes || 0) }} {{ empresaFidelizacion.empresaFidelizacion.anio || '' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="contenido-fidelizacion">
+          
+          <!-- Estadísticas del Período -->
+          <div class="seccion-estadisticas">
+            <div class="titulo-seccion">
+              <mat-icon>analytics</mat-icon>
+              <h3>Estadísticas del Período</h3>
+            </div>
+            
+            <div class="rejilla-estadisticas">
+              <mat-card class="tarjeta-estadistica entregas">
+                <mat-card-content>
+                  <div class="contenido-estadistica">
+                    <div class="icono-estadistica">
+                      <mat-icon>local_shipping</mat-icon>
+                    </div>
+                    <div class="datos-estadistica">
+                      <div class="numero-estadistica">{{ empresaFidelizacion.empresaFidelizacion.totalEntregas || 0 }}</div>
+                      <div class="etiqueta-estadistica">Total Entregas</div>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+              
+              <mat-card class="tarjeta-estadistica monto">
+                <mat-card-content>
+                  <div class="contenido-estadistica">
+                    <div class="icono-estadistica">
+                      <mat-icon>attach_money</mat-icon>
+                    </div>
+                    <div class="datos-estadistica">
+                      <div class="numero-estadistica">{{ formatearMoneda(empresaFidelizacion.empresaFidelizacion.montoTotalEntregas || 0) }}</div>
+                      <div class="etiqueta-estadistica">Monto Total</div>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+              
+              <mat-card class="tarjeta-estadistica cancelaciones">
+                <mat-card-content>
+                  <div class="contenido-estadistica">
+                    <div class="icono-estadistica">
+                      <mat-icon>cancel</mat-icon>
+                    </div>
+                    <div class="datos-estadistica">
+                      <div class="numero-estadistica">{{ empresaFidelizacion.empresaFidelizacion.totalCancelaciones || 0 }}</div>
+                      <div class="etiqueta-estadistica">Cancelaciones</div>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+              
+              <mat-card class="tarjeta-estadistica descuento">
+                <mat-card-content>
+                  <div class="contenido-estadistica">
+                    <div class="icono-estadistica">
+                      <mat-icon>percent</mat-icon>
+                    </div>
+                    <div class="datos-estadistica">
+                      <div class="numero-estadistica">{{ formatearMoneda(empresaFidelizacion.empresaFidelizacion.descuentoAplicado || 0) }}</div>
+                      <div class="etiqueta-estadistica">Descuento Aplicado</div>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+              
+              <mat-card class="tarjeta-estadistica penalizaciones">
+                <mat-card-content>
+                  <div class="contenido-estadistica">
+                    <div class="icono-estadistica">
+                      <mat-icon>warning</mat-icon>
+                    </div>
+                    <div class="datos-estadistica">
+                      <div class="numero-estadistica">{{ formatearMoneda(empresaFidelizacion.empresaFidelizacion.penalizacionesAplicadas || 0) }}</div>
+                      <div class="etiqueta-estadistica">Penalizaciones</div>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+
+          <!-- Nivel de Fidelización -->
+          <div class="seccion-nivel" *ngIf="empresaFidelizacion.nivelFidelizacion">
+            
+            <div class="seccion-datos">
+              <mat-card-content>
+                <div class="titulo-seccion">
+                  <mat-icon>emoji_events</mat-icon>
+                  <h3>{{ empresaFidelizacion.nivelFidelizacion.nombreNivel || 'N/A' }}</h3>
+                </div>
+                
+                <div class="detalles-nivel">  
+                  <div class="item-dato">
+                    <div class="etiqueta-dato">
+                      <mat-icon>trending_up</mat-icon>
+                      <span>Rango de Entregas</span>
+                    </div>
+                    <div class="valor-dato">{{ (empresaFidelizacion.nivelFidelizacion.numeroMinimoEntregas || 0) + ' - ' + (empresaFidelizacion.nivelFidelizacion.numeroMaximoEntregas || 0) }}</div>
+                  </div>
+                  
+                  <div class="item-dato">
+                    <div class="etiqueta-dato">
+                      <mat-icon>discount</mat-icon>
+                      <span>Descuento</span>
+                    </div>
+                    <div class="valor-dato">{{ (empresaFidelizacion.nivelFidelizacion.descuentoPorcentaje || 0) + '%' }}</div>
+                  </div>
+                  
+                  <div class="item-dato">
+                    <div class="etiqueta-dato">
+                      <mat-icon>cancel_presentation</mat-icon>
+                      <span>Cancelaciones Gratuitas</span>
+                    </div>
+                    <div class="valor-dato">{{ (empresaFidelizacion.nivelFidelizacion.cancelacionesGratuitasMes || 0) + '/mes' }}</div>
+                  </div>
+                  
+                  <div class="item-dato">
+                    <div class="etiqueta-dato">
+                      <mat-icon>report_problem</mat-icon>
+                      <span>Penalización</span>
+                    </div>
+                    <span class="valor-dato">{{ (empresaFidelizacion.nivelFidelizacion.porcentajePenalizacion || 0) + '%' }}</span>
+                  </div>
+                  
+                  <div class="item-dato">
+                    <div class="etiqueta-dato">
+                      <mat-icon>event</mat-icon>
+                      <span>Vigencia</span>
+                    </div>
+                    <span class="valor">
+                      Desde {{ formatearFecha(empresaFidelizacion.nivelFidelizacion.fechaInicioVigencia || '') }}
+                      <span *ngIf="empresaFidelizacion.nivelFidelizacion.fechaFinVigencia">
+                        hasta {{ formatearFecha(empresaFidelizacion.nivelFidelizacion.fechaFinVigencia) }}
+                      </span>
+                    </span>
+                  </div>
+                  
+                  <div class="item-dato">
+                    <div class="etiqueta-dato">
+                      <mat-icon>check_circle</mat-icon>
+                      <span>Estado</span>
+                    </div>
+                    <div class="valor-dato">
+                      <mat-chip class="chip-estado" [color]="empresaFidelizacion.nivelFidelizacion.activo ? 'primary' : 'warn'">
+                        {{ empresaFidelizacion.nivelFidelizacion.activo ? 'Activo' : 'Inactivo' }}
+                      </mat-chip>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

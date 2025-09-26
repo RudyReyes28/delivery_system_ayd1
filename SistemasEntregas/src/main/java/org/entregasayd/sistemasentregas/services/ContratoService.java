@@ -1,22 +1,23 @@
 package org.entregasayd.sistemasentregas.services;
 
 import jakarta.transaction.Transactional;
-import org.entregasayd.sistemasentregas.dto.contrato.ContratoComisionRequestDTO;
+import org.entregasayd.sistemasentregas.dto.contrato.ContratoComisionDTO;
 import org.entregasayd.sistemasentregas.dto.contrato.ContratoRequestDTO;
 import org.entregasayd.sistemasentregas.dto.contrato.ContratoResponseDTO;
 import org.entregasayd.sistemasentregas.mapper.ContratoMap;
 import org.entregasayd.sistemasentregas.models.Contrato;
 import org.entregasayd.sistemasentregas.models.ContratoComision;
 import org.entregasayd.sistemasentregas.models.Empleado;
-import org.entregasayd.sistemasentregas.repositories.ContratoComisionRepository;
 import org.entregasayd.sistemasentregas.repositories.ContratoRepository;
 import org.entregasayd.sistemasentregas.repositories.EmpleadoRepository;
 import org.entregasayd.sistemasentregas.utils.ErrorApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ContratoService {
@@ -35,6 +36,10 @@ public class ContratoService {
         return repository.save(contrato);
     }
 
+    public Contrato findById(Long id){
+        return repository.findByIdContrato(id);
+    }
+
     public Contrato searchByNumberContrato(String numeroContrato){
         return repository.findByNumeroContrato(numeroContrato);
     }
@@ -42,7 +47,7 @@ public class ContratoService {
     @Transactional
     public ContratoResponseDTO createWithComision(
             ContratoRequestDTO contratoRequestDTO,
-            ContratoComisionRequestDTO contratoComisionRequestDTO){
+            ContratoComisionDTO contratoComisionRequestDTO){
         Optional<Empleado> empleadoOptional = empleadoRepository.findById(contratoRequestDTO.getIdEmpleado());
         if (empleadoOptional.isEmpty()) {
             throw new ErrorApi(404,"Empleado no encontrado");
@@ -84,8 +89,11 @@ public class ContratoService {
         return contratoMap.toDTO(contratoSave);
     }
 
-    public Contrato update(Contrato contrato){
+    public Contrato update(ContratoResponseDTO contrato){
         Contrato contratoUpdate = repository.findByIdContrato(contrato.getIdContrato());
+        if(contratoUpdate == null){
+            throw new ErrorApi(404, "Contrato no encontrado.");
+        }
         contratoUpdate.setNumeroContrato(contrato.getNumeroContrato());
         contratoUpdate.setTipoContrato(contrato.getTipoContrato());
         contratoUpdate.setModalidadTrabajo(contrato.getModalidadTrabajo());
@@ -103,6 +111,54 @@ public class ContratoService {
 
     public List<Contrato> findAll(){
         return repository.findAll();
+    }
+
+    /**
+     * Lista todos los contratos
+     *
+     * @return
+     */
+    public List<ContratoResponseDTO> getAll(){
+        return repository.findAll().stream().map(contratoMap::toDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Obtiene todos los contratos por estado
+     * @param estado
+     * @return List<ContratoResponseDTO>
+     */
+    public List<ContratoResponseDTO> contratosPorEstado(String estado){
+        return repository.findByEstadoContrato(
+                Contrato.EstadoContrato.valueOf(estado.toUpperCase())).stream().map(contratoMap::toDTO).collect(Collectors.toList());
+    }
+    public List<ContratoResponseDTO> contratosPorModalidad(String modalidad){
+        return repository.findByModalidadTrabajo(
+                Contrato.ModalidadTrabajo.valueOf(modalidad.toUpperCase())).stream().map(contratoMap::toDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Obtiene todos los contratos por tipo de contrato
+     * @param tipoContrato
+     * @return
+     */
+    public List<ContratoResponseDTO> contratosPorTipoContrato(String tipoContrato){
+        return repository.findByTipoContrato(
+                Contrato.TipoContrato.valueOf(tipoContrato.toUpperCase())).stream().map(contratoMap::toDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Obtiene todos los contratos entre dos fechas
+     * @param fechaFin fecha final
+     * @param fechaInicio fecha inicial
+     * @return
+     */
+    public List<ContratoResponseDTO> contratosEntreFecha(LocalDate fechaFin, LocalDate fechaInicio ){
+        return repository.findByFechaFinBetween(fechaFin, fechaInicio).stream().map(contratoMap::toDTO).collect(Collectors.toList());
+    }
+
+    public List<ContratoResponseDTO> contratosPorEmpleado(Long idEmpleado){
+        //return repository.findByEmpleado_IdEmpleado(idEmpleado).stream().map(contrato -> contratoMap.toDTO(contrato)).collect(Collectors.toList());
+        return repository.findByEmpleado_IdEmpleado(idEmpleado).stream().map(contratoMap::toDTO).collect(Collectors.toList());
     }
 
 }

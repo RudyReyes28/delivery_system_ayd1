@@ -1,7 +1,9 @@
 package org.entregasayd.sistemasentregas.services;
 
 import jakarta.transaction.Transactional;
+import org.entregasayd.sistemasentregas.dto.user.EmpleadoRequestDTO;
 import org.entregasayd.sistemasentregas.dto.user.UsuarioResponseDto;
+import org.entregasayd.sistemasentregas.mapper.EmpleadoMap;
 import org.entregasayd.sistemasentregas.mapper.UsuarioMap;
 import org.entregasayd.sistemasentregas.models.Empleado;
 import org.entregasayd.sistemasentregas.models.Persona;
@@ -25,6 +27,8 @@ public class UsuarioService {
     private EmpleadoService empleadoService;
     @Autowired
     private UsuarioMap userMap;
+    @Autowired
+    private EmpleadoMap empleadoMap;
     private Encriptation encriptation;
 
     public UsuarioService() {
@@ -44,7 +48,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public UsuarioResponseDto create(Persona persona, Usuario usuario, Empleado empleado){
+    public EmpleadoRequestDTO create(Persona persona, Usuario usuario, Empleado empleado){
         try {
             if(findByUsername(usuario.getNombreUsuario()) != null){
                 throw new ErrorApi(400,"El nombre de usuario ya se encuentra en uso.");
@@ -64,9 +68,7 @@ public class UsuarioService {
             Usuario usuarioSave = usuarioRepository.save(usuario);
             //registrar empleado
             empleado.setUsuario(usuarioSave);
-            empleadoService.create(empleado);
-
-            return userMap.toDto(usuarioRepository.save(usuarioSave));
+            return empleadoMap.toDto(empleadoService.create(empleado));
         } catch (Exception e){
             throw new ErrorApi(500,"Lo sentimos, hubo un error al crear el usuario" + e.getMessage());
         }

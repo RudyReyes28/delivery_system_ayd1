@@ -18,4 +18,12 @@ public class EmpleadoService {
         return empleadoRepository.save(empleado);
     }
 
+    public Empleado getByIdUsuario(Long idUsuario){
+        return empleadoRepository.getByUsuario_IdUsuario(idUsuario);
+    }
+
+    public Empleado findById(Long id){
+        return empleadoRepository.findById(id).orElse(null);
+    }
+
 }

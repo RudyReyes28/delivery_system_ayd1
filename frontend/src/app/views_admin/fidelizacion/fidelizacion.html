@@ -1,0 +1,362 @@
+<div class="admin-fidelizacion-container">
+  <h1>Administración de Fidelización</h1>
+  
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>Cargando empresas...</p>
+  </div>
+
+  <div class="empresas-grid" *ngIf="!loading">
+    <mat-card *ngFor="let empresaData of empresas" class="empresa-card">
+      <mat-card-header>
+        <mat-card-title>{{ empresaData.empresa.nombreComercial }}</mat-card-title>
+        <mat-card-subtitle>{{ empresaData.empresa.razonSocial }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="empresa-info">
+          <p><strong>NIT:</strong> {{ empresaData.empresa.nit }}</p>
+          <p><strong>Estado:</strong> 
+            <span class="estado" [ngClass]="empresaData.empresa.estado.toLowerCase()">
+              {{ empresaData.empresa.estado }}
+            </span>
+          </p>
+          <p><strong>Tipo:</strong> {{ empresaData.empresa.tipoEmpresa }}</p>
+          
+          <div class="fidelizacion-info" *ngIf="empresaData.empresa.nivelFidelizacion">
+            <h4>Fidelización Actual</h4>
+            <p><strong>Nivel:</strong> {{ empresaData.empresa.nivelFidelizacion.nombreNivel }}</p>
+            <p><strong>Descuento:</strong> {{ empresaData.empresa.nivelFidelizacion.descuentoPorcentaje }}%</p>
+            <div class="estadisticas" *ngIf="empresaData.empresa.empresaFidelizacion">
+              <p><strong>Entregas:</strong> {{ empresaData.empresa.empresaFidelizacion.totalEntregas }}</p>
+              <p><strong>Monto total:</strong> ${{ empresaData.empresa.empresaFidelizacion.montoTotalEntregas }}</p>
+            </div>
+          </div>
+
+          <div class="sin-fidelizacion" *ngIf="!empresaData.empresa.nivelFidelizacion">
+            <p class="no-program">Sin programa de fidelización asignado</p>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button color="primary" (click)="verMasInfo(empresaData.empresa)">
+          <mat-icon>info</mat-icon>
+          Ver Más
+        </button>
+
+        <!-- Botón Asignar Fidelización (solo si no tiene programa) -->
+        <button 
+          mat-raised-button 
+          color="accent" 
+          *ngIf="!empresaData.empresa.empresaFidelizacion && !empresaData.empresa.nivelFidelizacion"
+          (click)="asignarFidelizacion(empresaData.empresa)"
+          [disabled]="procesando === empresaData.empresa.idEmpresa">
+          <mat-icon>add_circle</mat-icon>
+          Asignar Fidelización
+        </button>
+
+        <!-- Botón Cambiar Fidelización (solo si ya tiene programa) -->
+        <button 
+          mat-raised-button 
+          color="warn" 
+          *ngIf="empresaData.empresa.empresaFidelizacion && empresaData.empresa.nivelFidelizacion"
+          (click)="cambiarFidelizacion(empresaData.empresa)"
+          [disabled]="procesando === empresaData.empresa.idEmpresa">
+          <mat-icon>swap_horiz</mat-icon>
+          Cambiar Fidelización
+        </button>
+
+        <mat-spinner diameter="20" *ngIf="procesando === empresaData.empresa.idEmpresa"></mat-spinner>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Panel de selección de nivel -->
+  <mat-card *ngIf="mostrarSelectorNivel" class="selector-nivel-card">
+    <mat-card-header>
+      <mat-card-title>
+        {{ accionActual === 'asignar' ? 'Asignar' : 'Cambiar' }} Nivel de Fidelización
+      </mat-card-title>
+      <mat-card-subtitle>{{ empresaSeleccionada?.nombreComercial }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Seleccionar Nivel</mat-label>
+        <mat-select [(value)]="nivelSeleccionado">
+          <mat-option value="PLATA">
+            <div class="nivel-option">
+              <span class="nivel-nombre">Plata</span>
+              <small>0-99 entregas • 5% descuento • 100% penalización</small>
+            </div>
+          </mat-option>
+          <mat-option value="ORO">
+            <div class="nivel-option">
+              <span class="nivel-nombre">Oro</span>
+              <small>100-299 entregas • 8% descuento • 50% penalización</small>
+            </div>
+          </mat-option>
+          <mat-option value="DIAMANTE">
+            <div class="nivel-option">
+              <span class="nivel-nombre">Diamante</span>
+              <small>300+ entregas • 12% descuento • 25% penalización</small>
+            </div>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="nivel-descripcion" *ngIf="nivelSeleccionado">
+        <h4>Beneficios del Nivel {{ nivelSeleccionado }}</h4>
+        <div [ngSwitch]="nivelSeleccionado">
+          <div *ngSwitchCase="'PLATA'">
+            <p>✓ 5% de descuento en todas las entregas</p>
+            <p>✓ Válido para empresas con 0-99 entregas</p>
+            <p>⚠ 100% de penalización por cancelaciones</p>
+          </div>
+          <div *ngSwitchCase="'ORO'">
+            <p>✓ 8% de descuento en todas las entregas</p>
+            <p>✓ Válido para empresas con 100-299 entregas</p>
+            <p>⚠ 50% de penalización por cancelaciones</p>
+          </div>
+          <div *ngSwitchCase="'DIAMANTE'">
+            <p>✓ 12% de descuento en todas las entregas</p>
+            <p>✓ Válido para empresas con 300+ entregas</p>
+            <p>⚠ 25% de penalización por cancelaciones</p>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-button (click)="cancelarSeleccion()">
+        <mat-icon>cancel</mat-icon>
+        Cancelar
+      </button>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="confirmarAccion()" 
+        [disabled]="!nivelSeleccionado || procesandoAccion">
+        <mat-icon *ngIf="!procesandoAccion">{{ accionActual === 'asignar' ? 'add' : 'swap_horiz' }}</mat-icon>
+        <mat-spinner diameter="20" *ngIf="procesandoAccion"></mat-spinner>
+        {{ accionActual === 'asignar' ? 'Asignar' : 'Cambiar' }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Overlay para el selector de nivel -->
+  <div class="overlay" *ngIf="mostrarSelectorNivel" (click)="cancelarSeleccion()"></div>
+
+  <!-- Modal de detalle de empresa -->
+  <mat-card *ngIf="mostrarDetalleEmpresa" class="detalle-empresa-card">
+    <mat-card-header>
+      <div mat-card-avatar class="empresa-avatar">
+        <mat-icon>business</mat-icon>
+      </div>
+      <mat-card-title>{{ empresaDetalleSeleccionada?.nombreComercial }}</mat-card-title>
+      <mat-card-subtitle>Información Completa</mat-card-subtitle>
+      <button mat-icon-button class="close-button" (click)="cerrarDetalleEmpresa()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-card-header>
+
+    <mat-card-content class="detalle-content">
+      <!-- Información básica de la empresa -->
+      <div class="seccion-detalle">
+        <h3><mat-icon>business</mat-icon> Información Empresarial</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">ID Empresa:</span>
+            <span class="value">{{ empresaDetalleSeleccionada?.idEmpresa }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Razón Social:</span>
+            <span class="value">{{ empresaDetalleSeleccionada?.razonSocial }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">NIT:</span>
+            <span class="value">{{ empresaDetalleSeleccionada?.nit }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Registro Mercantil:</span>
+            <span class="value">{{ empresaDetalleSeleccionada?.registroMercantil }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Tipo de Empresa:</span>
+            <span class="value">{{ empresaDetalleSeleccionada?.tipoEmpresa }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Estado:</span>
+            <span class="value estado" [ngClass]="empresaDetalleSeleccionada?.estado?.toLowerCase()">
+              {{ empresaDetalleSeleccionada?.estado }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fechas importantes -->
+      <div class="seccion-detalle">
+        <h3><mat-icon>event</mat-icon> Fechas Importantes</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Fecha Constitución:</span>
+            <span class="value">{{ empresaDetalleSeleccionada?.fechaConstitucion | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Fecha Afiliación:</span>
+            <span class="value">{{ empresaDetalleSeleccionada?.fechaAfiliacion | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Vencimiento Afiliación:</span>
+            <span class="value">{{ empresaDetalleSeleccionada?.fechaVencimientoAfiliacion | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Programa de fidelización -->
+      <div class="seccion-detalle" *ngIf="empresaDetalleSeleccionada?.nivelFidelizacion">
+        <h3><mat-icon>star</mat-icon> Programa de Fidelización</h3>
+        <div class="fidelizacion-detalle">
+          <div class="nivel-badge" [ngClass]="empresaDetalleSeleccionada?.nivelFidelizacion?.codigoNivel?.toLowerCase()">
+            <mat-icon>military_tech</mat-icon>
+            {{ empresaDetalleSeleccionada?.nivelFidelizacion?.nombreNivel }}
+          </div>
+          
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Código Nivel:</span>
+              <span class="value">{{ empresaDetalleSeleccionada?.nivelFidelizacion?.codigoNivel }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Descripción:</span>
+              <span class="value">{{ empresaDetalleSeleccionada?.nivelFidelizacion?.descripcion }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Descuento:</span>
+              <span class="value descuento">{{ empresaDetalleSeleccionada?.nivelFidelizacion?.descuentoPorcentaje }}%</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Rango de Entregas:</span>
+              <span class="value">
+                {{ empresaDetalleSeleccionada?.nivelFidelizacion?.numeroMinimoEntregas || empresaDetalleSeleccionada?.nivelFidelizacion?.entregasMinimas }} - 
+                {{ empresaDetalleSeleccionada?.nivelFidelizacion?.numeroMaximoEntregas || empresaDetalleSeleccionada?.nivelFidelizacion?.entregasMaximas }}
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="label">Cancelaciones Gratuitas:</span>
+              <span class="value">{{ empresaDetalleSeleccionada?.nivelFidelizacion?.cancelacionesGratuitasMes }} por mes</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Penalización:</span>
+              <span class="value penalizacion">{{ empresaDetalleSeleccionada?.nivelFidelizacion?.porcentajePenalizacion }}%</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Vigencia:</span>
+              <span class="value">
+                {{ empresaDetalleSeleccionada?.nivelFidelizacion?.fechaInicioVigencia | date:'dd/MM/yyyy' }}
+                <span *ngIf="empresaDetalleSeleccionada?.nivelFidelizacion?.fechaFinVigencia">
+                  - {{ empresaDetalleSeleccionada?.nivelFidelizacion?.fechaFinVigencia | date:'dd/MM/yyyy' }}
+                </span>
+                <span *ngIf="!empresaDetalleSeleccionada?.nivelFidelizacion?.fechaFinVigencia" class="indefinido">
+                  - Indefinido
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estadísticas del programa -->
+      <div class="seccion-detalle" *ngIf="empresaDetalleSeleccionada?.empresaFidelizacion">
+        <h3><mat-icon>analytics</mat-icon> Estadísticas del Programa</h3>
+        <div class="estadisticas-grid">
+          <div class="estadistica-card entregas">
+            <mat-icon>local_shipping</mat-icon>
+            <div class="estadistica-info">
+              <span class="numero">{{ empresaDetalleSeleccionada?.empresaFidelizacion?.totalEntregas }}</span>
+              <span class="concepto">Entregas Totales</span>
+            </div>
+          </div>
+          
+          <div class="estadistica-card monto">
+            <mat-icon>attach_money</mat-icon>
+            <div class="estadistica-info">
+              <span class="numero">${{ empresaDetalleSeleccionada?.empresaFidelizacion?.montoTotalEntregas | number:'1.2-2' }}</span>
+              <span class="concepto">Monto Total</span>
+            </div>
+          </div>
+          
+          <div class="estadistica-card cancelaciones">
+            <mat-icon>cancel</mat-icon>
+            <div class="estadistica-info">
+              <span class="numero">{{ empresaDetalleSeleccionada?.empresaFidelizacion?.totalCancelaciones }}</span>
+              <span class="concepto">Cancelaciones</span>
+            </div>
+          </div>
+          
+          <div class="estadistica-card descuentos">
+            <mat-icon>local_offer</mat-icon>
+            <div class="estadistica-info">
+              <span class="numero">${{ empresaDetalleSeleccionada?.empresaFidelizacion?.descuentoAplicado | number:'1.2-2' }}</span>
+              <span class="concepto">Descuentos Aplicados</span>
+            </div>
+          </div>
+          
+          <div class="estadistica-card penalizaciones">
+            <mat-icon>warning</mat-icon>
+            <div class="estadistica-info">
+              <span class="numero">${{ empresaDetalleSeleccionada?.empresaFidelizacion?.penalizacionesAplicadas | number:'1.2-2' }}</span>
+              <span class="concepto">Penalizaciones</span>
+            </div>
+          </div>
+          
+          <div class="estadistica-card periodo">
+            <mat-icon>schedule</mat-icon>
+            <div class="estadistica-info">
+              <span class="numero">{{ empresaDetalleSeleccionada?.empresaFidelizacion?.mes }}/{{ empresaDetalleSeleccionada?.empresaFidelizacion?.anio }}</span>
+              <span class="concepto">Período Actual</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje si no tiene programa -->
+      <div class="seccion-detalle" *ngIf="!empresaDetalleSeleccionada?.nivelFidelizacion">
+        <div class="sin-programa">
+          <mat-icon>info</mat-icon>
+          <h3>Sin Programa de Fidelización</h3>
+          <p>Esta empresa aún no tiene asignado un programa de fidelización.</p>
+        </div>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-button (click)="cerrarDetalleEmpresa()">
+        <mat-icon>close</mat-icon>
+        Cerrar
+      </button>
+      
+      <button 
+        mat-raised-button 
+        color="accent" 
+        *ngIf="!empresaDetalleSeleccionada?.empresaFidelizacion && !empresaDetalleSeleccionada?.nivelFidelizacion"
+        (click)="asignarFidelizacion(empresaDetalleSeleccionada!); cerrarDetalleEmpresa()">
+        <mat-icon>add_circle</mat-icon>
+        Asignar Fidelización
+      </button>
+      
+      <button 
+        mat-raised-button 
+        color="warn" 
+        *ngIf="empresaDetalleSeleccionada?.empresaFidelizacion && empresaDetalleSeleccionada?.nivelFidelizacion"
+        (click)="cambiarFidelizacion(empresaDetalleSeleccionada!); cerrarDetalleEmpresa()">
+        <mat-icon>swap_horiz</mat-icon>
+        Cambiar Fidelización
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Overlay para el detalle de empresa -->
+  <div class="overlay" *ngIf="mostrarDetalleEmpresa" (click)="cerrarDetalleEmpresa()"></div>
+</div>
