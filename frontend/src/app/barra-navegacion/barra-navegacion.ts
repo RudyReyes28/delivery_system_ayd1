@@ -41,64 +41,70 @@ interface MenuItem {
 })
 export class BarraNavegacion implements OnInit {
   private allMenuItems: MenuItem[] = [
-    { 
-      icon: 'local_shipping', 
-      label: 'General', 
+    {
+      icon: 'local_shipping',
+      label: 'General',
       route: '/',
     },
-    { 
-      icon: 'account_circle', 
-      label: 'Iniciar Sesión', 
+    {
+      icon: 'account_circle',
+      label: 'Iniciar Sesión',
       route: '/login',
     },
-    { 
-      icon: 'person', 
-      label: 'Crear Usuario', 
+    {
+      icon: 'person',
+      label: 'Crear Usuario',
       route: '/crear-usuario',
-      roles: ['ADMINISTRADOR']
+      roles: ['ADMINISTRADOR'],
     },
-    { 
-      icon: 'group', 
-      label: 'Gestión Empleados', 
+    {
+      icon: 'group',
+      label: 'Gestión Empleados',
       route: '/gestion-empleados',
-      roles: ['ADMINISTRADOR']
+      roles: ['ADMINISTRADOR'],
     },
-    { 
-      icon: 'business_center', 
-      label: 'Gestión Empresas', 
+    {
+      icon: 'density_small',
+      label: 'Gestión de Contratos',
+      route: '/gestion-contratos',
+      roles: ['ADMINISTRADOR'],
+    },
+    {
+      icon: 'business_center',
+      label: 'Gestión Empresas',
       route: '/empresa',
-      roles: ['ADMINISTRADOR']
+      roles: ['ADMINISTRADOR'],
     },
-    { 
-      icon: 'store', 
-      label: 'Gestión Sucursales', 
+    {
+      icon: 'store',
+      label: 'Gestión Sucursales',
       route: '/sucursal',
-      roles: ['ADMINISTRADOR']
+      roles: ['ADMINISTRADOR'],
     },
-    { 
-      icon: 'grade', 
-      label: 'Fidelización', 
+    {
+      icon: 'grade',
+      label: 'Fidelización',
       route: '/fidelizacion',
-      roles: ['ADMINISTRADOR']
+      roles: ['ADMINISTRADOR'],
     },
-    { 
-      icon: 'settings', 
-      label: 'General', 
+    {
+      icon: 'settings',
+      label: 'General',
       route: 'general-sucursal',
-      roles: ['SUCURSAL']
+      roles: ['SUCURSAL'],
     },
-    { 
-      icon: 'local_shipping', 
-      label: 'Gestión Guías', 
+    {
+      icon: 'local_shipping',
+      label: 'Gestión Guías',
       route: '/guia-sucursal',
-      roles: ['SUCURSAL']
+      roles: ['SUCURSAL'],
     },
-    { 
-      icon: 'logout', 
-      label: 'Cerrar Sesión', 
+    {
+      icon: 'logout',
+      label: 'Cerrar Sesión',
       route: '/logout',
-      roles: ['ADMINISTRADOR','SUCURSAL']
-    }
+      roles: ['ADMINISTRADOR', 'SUCURSAL'],
+    },
   ];
 
   menuItems: MenuItem[] = [];
@@ -106,16 +112,20 @@ export class BarraNavegacion implements OnInit {
   nombreRolActual: string | null = null;
   private routerSubscription: any;
 
-  constructor( private router: Router, private authService: AuthService, private snackBar: MatSnackBar) {
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private snackBar: MatSnackBar
+  ) {
     this.routerSubscription = this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
+      .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
         this.cargarDatosUsuarioYMenu();
       });
   }
 
-  ngOnInit() { 
-    this.cargarDatosUsuarioYMenu(); 
+  ngOnInit() {
+    this.cargarDatosUsuarioYMenu();
   }
 
   ngOnDestroy() {
@@ -127,24 +137,22 @@ export class BarraNavegacion implements OnInit {
   private cargarDatosUsuarioYMenu() {
     const idUsuario = sessionStorage.getItem('idUsuario');
     const nombreRol = sessionStorage.getItem('nombreRol');
-    
+
     if (idUsuario) {
       this.idUsuarioActual = Number(idUsuario);
       this.nombreRolActual = nombreRol;
       this.filtrarMenu();
     } else {
-      this.menuItems = this.allMenuItems.filter(item => 
-        !item.roles && !item.roleIds
-      );
+      this.menuItems = this.allMenuItems.filter((item) => !item.roles && !item.roleIds);
     }
   }
 
   private filtrarMenu() {
-    this.menuItems = this.allMenuItems.filter(item => {
+    this.menuItems = this.allMenuItems.filter((item) => {
       if (!item.roles && !item.roleIds) {
         return true;
       }
-      
+
       if (item.roles && this.nombreRolActual) {
         if (item.roles.includes(this.nombreRolActual)) {
           return true;
@@ -171,11 +179,14 @@ export class BarraNavegacion implements OnInit {
           this.mostrarMensaje(response.message, 'success-snackbar');
         },
         error: (error) => {
-          this.mostrarMensaje(error.error?.message || "Error al cambiar Autentificación", "error-snackbar");
-        }
+          this.mostrarMensaje(
+            error.error?.message || 'Error al cambiar Autentificación',
+            'error-snackbar'
+          );
+        },
       });
     } else {
-      this.mostrarMensaje("No existe una Sesión Activa", "error-snackbar");
+      this.mostrarMensaje('No existe una Sesión Activa', 'error-snackbar');
     }
   }
 
@@ -183,22 +194,19 @@ export class BarraNavegacion implements OnInit {
     if (this.idUsuarioActual !== null && this.nombreRolActual !== null) {
       try {
         sessionStorage.clear();
-        
+
         this.idUsuarioActual = null;
         this.nombreRolActual = null;
-        
-        this.menuItems = this.allMenuItems.filter(item => 
-          !item.roles && !item.roleIds
-        );
-        
-        this.mostrarMensaje("Sesión cerrada correctamente", "success-snackbar");
+
+        this.menuItems = this.allMenuItems.filter((item) => !item.roles && !item.roleIds);
+
+        this.mostrarMensaje('Sesión cerrada correctamente', 'success-snackbar');
         this.router.navigate(['/']);
-        
       } catch (error) {
-        this.mostrarMensaje("Error al cerrar sesión", "error-snackbar");
+        this.mostrarMensaje('Error al cerrar sesión', 'error-snackbar');
       }
     } else {
-      this.mostrarMensaje("No hay usuario registrado", "info-snackbar");
+      this.mostrarMensaje('No hay usuario registrado', 'info-snackbar');
     }
   }
 

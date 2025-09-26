@@ -14,6 +14,7 @@ import org.entregasayd.sistemasentregas.utils.ErrorApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -119,6 +120,40 @@ public class ContratoService {
      */
     public List<ContratoResponseDTO> getAll(){
         return repository.findAll().stream().map(contratoMap::toDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Obtiene todos los contratos por estado
+     * @param estado
+     * @return List<ContratoResponseDTO>
+     */
+    public List<ContratoResponseDTO> contratosPorEstado(String estado){
+        return repository.findByEstadoContrato(
+                Contrato.EstadoContrato.valueOf(estado.toUpperCase())).stream().map(contratoMap::toDTO).collect(Collectors.toList());
+    }
+    public List<ContratoResponseDTO> contratosPorModalidad(String modalidad){
+        return repository.findByModalidadTrabajo(
+                Contrato.ModalidadTrabajo.valueOf(modalidad.toUpperCase())).stream().map(contratoMap::toDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Obtiene todos los contratos por tipo de contrato
+     * @param tipoContrato
+     * @return
+     */
+    public List<ContratoResponseDTO> contratosPorTipoContrato(String tipoContrato){
+        return repository.findByTipoContrato(
+                Contrato.TipoContrato.valueOf(tipoContrato.toUpperCase())).stream().map(contratoMap::toDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Obtiene todos los contratos entre dos fechas
+     * @param fechaFin fecha final
+     * @param fechaInicio fecha inicial
+     * @return
+     */
+    public List<ContratoResponseDTO> contratosEntreFecha(LocalDate fechaFin, LocalDate fechaInicio ){
+        return repository.findByFechaFinBetween(fechaFin, fechaInicio).stream().map(contratoMap::toDTO).collect(Collectors.toList());
     }
 
     public List<ContratoResponseDTO> contratosPorEmpleado(Long idEmpleado){

@@ -1,0 +1,839 @@
+@use "tailwindcss";
+
+// empresa-usuarios.component.scss
+.container {
+  padding: 20px;
+  max-width: 1270px;
+  margin: 0 auto;
+
+  mat-card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+
+    mat-card-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px 12px 0 0;
+      margin: -24px -24px 24px -24px;
+
+      mat-card-title {
+        font-size: 24px;
+        font-weight: 500;
+        margin: 0;
+      }
+    }
+  }
+}
+
+.tab-content {
+  padding: 20px 0;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h3 {
+    margin: 0;
+    color: #333;
+    font-weight: 500;
+  }
+
+  mat-spinner {
+    margin-left: 20px;
+  }
+}
+
+// Contenedor para los elementos
+.items-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// Estilos para los elementos de la lista
+.list-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  transition: box-shadow 0.3s ease;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &.empresa-item {
+    border-left: 4px solid #4caf50;
+  }
+
+  .item-content {
+    width: 100%;
+    padding: 16px;
+  }
+}
+
+.basic-info {
+  margin-bottom: 12px;
+  width: 97%;
+
+  .primary-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    strong {
+      font-size: 18px;
+      color: #333;
+      flex: 1;
+      min-width: 200px;
+    }
+  }
+
+  .secondary-text {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+}
+
+// Estilos para los chips de estado
+.status-chip {
+  font-size: 12px !important;
+  padding: 4px 12px !important;
+  border-radius: 16px !important;
+  font-weight: 500 !important;
+  min-height: auto !important;
+  height: auto !important;
+
+  &.active {
+    background-color: #4caf50 !important;
+    color: white !important;
+  }
+
+  &.inactive {
+    background-color: #f44336 !important;
+    color: white !important;
+  }
+
+  &.suspended {
+    background-color: #ff9800 !important;
+    color: white !important;
+  }
+}
+
+// Información expandible
+.expanded-info {
+  margin: 16px 0;
+  padding-top: 16px;
+  width: 97%;
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    color: #333;
+    margin: 16px 0 8px 0;
+    font-size: 16px;
+
+    mat-icon {
+      margin-right: 8px;
+      color: #666;
+      font-size: 20px;
+    }
+  }
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+
+  .detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    border-left: 3px solid #2196f3;
+
+    .label {
+      font-weight: 500;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .value {
+      color: #333;
+      font-size: 14px;
+      text-align: right;
+      max-width: 150px;
+      word-break: break-word;
+
+      .status-icon {
+        font-size: 18px;
+
+        &.active {
+          color: #4caf50;
+        }
+
+        &:not(.active) {
+          color: #f44336;
+        }
+      }
+    }
+  }
+}
+
+// Botones de acción
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+  width: 97%;
+
+  button {
+    min-width: 120px;
+
+    mat-icon {
+      margin-right: 8px;
+      font-size: 18px;
+    }
+  }
+}
+
+// Mensaje cuando no hay contacto
+.no-contact-info {
+  padding: 16px;
+  background: #fff3e0;
+  border-radius: 8px;
+  border-left: 4px solid #ff9800;
+  margin: 12px 0;
+
+  .section-title {
+    margin-bottom: 8px;
+    color: #e65100;
+  }
+
+  .no-contact-message {
+    margin: 0;
+    color: #bf360c;
+    font-style: italic;
+    font-size: 14px;
+  }
+}
+
+// Mensaje cuando no hay datos
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+
+  mat-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: 16px;
+    margin: 0;
+  }
+}
+
+// Estilos globales para Angular Material
+::ng-deep {
+  .mat-mdc-tab-group {
+    .mat-mdc-tab-header {
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .mat-mdc-tab {
+      font-weight: 500;
+      min-width: 160px;
+    }
+
+    .mat-mdc-tab-body-content {
+      padding: 0;
+    }
+  }
+
+  // Estilos para snackbar
+  .error-snackbar {
+    background: #f44336 !important;
+    color: white !important;
+  }
+
+  .success-snackbar {
+    background: #4caf50 !important;
+    color: white !important;
+  }
+
+  // Arreglos para mat-chip
+  .mat-mdc-chip {
+    --mat-chip-trailing-action-state-layer-color: transparent;
+    --mat-chip-focus-state-layer-color: transparent;
+    --mat-chip-hover-state-layer-color: transparent;
+  }
+}
+
+// Media queries para responsividad
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .basic-info .primary-text {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .item-content {
+    padding: 12px;
+  }
+
+  .container mat-card mat-card-header {
+    margin: -16px -16px 16px -16px;
+    padding: 16px;
+  }
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h3 {
+    margin: 0;
+    color: #333;
+    font-weight: 500;
+  }
+
+  mat-spinner {
+    margin-left: 20px;
+  }
+}
+
+// Estilos para los elementos de la lista
+.list-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  padding: 0;
+  background: white;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &.empresa-item {
+    border-left: 4px solid #4caf50;
+  }
+
+  .item-content {
+    width: 100%;
+    padding: 16px;
+  }
+}
+
+.basic-info {
+  margin-bottom: 12px;
+
+  .primary-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    strong {
+      font-size: 18px;
+      color: #333;
+    }
+  }
+
+  .secondary-text {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+}
+
+// Estilos para los chips de estado
+.status-chip {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-weight: 500;
+
+  &.active {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  &.inactive {
+    background-color: #f44336;
+    color: white;
+  }
+
+  &.suspended {
+    background-color: #ff9800;
+    color: white;
+  }
+}
+
+// Información expandible
+.expanded-info {
+  margin: 16px 0;
+  padding-top: 16px;
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    color: #333;
+    margin: 16px 0 8px 0;
+    font-size: 16px;
+
+    mat-icon {
+      margin-right: 8px;
+      color: #666;
+      font-size: 20px;
+    }
+  }
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+
+  .detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    border-left: 3px solid #2196f3;
+
+    .label {
+      font-weight: 500;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .value {
+      color: #333;
+      font-size: 14px;
+      text-align: right;
+      max-width: 150px;
+      word-break: break-word;
+
+      .status-icon {
+        font-size: 18px;
+
+        &.active {
+          color: #4caf50;
+        }
+
+        &:not(.active) {
+          color: #f44336;
+        }
+      }
+    }
+  }
+}
+
+// Botones de acción
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+
+  button {
+    min-width: 120px;
+
+    mat-icon {
+      margin-right: 8px;
+      font-size: 18px;
+    }
+  }
+}
+
+// Mensaje cuando no hay contacto
+.no-contact-info {
+  padding: 16px;
+  background: #fff3e0;
+  border-radius: 8px;
+  border-left: 4px solid #ff9800;
+  margin: 12px 0;
+
+  .section-title {
+    margin-bottom: 8px;
+    color: #e65100;
+  }
+
+  .no-contact-message {
+    margin: 0;
+    color: #bf360c;
+    font-style: italic;
+    font-size: 14px;
+  }
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+
+  mat-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: 16px;
+    margin: 0;
+  }
+}
+
+// Estilos para los tabs
+::ng-deep {
+  .mat-tab-group {
+    .mat-tab-header {
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .mat-tab-label {
+      font-weight: 500;
+      min-width: 160px;
+    }
+
+    .mat-tab-body-content {
+      padding: 0;
+    }
+  }
+
+  // Estilos para snackbar
+  .error-snackbar {
+    background: #f44336;
+    color: white;
+  }
+
+  .success-snackbar {
+    background: #4caf50;
+    color: white;
+  }
+}
+
+// Media queries para responsividad
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .basic-info .primary-text {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .item-content {
+    padding: 12px;
+  }
+
+  .container mat-card mat-card-header {
+    margin: -16px -16px 16px -16px;
+    padding: 16px;
+  }
+}
+
+// Estilos adicionales para agregar al archivo empresa-usuarios.component.scss
+
+// Sección del botón crear empresa
+.create-button-section {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+
+  .create-button {
+    min-width: 150px;
+    height: 40px;
+    font-weight: 500;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+// Estilos para el formulario de empresa
+.empresa-form {
+  max-width: 100%;
+  padding: 20px 0;
+
+  .form-section {
+    margin-bottom: 32px;
+
+    h4 {
+      margin: 0 0 20px 0;
+      color: #333;
+      font-weight: 500;
+      font-size: 18px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #2196f3;
+      display: inline-block;
+    }
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 16px;
+
+    .form-field {
+      width: 100%;
+    }
+
+    .checkbox-field {
+      display: flex;
+      align-items: center;
+      height: 56px; // Para alinear con los form fields
+    }
+  }
+
+  .usuario-selection {
+    margin-bottom: 20px;
+
+    .full-width {
+      width: 100%;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+
+    button {
+      min-width: 120px;
+      height: 40px;
+    }
+  }
+}
+
+// Estilos para campos de formulario con errores
+::ng-deep {
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      &.mdc-text-field--invalid {
+
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: #f44336 !important;
+        }
+      }
+    }
+  }
+
+  .mat-mdc-form-field-error {
+    color: #f44336;
+    font-size: 12px;
+  }
+}
+
+// Sección del estado con spinner
+.estado-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  mat-spinner {
+    flex-shrink: 0;
+  }
+}
+
+// Estilos para el status chip con más variantes
+.status-chip {
+  &.morosa {
+    background-color: #9c27b0 !important;
+    color: white !important;
+  }
+}
+
+// Responsive para el formulario
+@media (max-width: 768px) {
+  .create-button-section {
+    justify-content: center;
+  }
+
+  .empresa-form {
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .form-actions {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+
+  .estado-section {
+    flex-direction: column;
+    align-items: stretch;
+
+    mat-form-field {
+      width: 100%;
+    }
+
+    mat-spinner {
+      align-self: center;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .create-button-section {
+    margin-bottom: 16px;
+
+    .create-button {
+      width: 100%;
+      min-width: auto;
+    }
+  }
+
+  .empresa-form {
+    padding: 16px 0;
+
+    .form-section {
+      margin-bottom: 24px;
+
+      h4 {
+        font-size: 16px;
+      }
+    }
+
+    .form-actions {
+      margin-top: 24px;
+      padding-top: 16px;
+    }
+  }
+}
+
+// Mejoras en la validación visual
+.mat-mdc-checkbox {
+  --mdc-checkbox-selected-focus-state-layer-color: #2196f3;
+  --mdc-checkbox-selected-hover-state-layer-color: #2196f3;
+  --mdc-checkbox-selected-pressed-state-layer-color: #2196f3;
+}
+
+// Estilos para el tab activo
+::ng-deep {
+  .mat-mdc-tab-group {
+    .mat-mdc-tab-header {
+      .mat-mdc-tab-label-container {
+        .mat-mdc-tab-label {
+          &.mdc-tab--active {
+            .mdc-tab__text-label {
+              color: #2196f3;
+              font-weight: 600;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animaciones para las transiciones
+.tab-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -294,6 +294,7 @@ export class Empleados implements OnInit {
   ) {
     this.empleadoForm = this.crearFormulario();
     this.isRepartidor = false;
+    this.selectedTabIndex = 1;
   }
 
   ngOnInit(): void {
