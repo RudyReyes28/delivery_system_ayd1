@@ -26,8 +26,9 @@ public class AsignacionRepartidor {
     @JoinColumn(name = "id_repartidor")
     private Repartidor repartidor;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_asignacion", nullable = false)
-    private TipoAsignacion tipoAsignacion; // 'automatica', 'manual', 'reasignacion
+    private TipoAsignacion tipoAsignacion = TipoAsignacion.MANUAL; // 'automatica', 'manual', 'reasignacion
 
     @Column(name = "fecha_asignacion", nullable = false)
     private LocalDateTime fechaAsignacion;
@@ -50,6 +51,7 @@ public class AsignacionRepartidor {
     @Column(name = "tiempo_estimado_entrega")
     private Integer tiempoEstimadoEntrega; // En minutos
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado_asignacion", nullable = false)
     private EstadoAsignacion estadoAsignacion = EstadoAsignacion.PENDIENTE; // 'pendiente', 'aceptada', 'rechazada', 'completada', 'cancelada
 
