@@ -21,4 +21,30 @@ export class ContratoService {
   public contratosPorEmpleado(idEmpleado: number): Observable<ContratoModel[]> {
     return this.http.get<ContratoModel[]>(`${this.API_URL}/contratos-por-empleado/${idEmpleado}`);
   }
+
+  public obtenerTodosLosContratos(): Observable<ContratoModel[]> {
+    return this.http.get<ContratoModel[]>(`${this.API_URL}/get-all`);
+  }
+
+  public contratosPorEstado(estado: string): Observable<ContratoModel[]> {
+    return this.http.get<ContratoModel[]>(`${this.API_URL}/contratos-por-estado/${estado}`);
+  }
+
+  public contratosPorModalidad(modalidad: string): Observable<ContratoModel[]> {
+    return this.http.get<ContratoModel[]>(`${this.API_URL}/contratos-por-modalidad/${modalidad}`);
+  }
+
+  public contratosPorTipoContrato(tipoContrato: string): Observable<ContratoModel[]> {
+    return this.http.get<ContratoModel[]>(`${this.API_URL}/contratos-por-tipo-contrato/${tipoContrato}`);
+  }
+
+  public contratosEntreFechas(fecha1: string, fecha2: string): Observable<ContratoModel[]> {
+    return this.http.get<ContratoModel[]>(
+      `${this.API_URL}/contratos-entre-fechas/${fecha1}/${fecha2}`
+    );
+  }
+
+  public contratosApuntoDeCaducir(): Observable<ContratoModel[]> {
+    return this.http.get<ContratoModel[]>(`${this.API_URL}/a-punto-de-caducir`);
+  }
 }

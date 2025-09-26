@@ -1,7 +1,8 @@
 package org.entregasayd.sistemasentregas.controllers;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.entregasayd.sistemasentregas.dto.contrato.ComisionDTO;
 import org.entregasayd.sistemasentregas.dto.contrato.ContratoComisionDTO;
+import org.entregasayd.sistemasentregas.dto.contrato.ContratoResponseDTO;
 import org.entregasayd.sistemasentregas.mapper.ContratoMap;
 import org.entregasayd.sistemasentregas.services.ContratoComisionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,15 @@ public class ContratoComisionController {
         return  map.toComisionDTO(contratoComisionService.findById(id));
     }
 
-    @PutMapping("/actualizar-comision-contrato")
-    public ContratoComisionDTO udpate(@RequestBody ContratoComisionDTO contratoComisionDTO) {
+    @GetMapping("/obtener-por-contrato/{idContrato}")
+    public ContratoComisionDTO obtenerPorComision(@PathVariable Long idContrato) {
+        return map.toComisionDTO(contratoComisionService.findByContrato(idContrato));
+    }
+
+    @PutMapping("/actualizar-comision")
+    public ContratoComisionDTO udpate(@RequestBody ContratoComisionDTO  contratoComisionDTO) {
+        System.out.println(String.format("Datos recibidos: %s",
+                contratoComisionDTO.toString()));
         return map.toComisionDTO(contratoComisionService.update(contratoComisionDTO));
     }
 

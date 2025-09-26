@@ -12,33 +12,6 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "contrato")
 public class Contrato {
-   /*CONTRATO
-    id_contrato (PK)
-    id_empleado (FK)
-    numero_contrato VARCHAR(50) UNIQUE NOT NULL
-    tipo_contrato ENUM('indefinido','temporal','por_servicios','practicante') NOT NULL
-    modalidad_trabajo ENUM('presencial','remoto','hibrido') DEFAULT 'presencial'
-
-    -- Vigencia
-    fecha_inicio DATE NOT NULL
-    fecha_fin DATE NULL
-    renovacion_automatica BOOLEAN DEFAULT FALSE
-
-    -- Términos económicos
-    salario_base DECIMAL(10,2) DEFAULT 0.00
-    moneda VARCHAR(3) DEFAULT 'GTQ'
-    frecuencia_pago ENUM('semanal','quincenal','mensual') DEFAULT 'quincenal'
-
-    -- Beneficios
-    incluye_aguinaldo BOOLEAN DEFAULT TRUE
-    incluye_bono_14 BOOLEAN DEFAULT TRUE
-    incluye_vacaciones BOOLEAN DEFAULT TRUE
-    incluye_igss BOOLEAN DEFAULT TRUE
-
-    -- Estado del contrato
-    estado_contrato ENUM('borrador','activo','suspendido','terminado','rescindido') DEFAULT 'borrador'
-
-*/
     @Id
     @Column(name = "id_contrato", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

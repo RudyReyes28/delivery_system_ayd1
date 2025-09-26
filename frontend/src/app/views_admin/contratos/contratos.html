@@ -1,0 +1,501 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Gestión de Empleados</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Botón para crear nuevo empleado -->
+      <div class="create-button-section">
+        <mat-form-field class="mr-4" appearance="outline">
+          <mat-label>Filtrar contratos</mat-label>
+          <mat-select (selectionChange)="filtrarContratos($event.value)">
+            @for (item of otrasOpciones; track $index) {
+            <mat-option [value]="item.value">
+              {{ item.viewValue }}
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="mr-4 form-field" appearance="outline">
+          <mat-label>Por tipo</mat-label>
+          <mat-select (selectionChange)="filtrarPorTipo($event.value)">
+            @for (item of tipos; track $index) {
+            <mat-option [value]="item">
+              {{ item }}
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="mr-4" appearance="outline">
+          <mat-label>Por modalidad</mat-label>
+          <mat-select (selectionChange)="filtrarPorModalidad($event.value)">
+            @for (item of modalidades; track $index) {
+            <mat-option [value]="item">
+              {{ item }}
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="mr-4" appearance="outline">
+          <mat-label>Por estado</mat-label>
+          <mat-select (selectionChange)="filtrarPorEstado($event.value)">
+            @for (item of estadosContrato; track $index) {
+            <mat-option [value]="item">
+              {{ item }}
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
+        <!-- Tab para el formulario de contrato -->
+        <mat-tab label="{{ modoEdicion ? 'Editar contrato' : 'Renovación del contrato' }}">
+          <div class="tab-content">
+            <div class="header-section">
+              <h3>{{ modoEdicion ? 'Editar contrato' : 'Renovación del contrato' }}</h3>
+              @if (guardandoContrato) {
+              <mat-spinner diameter="30"></mat-spinner>
+              }
+            </div>
+
+            <form [formGroup]="contratoForm" (ngSubmit)="guardarContrato()" class="empresa-form">
+              <!-- Información sobre el contrato -->
+              <div class="form-section">
+                <h4>Información de Contrato</h4>
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Número de Contrato</mat-label>
+                    <input matInput type="text" formControlName="numeroContrato" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Tipo de Contrato</mat-label>
+                    <mat-select formControlName="tipoContrato" required>
+                      @for (item of tipos; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Modalidad de trabajo</mat-label>
+                    <mat-select formControlName="modalidadTrabajo" required>
+                      @for (item of modalidades; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha de inicio</mat-label>
+                    <input matInput type="date" formControlName="fechaInicio" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Fecha de finalización</mat-label>
+                    <input matInput type="date" formControlName="fechaFin" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Estado del contrato</mat-label>
+                    <mat-select formControlName="estadoContrato" required>
+                      @for (item of estadosContrato; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Salario base</mat-label>
+                    <input matInput type="number" min="1" formControlName="salarioBase" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Frecuencia de pago</mat-label>
+                    <mat-select formControlName="frecuenciaPago" required>
+                      @for (item of frecuencias; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <!-- switch-->
+                  <mat-slide-toggle formControlName="renovacionAutomatica"
+                    >¿Renovacion automática?</mat-slide-toggle
+                  >
+                </div>
+
+                <div class="grid grid-cols-4 gap-4">
+                  <!-- switch-->
+                  <mat-slide-toggle formControlName="incluyeAguinaldo"
+                    >¿Incluye Aguinaldo?</mat-slide-toggle
+                  >
+                  <!-- switch-->
+                  <mat-slide-toggle formControlName="incluyeBono14"
+                    >¿Incluye Bono 14?</mat-slide-toggle
+                  >
+                  <mat-slide-toggle formControlName="incluyeVacaciones"
+                    >¿Incluye vacaciones?</mat-slide-toggle
+                  >
+                  <mat-slide-toggle formControlName="incluyeIgss">¿Incluye Igss?</mat-slide-toggle>
+                </div>
+              </div>
+
+              <mat-divider></mat-divider>
+              <!-- Información la comision del contrato -->
+              <div class="form-section">
+                <h4>Detalles de la comisión</h4>
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Tipo de de comisión</mat-label>
+                    <mat-select formControlName="tipoComision" required>
+                      @for (item of tiposComision; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Porcentaje</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      min="0"
+                      max="1"
+                      formControlName="porcentaje"
+                      required
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Monto fijo (Q.)</mat-label>
+                    <input matInput type="number" formControlName="montoFijo" required />
+                  </mat-form-field>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Aplicable desde</mat-label>
+                    <input matInput type="date" formControlName="fechaDesde" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Aplicable hasta</mat-label>
+                    <input matInput type="date" formControlName="fechaHasta" required />
+                  </mat-form-field>
+
+                  <!-- switch-->
+                  <mat-slide-toggle formControlName="comisionActiva"
+                    >¿Comisión Activa?</mat-slide-toggle
+                  >
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Mínimo de entregas al mes</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      min="1"
+                      formControlName="minimoEntregasMes"
+                      required
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Máximo de entregas al mes</mat-label>
+                    <input matInput type="number" formControlName="maximoEntregasMes" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Factor multiplicador de la comisión</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      min="0"
+                      formControlName="factorMultiplicador"
+                      required
+                    />
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button
+                  mat-button
+                  type="button"
+                  color="warn"
+                  (click)="cancelarFormulario()"
+                  [disabled]="guardandoContrato"
+                >
+                  Cancelar
+                </button>
+                <!-- [disabled]="empleadoForm.invalid || guardandoEmpleado" -->
+                <button
+                  mat-raised-button
+                  type="submit"
+                  color="primary"
+                  [disabled]="contratoForm.invalid"
+                >
+                  @if(guardandoContrato){
+                  <mat-spinner diameter="20" style="margin-right: 8px"></mat-spinner>
+                  }
+                  {{ modoEdicion ? 'Actualizar contrato' : 'Renovar contrato' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+
+        <!-- Tab para Lista de Empleados -->
+        <mat-tab label="Contratos">
+          <div class="tab-content">
+            <div class="header-section">
+              <h2>Conratos</h2>
+              @if(!loadingContratos){
+              <mat-spinner diameter="30"></mat-spinner>
+              }
+            </div>
+
+            @if (loadingContratos && contratos.length > 0) {
+            <div class="items-container">
+              @for (item of contratos; track $index) {
+              <div class="list-item empleado-item">
+                <div class="item-content">
+                  <!-- Información del contrato -->
+                  <div class="basic-info">
+                    <div class="primary-text">
+                      <strong> Código: {{ item.contrato.numeroContrato }} </strong>
+                      <mat-chip
+                        class="status-chip"
+                        [ngClass]="
+                          item.contrato
+                            ? {
+                                active: item.contrato.estadoContrato === 'ACTIVO',
+                                inactive: item.contrato.estadoContrato === 'INACTIVO',
+                                suspended: item.contrato.estadoContrato === 'SUSPENDIDO',
+                                terminated: item.contrato.estadoContrato === 'TERMINADO',
+                                rescinded: item.contrato.estadoContrato === 'RESCINDIDO',
+                                draft: item.contrato.estadoContrato === 'BORRADOR'
+                              }
+                            : {}
+                        "
+                      >
+                        {{ item.contrato.estadoContrato }}
+                      </mat-chip>
+                    </div>
+                    <div class="secondary-text">
+                      Fecha inicio: {{ item.contrato.fechaInicio }} | Fecha finalización:
+                      {{ item.contrato.fechaFin ? item.contrato.fechaFin : 'Indefinido' }}
+                    </div>
+                  </div>
+
+                  <!-- Expandible -->
+                  @if (item.expanded) {
+                  <div
+                    class="expanded-info overflow-hidden transition-all duration-1000 ease-in-out"
+                  >
+                    <mat-divider></mat-divider>
+
+                    <div class="section-title">
+                      <mat-icon>badge</mat-icon>
+                      Información del contrato
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Tipo de Contrato:</span>
+                        <span class="value">{{ item.contrato.tipoContrato }}</span>
+                      </div>
+
+                      <div class="detail-item">
+                        <span class="label">Modalidad de Trabajo:</span>
+                        <span class="value">{{ item.contrato.modalidadTrabajo }}</span>
+                      </div>
+
+                      <div class="detail-item">
+                        <span class="label">Fecha de Inicio:</span>
+                        <span class="value">{{ item.contrato.fechaInicio }}</span>
+                      </div>
+
+                      @if (item.contrato.fechaFin) {
+                      <div class="detail-item">
+                        <span class="label">Fecha de Fin:</span>
+                        <span class="value">{{ item.contrato.fechaFin }}</span>
+                      </div>
+                      }
+
+                      <div class="detail-item">
+                        <span class="label">Renovación Automática:</span>
+                        <span class="value">{{
+                          item.contrato.renovacionAutomatica ? 'Sí' : 'No'
+                        }}</span>
+                      </div>
+
+                      <div class="detail-item">
+                        <span class="label">Salario Base:</span>
+                        <span class="value">{{
+                          item.contrato.salarioBase | currency : item.contrato.moneda
+                        }}</span>
+                      </div>
+
+                      <div class="detail-item">
+                        <span class="label">Frecuencia de Pago:</span>
+                        <span class="value">{{ item.contrato.frecuenciaPago }}</span>
+                      </div>
+
+                      <div class="detail-item">
+                        <span class="label">Incluye Aguinaldo:</span>
+                        <span class="value">{{
+                          item.contrato.incluyeAguinaldo ? 'Sí' : 'No'
+                        }}</span>
+                      </div>
+
+                      <div class="detail-item">
+                        <span class="label">Incluye Bono 14:</span>
+                        <span class="value">{{ item.contrato.incluyeBono14 ? 'Sí' : 'No' }}</span>
+                      </div>
+
+                      <div class="detail-item">
+                        <span class="label">Incluye Vacaciones:</span>
+                        <span class="value">{{
+                          item.contrato.incluyeVacaciones ? 'Sí' : 'No'
+                        }}</span>
+                      </div>
+
+                      <div class="detail-item">
+                        <span class="label">IGSS:</span>
+                        <span class="value">{{ item.contrato.incluyeIgss ? 'Sí' : 'No' }}</span>
+                      </div>
+
+                      <div class="detail-item">
+                        <span class="label">Estado del Contrato:</span>
+                        <span class="value">{{ item.contrato.estadoContrato }}</span>
+                      </div>
+                    </div>
+
+                    <div class="section-title">
+                      <mat-icon>person</mat-icon>
+                      Detalle de la comisión del contrato
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Tipo de Comisión:</span>
+                        <span class="value">{{ item.comision.tipoComision }}</span>
+                      </div>
+
+                      @if(item.comision.porcentaje){
+                      <div class="detail-item">
+                        <span class="label">Porcentaje:</span>
+                        <span class="value">{{ item.comision.porcentaje }}%</span>
+                      </div>
+                      } @if(item.comision.montoFijo){
+                      <div class="detail-item">
+                        <span class="label">Monto Fijo:</span>
+                        <span class="value">{{ item.comision.montoFijo | currency }}</span>
+                      </div>
+                      }
+
+                      <div class="detail-item">
+                        <span class="label">Aplica Desde:</span>
+                        <span class="value">{{ item.comision.aplicaDesde }}</span>
+                      </div>
+
+                      @if(item.comision.aplicaHasta){
+                      <div class="detail-item">
+                        <span class="label">Aplica Hasta:</span>
+                        <span class="value">{{ item.comision.aplicaHasta }}</span>
+                      </div>
+                      }
+
+                      <div class="detail-item">
+                        <span class="label">Activo:</span>
+                        <span class="value">{{ item.comision.activo ? 'Sí' : 'No' }}</span>
+                      </div>
+
+                      @if(item.comision.minimoEntregasMes){
+                      <div class="detail-item">
+                        <span class="label">Mínimo Entregas al Mes:</span>
+                        <span class="value">{{ item.comision.minimoEntregasMes }}</span>
+                      </div>
+                      } @if(item.comision.maximoEntregasMes){
+                      <div class="detail-item">
+                        <span class="label">Máximo Entregas al Mes:</span>
+                        <span class="value">{{ item.comision.maximoEntregasMes }}</span>
+                      </div>
+                      } @if(item.comision.factorMultiplicador){
+                      <div class="detail-item">
+                        <span class="label">Factor Multiplicador:</span>
+                        <span class="value">{{ item.comision.factorMultiplicador }}</span>
+                      </div>
+                      }
+                    </div>
+                  </div>
+                  }
+
+                  <!-- Botones -->
+                  <div class="action-buttons">
+                    <div class="button-group">
+                      <button mat-button color="primary" (click)="toggleExpanded(item)">
+                        {{ item.expanded ? 'Ocultar detalle' : 'Ver detalle' }}
+                      </button>
+                      <button
+                        mat-raised-button
+                        color="accent"
+                        (click)="suspenderContrato(item.contrato)"
+                      >
+                        <mat-icon>hourglass_top</mat-icon>
+                        Suspender
+                      </button>
+                      <button
+                        mat-raised-button
+                        color="accent"
+                        (click)="rescindirContrato(item.contrato)"
+                      >
+                        <mat-icon>gavel</mat-icon>
+                        Rescindir
+                      </button>
+                      <button mat-raised-button color="accent">
+                        <mat-icon>contract_edit</mat-icon>
+                        Renovar
+                      </button>
+                      <button mat-raised-button color="accent" (click)="editarContrato(item)">
+                        <mat-icon>edit</mat-icon>
+                        Editar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+            } @if(!loadingContratos && contratos.length === 0){
+            <div class="no-data">
+              <mat-icon>group_off</mat-icon>
+              <p>No se encontraron contratos</p>
+            </div>
+            }
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -22,8 +22,10 @@ export class ContratoComisionService {
   }
 
   public obtenerContratoComisionPorId(id: number): Observable<ContratoComisionDTO> {
-    return this.http.get<ContratoComisionDTO>(
-      `${this.API_URL}/obtener-por-id/${id}`
-    );
+    return this.http.get<ContratoComisionDTO>(`${this.API_URL}/obtener-por-id/${id}`);
+  }
+
+  public obtenerContratoComisionPorContrato(idContrato: number): Observable<ContratoComisionDTO> {
+    return this.http.get<ContratoComisionDTO>(`${this.API_URL}/obtener-por-contrato/${idContrato}`);
   }
 }
