@@ -58,6 +58,12 @@ export class BarraNavegacion implements OnInit {
       roles: ['ADMINISTRADOR']
     },
     { 
+      icon: 'group', 
+      label: 'Gestión Empleados', 
+      route: '/gestion-empleados',
+      roles: ['ADMINISTRADOR']
+    },
+    { 
       icon: 'business_center', 
       label: 'Gestión Empresas', 
       route: '/empresa',
@@ -158,11 +164,11 @@ export class BarraNavegacion implements OnInit {
 
   quitarVerificacionDosPasos() {
     const idUsuario = sessionStorage.getItem('idUsuario');
-    
+
     if (idUsuario) {
       this.authService.desactivarAutetificacion(Number(idUsuario)).subscribe({
         next: (response) => {
-          this.mostrarMensaje(response.message, "success-snackbar");
+          this.mostrarMensaje(response.message, 'success-snackbar');
         },
         error: (error) => {
           this.mostrarMensaje(error.error?.message || "Error al cambiar Autentificación", "error-snackbar");
@@ -201,7 +207,7 @@ export class BarraNavegacion implements OnInit {
       duration: 3000,
       panelClass: [tipo],
       horizontalPosition: 'center',
-      verticalPosition: 'top'
+      verticalPosition: 'top',
     });
   }
 
