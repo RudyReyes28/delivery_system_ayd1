@@ -37,6 +37,7 @@ import {
   TIPOS_CONTRATO,
 } from '../../../models/contrato-model.ts/ContratoModel';
 import { ContratoItem } from '../../../models/contrato-model.ts/ContratoItem';
+import { EmpleadoRequestDto } from '../../../models/usuario-model/RegisterEmpleadoModel';
 
 @Component({
   selector: 'app-contratos',
@@ -90,6 +91,9 @@ export class Contratos implements OnInit {
   contratoSeleccionado!: ContratoModel;
   comisionSeleccionada!: ContratoComisionDTO;
 
+  //empleados
+  empleados: EmpleadoRequestDto[] = [];
+
   constructor(
     private snackBar: MatSnackBar,
     private fb: FormBuilder,
@@ -107,6 +111,7 @@ export class Contratos implements OnInit {
   ngOnInit(): void {
     this.contratoForm = this.crearFormulario();
     this.setContratos();
+    this.setEmpleados();
   }
 
   private logInvalidControls(formGroup: FormGroup | FormArray): void {
@@ -121,6 +126,34 @@ export class Contratos implements OnInit {
         console.log(`Campo inválido: ${key}, Valor: ${control.value}, Errores: `, control.errors);
       }
     });
+  }
+
+  filtrarPorEmpleado(idEmpleado: number): void {
+    console.log('Empleado seleccionado ID:', idEmpleado);
+    if (idEmpleado) {
+      this.contratService.contratosPorEmpleado(idEmpleado).subscribe({
+        next: (data: ContratoModel[]) => {
+          this.contratos = [];
+          data.forEach((contrato) => {
+            this.comisionService.obtenerContratoComisionPorContrato(contrato.idContrato).subscribe({
+              next: (comision: ContratoComisionDTO) => {
+                this.contratos.push({ contrato, comision, expanded: false });
+                this.loadingContratos = true;
+              },
+              error: (err) => {
+                console.error('Error al obtener la comisión del contrato:', err);
+              },
+            });
+          });
+        },
+        error: (err) => {
+          console.error('Error al filtrar contratos por empleado:', err);
+        },
+      });
+    } else {
+      this.contratos = [];
+      this.setContratos();
+    }
   }
 
   filtrarPorTipo(tipo: string): void {
@@ -230,6 +263,18 @@ export class Contratos implements OnInit {
       });
     }
   }
+
+  setEmpleados(): void {
+    this.empleadoService.obtenerTodosLosEmpleados().subscribe({
+      next: (data: EmpleadoRequestDto[]) => {
+        this.empleados = data;
+      },
+      error: (err) => {
+        console.error('Error al obtener los empleados:', err);
+      },
+    });
+  }
+
 
   setContratos(): void {
     this.contratService.obtenerTodosLosContratos().subscribe({

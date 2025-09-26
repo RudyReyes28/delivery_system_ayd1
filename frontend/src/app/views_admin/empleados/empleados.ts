@@ -61,6 +61,7 @@ import { ContratoService } from '../../../services/gestion-contrato-service/Cont
 import { ContratoComisionService } from '../../../services/gestion-contrato-service/ContratoComision.service';
 import { RepartidorService } from '../../../services/gestion-usuario-service/Repartidor.service';
 import { DireccionService } from '../../../services/gestion-usuario-service/Direccion.service';
+import { RepartidorVehiculoDTO } from '../../../models/RepartidorVehiculoModel';
 
 // Importando modelos
 
@@ -195,9 +196,49 @@ export class Empleados implements OnInit {
     motivoSalida: '',
   };
 
+  contratoRequest: ContratoRequestDTO = {
+    idContrato: 0,
+    idEmpleado: 0,
+    numeroContrato: '',
+    tipoContrato: '',
+    modalidadTrabajo: '',
+    fechaInicio: '',
+    fechaFin: '',
+    renovacionAutomatica: false,
+    salarioBase: 0,
+    moneda: '',
+    frecuenciaPago: '',
+    incluyeAguinaldo: false,
+    incluyeBono14: false,
+    incluyeVacaciones: false,
+    incluyeIgss: false,
+    estadoContrato: '',
+  };
+
+  contratoComisionRequest: ContratoComisionDTO = {
+    idContratoComision: 0,
+    idContrato: 0,
+    tipoComision: '',
+    porcentaje: 0,
+    montoFijo: 0,
+    aplicaDesde: '',
+    aplicaHasta: '',
+    activo: false,
+    minimoEntregasMes: 0,
+    maximoEntregasMes: 0,
+    factorMultiplicador: 0,
+    createdAt: '',
+  };
+
+  registroContrato: RegisterContratoDTO = {
+    contrato: this.contratoRequest,
+    comision: this.contratoComisionRequest,
+  };
   registerEmpleado: RegisterEmpleadoModel = {
     usuarioRequestDdto: this.usuarioRequest,
     empleadoRequestDdto: this.empleadoRequest,
+    contrato: this.registroContrato,
+    direccion: this.direccion,
   };
 
   estadosEmpleado: string[] = ESTADOS_EMPLEADO;
@@ -239,43 +280,6 @@ export class Empleados implements OnInit {
   frecuencias = FRECUENCIA_PAGO;
   estadosContrato = ESTADOS_CONTRATO;
 
-  contratoRequest: ContratoRequestDTO = {
-    idContrato: 0,
-    idEmpleado: 0,
-    numeroContrato: '',
-    tipoContrato: '',
-    modalidadTrabajo: '',
-    fechaInicio: '',
-    fechaFin: '',
-    renovacionAutomatica: false,
-    salarioBase: 0,
-    moneda: '',
-    frecuenciaPago: '',
-    incluyeAguinaldo: false,
-    incluyeBono14: false,
-    incluyeVacaciones: false,
-    incluyeIgss: false,
-    estadoContrato: '',
-  };
-
-  contratoComisionRequest: ContratoComisionDTO = {
-    idContratoComision: 0,
-    idContrato: 0,
-    tipoComision: '',
-    porcentaje: 0,
-    montoFijo: 0,
-    aplicaDesde: '',
-    aplicaHasta: '',
-    activo: false,
-    minimoEntregasMes: 0,
-    maximoEntregasMes: 0,
-    factorMultiplicador: 0,
-    createdAt: '',
-  };
-  registroContrato: RegisterContratoDTO = {
-    contrato: this.contratoRequest,
-    comision: this.contratoComisionRequest,
-  };
   //sobre comisiones
   tiposComision = TIPOS_COMISION;
   constructor(
@@ -614,38 +618,76 @@ export class Empleados implements OnInit {
         },
       });
     } else {
-      this.direccionService.crearDireccion(this.direccion).subscribe({
-        next: (direccionCreada: DireccionModel) => {
-          this.direccion = direccionCreada;
-          this.usuarioRequest.idDireccion = direccionCreada.idDireccion;
+      this.registerEmpleado = {
+        usuarioRequestDdto: this.usuarioRequest,
+        empleadoRequestDdto: this.empleadoRequest,
+        contrato: this.registroContrato,
+        direccion: this.direccion,
+      };
+      this.usuarioService.crearUsuario(this.registerEmpleado).subscribe({
+        next: (empleado: EmpleadoRequestDto) => {
+          const nombreRols = this.roles.find(
+            (rol) => rol.idRol === this.empleadoForm.get('idRol')?.value
+          )?.nombre;
 
-          this.registerEmpleado.usuarioRequestDdto = this.usuarioRequest;
-          this.registerEmpleado.empleadoRequestDdto = this.empleadoRequest;
+          console.log('es repartidor ? > ', nombreRols);
 
-          this.usuarioService.crearUsuario(this.registerEmpleado).subscribe({
-            next: (empleado: EmpleadoRequestDto) => {
-              this.contratoRequest.idEmpleado = empleado.idEmpleado;
-              this.contratoService.crearContrato(this.registroContrato).subscribe({
-                next: (contratoNuevo: ContratoModel) => {
-                  this.showSnackbar(
-                    `Empleado ${empleado.codigoEmpleado} creado exitosamente`,
-                    'success-snackbar'
-                  );
-                  this.guardandoEmpleado = false;
-                  this.cambioProgmatico = true;
-                  this.selectedTabIndex = 1;
-                  this.resetearFormularioCompleto();
-                  this.setEmpleados();
-                },
-                error: (error) => {
-                  console.log(error);
-                },
-              });
-            },
-            error: (error) => {
-              console.log(error);
-            },
-          });
+          if (nombreRols?.toUpperCase().trim() === 'REPARTIDOR') {
+            console.log('Es repartidor, se crea registro en tabla repartidor');
+            const repartidor: RepartidorDTO = {
+              idRepartidor: 0,
+              idEmpleado: empleado.idEmpleado,
+              numeroLicencia: this.empleadoForm.get('numeroLicencia')?.value,
+              tipoLicencia: this.empleadoForm.get('tipoLicencia')?.value,
+              fechaVencimientoLicencia: this.empleadoForm.get('fechaVenLicencia')?.value,
+              zonaAsignada: this.empleadoForm.get('zonaAsignada')?.value,
+              radioCoberturaKm: this.empleadoForm.get('radioCobertura')?.value,
+              disponibilidad: this.empleadoForm.get('disponibilidad')?.value,
+              calificacionPromedio: 0,
+              totalEntregasCompletadas: 0,
+              totalEntregasFallidas: 0,
+            };
+            this.repartidorService.crearRepartidor(repartidor).subscribe({
+              next: (repartidorCreado: RepartidorDTO) => {
+                const vehiculosSeleccionados: number[] =
+                  this.empleadoForm.get('vehiculosAsignados')?.value || [];
+                for (const vehiculo in vehiculosSeleccionados) {
+                  const repartidorVehiculo: RepartidorVehiculoDTO = {
+                    idRepartidorVehiculo: 0,
+                    idRepartidor: repartidorCreado.idRepartidor,
+                    idVehiculo: vehiculosSeleccionados[vehiculo],
+                    fechaAsignacion: '',
+                    esVehiculoPrincipal: true,
+                    activo: true,
+                  };
+                  this.vehiculoRepartidor.crearRepartidorVehiculo(repartidorVehiculo).subscribe({
+                    next: (asignacion: RepartidorVehiculoDTO) => {
+                      console.log('Asignación creada:', asignacion);
+                    },
+                    error: (error) => {
+                      console.log(error);
+                    },
+                  });
+                }
+              },
+              error: (error) => {
+                console.log(error);
+              },
+            });
+          }else {
+            console.log('No es repartidor, no se crea registro en tabla repartidor');
+          }
+          this.showSnackbar(
+            `Empleado ${this.empleadoRequest.codigoEmpleado} creado exitosamente`,
+            'success-snackbar'
+          );
+          /*
+          this.guardandoEmpleado = false;
+          this.cambioProgmatico = true;
+          this.selectedTabIndex = 1;
+          this.resetearFormularioCompleto();
+          this.setEmpleados();
+          */
         },
         error: (error) => {
           console.log(error);
@@ -755,7 +797,6 @@ export class Empleados implements OnInit {
       this.selectedTabIndex = 0;
     }, 0);
   }
-
 
   suspenderEmpleado(item: UsuarioItem): void {
     this.actualizarEstado(item, 'SUSPENDIDO');

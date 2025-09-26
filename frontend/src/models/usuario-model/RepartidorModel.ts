@@ -15,4 +15,4 @@ export interface RepartidorDTO {
 //tipo_licencia ENUM('A','B','C','M','NINGUNA') DEFAULT 'NINGUNA',
 export const TIPOS_LICENCIA: string[] = ['A', 'B', 'C', 'M', 'NINGUNA'];
 // disponibilidad ENUM('disponible','ocupado','descanso','inactivo') DEFAULT 'disponible',
-export const DISPONIBILIDAD_REPARTIDOR: string[] = ['disponible', 'ocupado', 'descanso', 'inactivo'];
+export const DISPONIBILIDAD_REPARTIDOR: string[] = ['DISPONIBLE', 'OCUPADO', 'DESCANSO', 'INACTIVO'];
