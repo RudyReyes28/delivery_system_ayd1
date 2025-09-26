@@ -1,3 +1,6 @@
+import { RegisterContratoDTO } from "../contrato-model.ts/ContratoModel";
+import { DireccionModel } from "./DireccionModel";
+
 // usuario-request.dto.ts
 export interface UsuarioRequestDto {
   idUsuario: number;
@@ -36,5 +39,7 @@ export interface EmpleadoRequestDto {
 export interface RegisterEmpleadoModel {
   usuarioRequestDdto: UsuarioRequestDto;
   empleadoRequestDdto: EmpleadoRequestDto;
+  contrato: RegisterContratoDTO;
+  direccion: DireccionModel;
 }
 

@@ -9,7 +9,9 @@ import org.entregasayd.sistemasentregas.utils.ErrorApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/empleados")
@@ -21,6 +23,11 @@ public class EmpleadoController {
     private EmpleadoRepository repository;
     @Autowired
     private EmpleadoMap map;
+
+    @GetMapping("/all")
+    public List<EmpleadoRequestDTO> getAll(){
+        return empleadoService.getAll().stream().map(map::toDto).collect(Collectors.toList());
+    }
 
     @GetMapping("/get-by-idUser/{idUser}")
     public EmpleadoRequestDTO getByIdUser(@PathVariable Long idUser){

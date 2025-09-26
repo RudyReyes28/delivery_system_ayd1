@@ -1,7 +1,7 @@
 <div class="container">
   <mat-card>
     <mat-card-header>
-      <mat-card-title>Gestión de Empleados</mat-card-title>
+      <mat-card-title>Gestión de Contratos</mat-card-title>
     </mat-card-header>
 
     <mat-card-content>
@@ -13,6 +13,17 @@
             @for (item of otrasOpciones; track $index) {
             <mat-option [value]="item.value">
               {{ item.viewValue }}
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="mr-4 form-field" appearance="outline">
+          <mat-label>Por empleado</mat-label>
+          <mat-select (selectionChange)="filtrarPorEmpleado($event.value)">
+            @for (item of empleados; track $index) {
+            <mat-option [value]="item.idEmpleado">
+              {{ item.codigoEmpleado }}
             </mat-option>
             }
           </mat-select>

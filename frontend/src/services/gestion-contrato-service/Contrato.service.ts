@@ -18,6 +18,7 @@ export class ContratoService {
   public actualizarContrato(contratoData: ContratoModel): Observable<ContratoModel> {
     return this.http.put<ContratoModel>(`${this.API_URL}/actualizar-contrato`, contratoData);
   }
+
   public contratosPorEmpleado(idEmpleado: number): Observable<ContratoModel[]> {
     return this.http.get<ContratoModel[]>(`${this.API_URL}/contratos-por-empleado/${idEmpleado}`);
   }
@@ -35,7 +36,9 @@ export class ContratoService {
   }
 
   public contratosPorTipoContrato(tipoContrato: string): Observable<ContratoModel[]> {
-    return this.http.get<ContratoModel[]>(`${this.API_URL}/contratos-por-tipo-contrato/${tipoContrato}`);
+    return this.http.get<ContratoModel[]>(
+      `${this.API_URL}/contratos-por-tipo-contrato/${tipoContrato}`
+    );
   }
 
   public contratosEntreFechas(fecha1: string, fecha2: string): Observable<ContratoModel[]> {
