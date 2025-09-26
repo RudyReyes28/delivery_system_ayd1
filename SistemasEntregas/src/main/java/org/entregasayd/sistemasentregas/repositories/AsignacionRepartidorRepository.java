@@ -8,4 +8,7 @@ import java.util.List;
 public interface AsignacionRepartidorRepository extends JpaRepository<AsignacionRepartidor, Long> {
     List<AsignacionRepartidor> findByGuia_IdGuiaAndEstadoAsignacion(Long idGuia, AsignacionRepartidor.EstadoAsignacion estadoAsignacion);
 
+    List<AsignacionRepartidor> findByRepartidor_IdRepartidor(Long idRepartidor);
+
+    List<AsignacionRepartidor> findByGuia_IdGuia(Long idGuia);
 }

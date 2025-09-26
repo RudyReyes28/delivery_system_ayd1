@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.entregasayd.sistemasentregas.models.*;
 import org.entregasayd.sistemasentregas.dto.coordinador.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -211,6 +212,9 @@ public class GuiasCoordinadorService {
 
         //Asignar el repartidor a la guia
         guia.setRepartidor(repartidor);
+        String fechaEntrega = asignacionGuiaDTO.getFechaEntrega();
+        LocalDate fecha = LocalDate.parse(fechaEntrega);
+        guia.setFechaEstimadaEntrega(fecha.atStartOfDay());
         Guia guiaSalvada = guiaRepository.save(guia);
 
         //Crear la asignacion de repartidor

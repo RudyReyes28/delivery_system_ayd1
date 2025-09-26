@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class AsignacionGuiaDTO {
     private Long idGuia;
     private Long idRepartidor;
+    private String fechaEntrega; // Formato: "yyyy-MM-dd"
 }
