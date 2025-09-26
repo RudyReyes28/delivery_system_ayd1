@@ -314,6 +314,9 @@ public class PedidosRepartidorService {
                 return nuevoEstado == Guia.EstadoActual.EN_REPARTO || nuevoEstado == Guia.EstadoActual.DEVUELTA;
             case EN_REPARTO:
                 return nuevoEstado == Guia.EstadoActual.ENTREGADA || nuevoEstado == Guia.EstadoActual.DEVUELTA || nuevoEstado == Guia.EstadoActual.CANCELADA;
+            case DEVUELTA:
+                return nuevoEstado == Guia.EstadoActual.CANCELADA || nuevoEstado == Guia.EstadoActual.EN_TRANSITO;
+
             default:
                 return false;
         }
