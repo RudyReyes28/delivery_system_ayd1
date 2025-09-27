@@ -10,6 +10,7 @@ import { Empleados } from './views_admin/empleados/empleados';
 import { Contratos } from './views_admin/contratos/contratos';
 import { GuiaSucursal } from './views_sucursal/guia-sucursal/guia-sucursal';
 import { GuiaCliente } from './views_cliente/guia-cliente/guia-cliente';
+import { GuiaCoordenador } from './guia-coordenador/guia-coordenador';
 
 
 export const routes: Routes = [
@@ -48,5 +49,8 @@ export const routes: Routes = [
     },
     {
         path: "", component: GuiaCliente, title: "Guía"
+    },
+    {
+        path: "guia-repartidor", component: GuiaCoordenador, title: "Gestión Guías Coordenador"
     }
 ];

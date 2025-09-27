@@ -100,6 +100,12 @@ export class BarraNavegacion implements OnInit {
       roles: ['SUCURSAL'],
     },
     {
+      icon: 'local_shipping',
+      label: 'Gestión Guías Coordinador',
+      route: '/guia-repartidor',
+      roles: ['COORDINADOR_OPERACIONES'],
+    },
+    {
       icon: 'logout',
       label: 'Cerrar Sesión',
       route: '/logout',
