@@ -11,6 +11,7 @@ import { Contratos } from './views_admin/contratos/contratos';
 import { GuiaSucursal } from './views_sucursal/guia-sucursal/guia-sucursal';
 import { GuiaCliente } from './views_cliente/guia-cliente/guia-cliente';
 import { GuiaCoordenador } from './guia-coordenador/guia-coordenador';
+import { Liquidacion } from './liquidacion/liquidacion';
 
 
 export const routes: Routes = [
@@ -52,5 +53,8 @@ export const routes: Routes = [
     },
     {
         path: "guia-repartidor", component: GuiaCoordenador, title: "Gestión Guías Coordenador"
+    },
+    {
+        path: "admin-liquidacion", component: Liquidacion, title: "Liquidación"
     }
 ];
