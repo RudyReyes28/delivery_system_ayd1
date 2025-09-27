@@ -64,3 +64,9 @@ public class ContratoComision {
         ESCALONADO
     }
 }
+
+/*
+Ejemplo sql de contrato comision
+INSERT INTO contrato_comision (id_contrato, tipo_comision, porcentaje, monto_fijo, aplica_desde, activo, minimo_entregas_mes, factor_multiplicador, created_at) VALUES (1, 'PORCENTAJE', 20.00, 0.00, '2024-01-01', true, 10, 1.00, '2024-06-01');
+INSERT INTO contrato_comision (id_contrato, tipo_comision, porcentaje, monto_fijo, aplica_desde, activo, minimo_entregas_mes, maximo_entregas_mes, factor_multiplicador, created_at) VALUES (1, 'PORCENTAJE', 20.00, 0.00, '2024-01-01', true, 0, 20, 1.00, '2024-06-01');
+ */
