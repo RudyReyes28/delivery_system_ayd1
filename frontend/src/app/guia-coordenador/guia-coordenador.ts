@@ -129,7 +129,7 @@ export class GuiaCoordenador implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar todas las guías:', error);
-        this.mostrarMensaje('Error al cargar las guías');
+        this.mostrarMensaje("Error al cargar las guías", "error-snackbar");
       }
     });
 
@@ -141,7 +141,7 @@ export class GuiaCoordenador implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar guías pendientes:', error);
-        this.mostrarMensaje('Error al cargar las guías pendientes');
+        this.mostrarMensaje("Error al cargar las guías pendientes", "error-snackbar");
       }
     });
 
@@ -153,7 +153,7 @@ export class GuiaCoordenador implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar repartidores:', error);
-        this.mostrarMensaje('Error al cargar los repartidores');
+        this.mostrarMensaje("Error al cargar los repartidores", "error-snackbar");
       }
     });
 
@@ -166,7 +166,7 @@ export class GuiaCoordenador implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar todos los repartidores:', error);
-        this.mostrarMensaje('Error al cargar todos los repartidores');
+        this.mostrarMensaje("Error al cargar todos los repartidores", "error-snackbar");
         this.loading = false;
       }
     });
@@ -178,7 +178,7 @@ export class GuiaCoordenador implements OnInit {
 
   asignarRepartidor(): void {
     if (!this.selectedGuiaId || !this.selectedRepartidorId || !this.fechaEntrega) {
-      this.mostrarMensaje('Por favor, seleccione una guía, un repartidor y una fecha de entrega');
+      this.mostrarMensaje("Por favor, seleccione una guía, un repartidor y una fecha de entrega", "info-snackbar");
       return;
     }
 
@@ -191,14 +191,14 @@ export class GuiaCoordenador implements OnInit {
     this.loading = true;
     this.guiaService.asignarRepartidor(request).subscribe({
       next: (response) => {
-        this.mostrarMensaje(response.message);
+        this.mostrarMensaje(response.message, "info-snackbar");
         this.cargarDatos();
         this.limpiarSeleccion();
         this.loading = false;
       },
       error: (error) => {
         console.error('Error al asignar repartidor:', error);
-        this.mostrarMensaje('Error al asignar el repartidor');
+        this.mostrarMensaje("Error al asignar el repartidor", "error-snackbar");
         this.loading = false;
       }
     });
@@ -251,11 +251,12 @@ export class GuiaCoordenador implements OnInit {
     return Math.round(((repartidor.totalEntregasCompletadas || 0) / total) * 100);
   }
 
-  private mostrarMensaje(mensaje: string): void {
+  private mostrarMensaje(mensaje: string,  tipo: string): void {
     this.snackBar.open(mensaje, 'Cerrar', {
       duration: 3000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top'
+      panelClass: [tipo],
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
     });
   }
 
