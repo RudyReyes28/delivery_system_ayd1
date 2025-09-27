@@ -19,4 +19,6 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
    List<Contrato>  findByEstadoContrato(Contrato.EstadoContrato estadoContrato);
    List<Contrato> findByModalidadTrabajo(Contrato.ModalidadTrabajo modalidadTrabajo);
    List<Contrato> findByTipoContrato(Contrato.TipoContrato tipoContrato);
+
+    Contrato findByEmpleado_IdEmpleadoAndEstadoContrato(Long empleadoIdEmpleado, Contrato.EstadoContrato estadoContrato);
 }
