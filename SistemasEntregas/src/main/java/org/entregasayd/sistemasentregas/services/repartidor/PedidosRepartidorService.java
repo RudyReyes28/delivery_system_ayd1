@@ -34,6 +34,20 @@ public class PedidosRepartidorService {
     private ContratoRepository contratoRepository;
     @Autowired
     private AsignacionRepartidorRepository asignacionRepartidorRepository;
+    @Autowired
+    private ContratoComisionRepository contratoComisionRepository;
+    @Autowired
+    private LiquidacionRepartidorRepository liquidacionRepartidorRepository;
+    @Autowired
+    private PeriodoLiquidacionRepository periodoLiquidacionRepository;
+    @Autowired
+    private EmpresaFidelizacionRepository EmpresaFidelizacionRepository;
+    @Autowired
+    private ComisionEntregaRepository comisionEntregaRepository;
+    @Autowired
+    private FacturaEmpresaRepository facturaEmpresaRepository;
+    @Autowired
+    private FacturaDetalleRepository facturaDetalleRepository;
 
     //Obtener todas las asignaciones del repartidor
     public ArrayList<DetallesAsignacionRepartidorDTO> getAsignacionesRepartidor(Long idUsuario){
@@ -275,6 +289,8 @@ public class PedidosRepartidorService {
             guia.setFechaRecoleccionReal(LocalDateTime.now());
         }else if (nuevoEstado == Guia.EstadoActual.ENTREGADA) {
             guia.setFechaEntregaReal(LocalDateTime.now());
+            //Calculamos la comision del repartidor
+            calculoDeComisionPedidoEntregado(guia);
         }else if (nuevoEstado == Guia.EstadoActual.CANCELADA || nuevoEstado == Guia.EstadoActual.DEVUELTA) {
             guia.setFechaEntregaReal(LocalDateTime.now());
         }
@@ -342,6 +358,123 @@ public class PedidosRepartidorService {
                 return GuiaEstado.Estado.CANCELADA;
             default:
                 throw new IllegalArgumentException("Estado no valido");
+        }
+    }
+
+
+    private void calculoDeComisionPedidoEntregado(Guia guia){
+        //CALCULAMOS LA COMISION DEL REPARTIDOR
+        //Obtenemos el tipo de servicio para saber el precio base
+        TipoServicio tipoServicio = tipoServicioRepository.findById(guia.getTipoServicio().getIdTipoServicio()).orElse(null);
+        //Obtener la comision del repartidor en COMISION_REPARTIDOR
+        Repartidor repartidor = repartidorRepository.findById(guia.getRepartidor().getIdRepartidor()).orElse(null);
+        ContratoComision contratoComision = null;
+        double precioBase = 0.00;
+        double comisionRepartidor = 0.00;
+        if (repartidor != null) {
+            //Obtener el contrato activo del repartidor
+            Contrato contrato = contratoRepository.findByEmpleado_IdEmpleadoAndEstadoContrato((repartidor.getEmpleado().getIdEmpleado()), Contrato.EstadoContrato.ACTIVO);
+            if (contrato != null) {
+                contratoComision = contratoComisionRepository.findByContrato_IdContrato(contrato.getIdContrato());
+                comisionRepartidor = contratoComision != null ? contratoComision.getPorcentaje() : 0.00;
+            }
+        }
+
+        if (tipoServicio != null) {
+            precioBase = tipoServicio.getPrecioBase();
+        }
+        double montoComisionPagar = (precioBase * comisionRepartidor) / 100;
+        //Actualizamos la comision en liquidacion
+        LiquidacionRepartidor liquidacion = liquidacionRepartidorRepository.findByRepartidor_IdRepartidorAndPeriodoLiquidacion_Estado(repartidor.getIdRepartidor(), PeriodoLiquidacion.EstadoPeriodo.ABIERTO);
+        //Sumale las comisiones y el total neto y subtotal
+        liquidacion.setTotalComisiones(liquidacion.getTotalComisiones() + montoComisionPagar);
+        liquidacion.setSubtotal(liquidacion.getSubtotal() + montoComisionPagar);
+        liquidacion.setTotalNeto(liquidacion.getTotalNeto() + montoComisionPagar);
+        liquidacion.setTotalEntregas(liquidacion.getTotalEntregas() + 1);
+        liquidacionRepartidorRepository.save(liquidacion);
+
+
+        //Sumar en PeriodoLiquidacion
+        PeriodoLiquidacion periodo = liquidacion.getPeriodoLiquidacion();
+        periodo.setTotalComisiones(periodo.getTotalComisiones() + montoComisionPagar);
+        periodo.setTotalNeto(periodo.getTotalNeto() + montoComisionPagar);
+        periodoLiquidacionRepository.save(periodo);
+
+        //Se genera un registro en COMISION_ENTREGA
+        ComisionEntrega comisionEntrega = new ComisionEntrega();
+        comisionEntrega.setGuia(guia);
+        comisionEntrega.setRepartidor(repartidor);
+        comisionEntrega.setPeriodoLiquidacion(liquidacion.getPeriodoLiquidacion());
+        comisionEntrega.setMontoBaseCalculo(precioBase);
+        comisionEntrega.setTipoComision(ComisionEntrega.TipoComision.PORCENTAJE);
+        comisionEntrega.setValorComision(comisionRepartidor);
+        comisionEntrega.setMontoComision(montoComisionPagar);
+        comisionEntrega.setBonificacion(0.00);
+        comisionEntrega.setDeduccion(0.00);
+        comisionEntrega.setMontoNeto(montoComisionPagar);
+        comisionEntrega.setEstado(ComisionEntrega.EstadoComision.CALCULADA);
+        comisionEntrega.setFechaCalculo(LocalDateTime.now());
+        //Guardar comisionEntrega
+        comisionEntregaRepository.save(comisionEntrega);
+
+        //Actualizar las entregas totales del repartidor
+        repartidor.setTotalEntregasCompletadas(repartidor.getTotalEntregasCompletadas() + 1);
+        repartidorRepository.save(repartidor);
+
+        EmpresaFidelizacion empresaFidelizacion = EmpresaFidelizacionRepository.findByEmpresaIdEmpresa(guia.getEmpresa().getIdEmpresa());
+
+        //Se crea una factura para la empresa
+        FacturaEmpresa factura = new FacturaEmpresa();
+        factura.setEmpresa(guia.getEmpresa());
+        factura.setNumeroFactura("F-" + guia.getEmpresa().getIdEmpresa() + "-" + System.currentTimeMillis());
+        factura.setSerieFactura("A");
+        factura.setMes(LocalDateTime.now().getMonthValue());
+        factura.setAnio(LocalDateTime.now().getYear());
+        factura.setFechaEmision(LocalDateTime.now().toLocalDate());
+        factura.setFechaVencimiento(LocalDateTime.now().toLocalDate().plusDays(30));
+        factura.setSubtotal(precioBase);
+        double descuentoFidelizacion = precioBase * (empresaFidelizacion.getNivelFidelizacion().getDescuentoPorcentaje() / 100);
+        factura.setDescuentoFidelizacion(descuentoFidelizacion);
+        factura.setRecargos(0.00);
+        factura.setPenalizaciones(0.00);
+        double baseImponible = precioBase - descuentoFidelizacion;
+        factura.setBaseImponible(baseImponible);
+        double iva = baseImponible * 0.12;
+        factura.setIva(iva);
+        double total = baseImponible + iva;
+        factura.setTotal(total);
+        factura.setEstadoFactura(FacturaEmpresa.EstadoFactura.EMITIDA);
+        factura.setMoneda("GTQ");
+        factura.setTipoCambio(1.0000);
+        factura.setFormaPago(FacturaEmpresa.FormaPago.CREDITO);
+        factura.setDiasCredito(30);
+        //Guardar factura
+        facturaEmpresaRepository.save(factura);
+        //Crear el detalle de la factura
+        FacturaDetalle detalle = new FacturaDetalle();
+        detalle.setFacturaEmpresa(factura);
+        detalle.setGuia(guia);
+        detalle.setDescripcion("Servicio de entrega para la guia " + guia.getNumeroGuia());
+        detalle.setCantidad(1);
+        detalle.setPrecioUnitario(precioBase);
+        detalle.setDescuentoUnitario(descuentoFidelizacion);
+        detalle.setSubtotalLinea(precioBase - descuentoFidelizacion);
+        //Guardar detalle
+        facturaDetalleRepository.save(detalle);
+
+        //Obtener nivel de fidelizacion de la empresa
+        //Actualizar el total de entregas
+        empresaFidelizacion.setTotalEntregas(empresaFidelizacion.getTotalEntregas() + 1);
+        empresaFidelizacion.setMontoTotalEntregas(empresaFidelizacion.getMontoTotalEntregas() + total);
+        EmpresaFidelizacionRepository.save(empresaFidelizacion);
+
+        //Actualizar los estados
+        List<AsignacionRepartidor> asignacionRepartidor = asignacionRepartidorRepository.findByRepartidor_IdRepartidorAndGuia_IdGuia(guia.getRepartidor().getIdRepartidor(), guia.getIdGuia());
+        for (AsignacionRepartidor asignacion : asignacionRepartidor) {
+            if (asignacion.getEstadoAsignacion() ==  AsignacionRepartidor.EstadoAsignacion.ACEPTADA) {
+                asignacion.setEstadoAsignacion(AsignacionRepartidor.EstadoAsignacion.COMPLETADA);
+                asignacionRepartidorRepository.save(asignacion);
+            }
         }
     }
 
