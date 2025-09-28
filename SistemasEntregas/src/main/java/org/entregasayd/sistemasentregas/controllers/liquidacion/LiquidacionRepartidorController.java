@@ -67,4 +67,17 @@ class LiquidacionRepartidorController {
         }
     }
 
+    //Cerrar periodo de liquidacion
+    @PostMapping("/cerrar-periodo/{idPeriodo}")
+    public ResponseEntity<?> cerrarPeriodoLiquidacion(@PathVariable Long idPeriodo) {
+        try {
+            String resultado = liquidacionRepartidorService.cerrarPeriodoLiquidacion(idPeriodo);
+            Map<String, String> response = Map.of("message", resultado);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, String> response = Map.of("message", e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
 }

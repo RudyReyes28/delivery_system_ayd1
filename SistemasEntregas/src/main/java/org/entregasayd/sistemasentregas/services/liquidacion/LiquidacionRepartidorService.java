@@ -230,5 +230,71 @@ public class LiquidacionRepartidorService {
         throw new RuntimeException("No hay ningun periodo de liquidacion abierto.");
     }
 
+    //Cerrar periodo de liquidacion
+    @Transactional
+    public String cerrarPeriodoLiquidacion(Long idPeriodo) {
+        //Validamos que el periodo de liquidacion exista y este abierto
+        PeriodoLiquidacion periodoLiquidacion = periodoLiquidacionRepository.findById(idPeriodo).orElseThrow(() -> new RuntimeException("Periodo de liquidacion no encontrado."));
+        if (periodoLiquidacion.getEstado() != PeriodoLiquidacion.EstadoPeriodo.ABIERTO) {
+            throw new RuntimeException("El periodo de liquidacion no esta abierto.");
+        }
+        //Obtenemos todas las liquidaciones de los repartidores en el periodo
+        List<LiquidacionRepartidor> liquidaciones = liquidacionRepartidorRepository.findByPeriodoLiquidacion_IdPeriodo(idPeriodo);
+        if (liquidaciones.isEmpty()) {
+            throw new RuntimeException("No hay repartidores asociados a este periodo de liquidacion.");
+        }
+
+        //Cerramos las liquidaciones de los repartidores
+        for (LiquidacionRepartidor liquidacion : liquidaciones) {
+            //Si el repartidor no tiene entregas, no se puede cerrar la liquidacion
+            /*if (liquidacion.getTotalEntregas() == 0) {
+                throw new RuntimeException("El repartidor " + liquidacion.getRepartidor().getEmpleado().getUsuario().getPersona().getNombre() + " " + liquidacion.getRepartidor().getEmpleado().getUsuario().getPersona().getApellido() + " no tiene entregas en este periodo de liquidacion. No se puede cerrar el periodo.");
+            }*/
+
+            //Verificamos que los repartidores no tengan asignaciones pendientes en el periodo
+            List<AsignacionRepartidor> asignacionesPendientes = asignacionRepartidorRepository.findByRepartidor_IdRepartidor(liquidacion.getRepartidor().getIdRepartidor());
+            for (AsignacionRepartidor asignacion : asignacionesPendientes) {
+                if (asignacion.getEstadoAsignacion() == AsignacionRepartidor.EstadoAsignacion.PENDIENTE ||
+                        asignacion.getEstadoAsignacion() == AsignacionRepartidor.EstadoAsignacion.ACEPTADA) {
+                    throw new RuntimeException("El repartidor " + liquidacion.getRepartidor().getEmpleado().getUsuario().getPersona().getNombre() + " " + liquidacion.getRepartidor().getEmpleado().getUsuario().getPersona().getApellido() + " tiene asignaciones pendientes. No se puede cerrar el periodo.");
+                }
+            }
+
+            //Calculamos el subtotal
+            double subtotal = liquidacion.getTotalComisiones() + liquidacion.getTotalBonificaciones() - liquidacion.getTotalDeducciones();
+            liquidacion.setSubtotal(subtotal);
+            //Calculamos los descuentos
+            //Descuento IGSS (4.83% del subtotal)
+            double descuentoIgss = subtotal * 0.0483;
+            liquidacion.setDescuentoIgss(descuentoIgss);
+            //Descuento ISR (dependiendo del subtotal)
+            double descuentoIsr = 0.00;
+            if (subtotal > 5000 && subtotal <= 10000) {
+                descuentoIsr = subtotal * 0.05;
+            } else if (subtotal > 10000 && subtotal <= 20000) {
+                descuentoIsr = subtotal * 0.10;
+            } else if (subtotal > 20000) {
+                descuentoIsr = subtotal * 0.15;
+            }
+            liquidacion.setDescuentoIsr(descuentoIsr);
+            //Otros descuentos (si los hay)
+            double otrosDescuentos = liquidacion.getOtrosDescuentos();
+            liquidacion.setOtrosDescuentos(otrosDescuentos);
+            //Total descuentos
+            double totalDescuentos = descuentoIgss + descuentoIsr + otrosDescuentos;
+            liquidacion.setTotalDescuentos(totalDescuentos);
+            //Total neto
+            double totalNeto = subtotal - totalDescuentos;
+            liquidacion.setTotalNeto(totalNeto);
+            //Cambiamos el estado de la liquidacion a LISTA
+            liquidacion.setEstadoPago(LiquidacionRepartidor.EstadoPago.PENDIENTE);
+            liquidacionRepartidorRepository.save(liquidacion);
+        }
+
+        //Cerramos el periodo de liquidacion
+        periodoLiquidacion.setEstado(PeriodoLiquidacion.EstadoPeriodo.CERRADO);
+        periodoLiquidacionRepository.save(periodoLiquidacion);
+        return "Periodo de liquidacion cerrado exitosamente.";
+    }
 
 }
