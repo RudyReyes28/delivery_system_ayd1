@@ -54,6 +54,8 @@ public class CancelacionesCoordinadorService {
     private SucursalPersonalRepository SucursalPersonalRepository;
     @Autowired
     private EmpresaFidelizacionRepository EmpresaFidelizacionRepository;
+    @Autowired
+    private IncidenciaRepository incidenciaRepository;
 
 
     //Obtener todas las solicitudes de cancelacion
@@ -207,5 +209,190 @@ public class CancelacionesCoordinadorService {
 
         return "Cancelación rechazada correctamente.";
     }
+
+    //CANCELACIONES POR PARTE DEL CLIENTE FINAL
+    //Obtenemos las incidencias de cancelacion del cliente
+    public List<CancelacionesClienteDTO> obtenerIncidenciasCancelacionClientes() throws Exception {
+        List<Incidencia> incidencias = incidenciaRepository.findByTipoIncidencia(Incidencia.TipoIncidencia.CLIENTE_RECHAZA);
+        List<CancelacionesClienteDTO> resultado = new ArrayList<>();
+
+        for (Incidencia incidencia : incidencias) {
+            CancelacionesClienteDTO dto = new CancelacionesClienteDTO();
+            CancelacionesClienteDTO.CancelacionIndicienciaDTO incidenciaDTO = new CancelacionesClienteDTO.CancelacionIndicienciaDTO();
+            incidenciaDTO.setIdIncidencia(incidencia.getIdIncidencia());
+            incidenciaDTO.setCodigoIncidencia(incidencia.getCodigoIncidencia());
+            incidenciaDTO.setTipoIncidencia(incidencia.getTipoIncidencia().name());
+            incidenciaDTO.setSeveridad(incidencia.getSeveridad().name());
+            incidenciaDTO.setDescripcion(incidencia.getDescripcion());
+            incidenciaDTO.setFechaReporte(incidencia.getFechaReporte().toString());
+
+            Guia guia = incidencia.getGuia();
+            GuiaDetalleClienteDTO.GuiaDetalleDto guiaDTO = new GuiaDetalleClienteDTO.GuiaDetalleDto();
+            guiaDTO.setIdGuia(guia.getIdGuia());
+            guiaDTO.setNumeroGuia(guia.getNumeroGuia());
+            guiaDTO.setDescripcionContenido(guia.getDescripcionContenido());
+            guiaDTO.setValorDeclarado(guia.getValorDeclarado());
+            guiaDTO.setPesoKg(guia.getPesoKg());
+            guiaDTO.setDimensiones(guia.getDimensiones());
+            guiaDTO.setObservaciones(guia.getObservaciones());
+            guiaDTO.setFechaCreacion(guia.getFechaCreacion().toString());
+            guiaDTO.setFechaRecoleccionReal(guia.getFechaRecoleccionReal() != null ? guia.getFechaRecoleccionReal().toString() : null);
+            guiaDTO.setPrioridad(guia.getPrioridad().name());
+            guiaDTO.setIntentosEntrega(guia.getIntentosEntrega());
+            guiaDTO.setTotal(guia.getTotal());
+            guiaDTO.setEstadoActual(guia.getEstadoActual().name());
+
+            //Obtenemos los estados de la guia
+            ArrayList<GetDetalleGuiaDTO.GuiaEstadoDTO> estadosDTO = new ArrayList<>();
+            List<GuiaEstado> estados = guiaEstadoRepository.findByGuiaIdGuiaOrderByFechaCambioDesc(guia.getIdGuia());
+            for (GuiaEstado estado : estados) {
+                GetDetalleGuiaDTO.GuiaEstadoDTO estadoDTO = new GetDetalleGuiaDTO.GuiaEstadoDTO();
+                estadoDTO.setIdGuiaEstado(estado.getIdGuiaEstado());
+                estadoDTO.setEstadoAnterior(estado.getEstadoAnterior().name());
+                estadoDTO.setEstadoNuevo(estado.getEstadoNuevo().name());
+                estadoDTO.setComentarios(estado.getComentarios());
+                estadoDTO.setMotivoCambio(estado.getMotivoCambio());
+                estadoDTO.setFechaCambio(estado.getFechaCambio().toString());
+                estadosDTO.add(estadoDTO);
+            }
+            guiaDTO.setEstadosEntregas(estadosDTO);
+            //Obtenemos los datos del repartidor
+            Repartidor repartidor = guia.getRepartidor();
+            if (repartidor != null) {
+                GuiaDetalleClienteDTO.RepartidorDTO repartidorDTO = new GuiaDetalleClienteDTO.RepartidorDTO();
+                Persona usuarioRepartidor = repartidor.getEmpleado().getUsuario().getPersona();
+                repartidorDTO.setIdRepartidor(repartidor.getIdRepartidor());
+                repartidorDTO.setNombreCompleto(usuarioRepartidor.getNombre() + " " + usuarioRepartidor.getApellido());
+                repartidorDTO.setEmail(usuarioRepartidor.getCorreo());
+                repartidorDTO.setTelefono(usuarioRepartidor.getTelefono());
+                guiaDTO.setRepartidor(repartidorDTO);
+            }else {
+                    guiaDTO.setRepartidor(null);
+            }
+
+
+            incidenciaDTO.setGuia(guiaDTO);
+
+            dto.setIncidencia(incidenciaDTO);
+            resultado.add(dto);
+        }
+
+        return resultado;
+    }
+
+    //Aceptar incidencia de cancelacion del cliente y devolver la guia
+    @Transactional
+    public String aceptarIncidenciaCancelacionCliente(AceptarCancelacionClienteDTO cancelacion) throws Exception {
+        Incidencia incidencia = incidenciaRepository.findById(cancelacion.getIdIncidencia()).orElseThrow(() -> new Exception("Incidencia no encontrada"));
+        if (incidencia.getTipoIncidencia() != Incidencia.TipoIncidencia.CLIENTE_RECHAZA) {
+            throw new Exception("La incidencia no es de tipo CLIENTE_RECHAZA");
+        }
+        if (incidencia.getEstado() != Incidencia.Estado.ABIERTA) {
+            throw new Exception("La incidencia ya ha sido atendida");
+        }
+
+        //Actualizamos la incidencia
+        incidencia.setFechaAtencion(LocalDateTime.now());
+        incidencia.setSolucionAplicada(cancelacion.getSolucionAplicada());
+        incidencia.setFechaResolucion(LocalDateTime.now());
+        incidencia.setFechaAtencion(LocalDateTime.now());
+        incidencia.setEstado(Incidencia.Estado.CERRADA);
+        incidenciaRepository.save(incidencia);
+
+        //Obtenemos el calculo de la comision y penalizacion
+        double montoPenalizacion = 0.0;
+
+        //Si aplica penalizacion es porque el repartidor ya estaba asignado a la guia
+
+        //Hay que volver a recalcular la comision del repartidor por los niveles de fidelizacion
+        Guia guia = incidencia.getGuia();
+        double montoComisionPagar = calcularMontoComision(guia);
+        //Obtener nivel de fidelizacion de la empresa
+        EmpresaFidelizacion empresaFidelizacion = EmpresaFidelizacionRepository.findByEmpresaIdEmpresa(guia.getEmpresa().getIdEmpresa());
+        NivelFindelizacion nivelFidelizacion = empresaFidelizacion.getNivelFidelizacion();
+        if (nivelFidelizacion.getCodigoNivel().equals("DIAMANTE")) {
+            if (nivelFidelizacion.getCancelacionesGratuitasMes() < empresaFidelizacion.getTotalCancelaciones()) {
+                montoComisionPagar = montoComisionPagar * (nivelFidelizacion.getPorcentajePenalizacion() / 100);
+            }
+            //Aumentamos en 1 las cancelaciones del mes
+            empresaFidelizacion.setTotalCancelaciones(empresaFidelizacion.getTotalCancelaciones() + 1);
+            EmpresaFidelizacionRepository.save(empresaFidelizacion);
+        } else if (nivelFidelizacion.getCodigoNivel().equals("ORO")) {
+            montoComisionPagar = montoComisionPagar * (nivelFidelizacion.getPorcentajePenalizacion() / 100);
+        } else if (nivelFidelizacion.getCodigoNivel().equals("PLATA")) {
+            montoComisionPagar = montoComisionPagar * (nivelFidelizacion.getPorcentajePenalizacion() / 100);
+        }
+
+        Repartidor repartidor = guia.getRepartidor();
+        // Buscamos el periodo de liquidacion activo
+        LiquidacionRepartidor liquidacion = liquidacionRepartidorRepository.findByRepartidor_IdRepartidorAndPeriodoLiquidacion_Estado(repartidor.getIdRepartidor(), PeriodoLiquidacion.EstadoPeriodo.ABIERTO);
+        //Sumale las comisiones y el total neto y subtotal
+        liquidacion.setTotalComisiones(liquidacion.getTotalComisiones() + montoComisionPagar);
+        liquidacion.setSubtotal(liquidacion.getSubtotal() + montoComisionPagar);
+        liquidacion.setTotalNeto(liquidacion.getTotalNeto() + montoComisionPagar);
+        liquidacionRepartidorRepository.save(liquidacion);
+
+        //Sumar en empresa fidelizacion las penalizaciones aplicadas
+        empresaFidelizacion.setPenalizacionesAplicadas(empresaFidelizacion.getPenalizacionesAplicadas() + montoPenalizacion);
+        EmpresaFidelizacionRepository.save(empresaFidelizacion);
+
+        //Sumar en PeriodoLiquidacion
+        PeriodoLiquidacion periodo = liquidacion.getPeriodoLiquidacion();
+        periodo.setTotalComisiones(periodo.getTotalComisiones() + montoComisionPagar);
+        periodo.setTotalNeto(periodo.getTotalNeto() + montoComisionPagar);
+        periodoLiquidacionRepository.save(periodo);
+
+
+        //Creamos un nuevo estado de guia
+        GuiaEstado nuevoEstado = new GuiaEstado();
+        nuevoEstado.setGuia(guia);
+        nuevoEstado.setEstadoAnterior(GuiaEstado.Estado.valueOf(guia.getEstadoActual().toString()));
+        nuevoEstado.setEstadoNuevo(GuiaEstado.Estado.CANCELADA);
+        Usuario usuarioCambio = usuarioRepository.findById(cancelacion.getIdUsuario()).orElseThrow(() -> new Exception("Usuario no encontrado"));
+        nuevoEstado.setUsuarioCambio(usuarioCambio);
+        nuevoEstado.setComentarios("Cancelacion autorizada por coordinador");
+        nuevoEstado.setMotivoCambio("Cancelacion de guia ID: " + guia.getIdGuia() + " por motivo: " + incidencia.getTipoIncidencia().name() + " - " + incidencia.getDescripcion());
+        nuevoEstado.setFechaCambio(LocalDateTime.now());
+        guiaEstadoRepository.save(nuevoEstado);
+
+        guia.setEstadoActual(Guia.EstadoActual.CANCELADA);
+        guiaRepository.save(guia);
+
+        List<AsignacionRepartidor> asignacionRepartidor = asignacionRepartidorRepository.findByRepartidor_IdRepartidorAndGuia_IdGuia(guia.getRepartidor().getIdRepartidor(), guia.getIdGuia());
+        for (AsignacionRepartidor asignacion : asignacionRepartidor) {
+            if (asignacion.getEstadoAsignacion() == AsignacionRepartidor.EstadoAsignacion.PENDIENTE || asignacion.getEstadoAsignacion() == AsignacionRepartidor.EstadoAsignacion.ACEPTADA) {
+                asignacion.setEstadoAsignacion(AsignacionRepartidor.EstadoAsignacion.CANCELADA);
+                asignacionRepartidorRepository.save(asignacion);
+            }
+        }
+
+        return "Incidencia aceptada y guía cancelada correctamente.";
+    }
+
+    private double calcularMontoComision(Guia guia){
+        //Obtenemos el tipo de servicio para saber el precio base
+        TipoServicio tipoServicio = tipoServicioRepository.findById(guia.getTipoServicio().getIdTipoServicio()).orElse(null);
+        //Obtener la comision del repartidor en COMISION_REPARTIDOR
+        Repartidor repartidor = repartidorRepository.findById(guia.getRepartidor().getIdRepartidor()).orElse(null);
+        ContratoComision contratoComision = null;
+        double precioBase = 0.00;
+        double comisionRepartidor = 0.00;
+        if (repartidor != null) {
+            //Obtener el contrato activo del repartidor
+            Contrato contrato = contratoRepository.findByEmpleado_IdEmpleadoAndEstadoContrato((repartidor.getEmpleado().getIdEmpleado()), Contrato.EstadoContrato.ACTIVO);
+            if (contrato != null) {
+                contratoComision = contratoComisionRepository.findByContrato_IdContrato(contrato.getIdContrato());
+                comisionRepartidor = contratoComision != null ? contratoComision.getPorcentaje() : 0.00;
+            }
+        }
+
+        if (tipoServicio != null) {
+            precioBase = tipoServicio.getPrecioBase();
+        }
+
+        //Calculos penalizacion
+        return precioBase * (comisionRepartidor/100);
+    }
+
 
 }
