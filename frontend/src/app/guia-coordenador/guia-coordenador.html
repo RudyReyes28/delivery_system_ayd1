@@ -1,0 +1,657 @@
+<div class="container">
+  <mat-card class="main-card">
+    <mat-card-header>
+      <mat-card-title>Gestión de Guías - Coordinador</mat-card-title>
+      <mat-card-subtitle>Administrar guías y asignación de repartidores</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-tab-group class="tabs-container">
+        <!-- Tab 1: Todas las Guías -->
+        <mat-tab label="Todas las Guías">
+          <div class="tab-content">
+            <div class="loading-container" *ngIf="loading">
+              <mat-spinner></mat-spinner>
+              <p>Cargando guías...</p>
+            </div>
+
+            <div class="table-container" *ngIf="!loading">
+              <mat-table [dataSource]="todasLasGuias" class="guias-table">
+                <!-- Número de Guía -->
+                <ng-container matColumnDef="numeroGuia">
+                  <mat-header-cell *matHeaderCellDef>Número de Guía</mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    <strong>{{ element.guia.numeroGuia }}</strong>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Cliente -->
+                <ng-container matColumnDef="cliente">
+                  <mat-header-cell *matHeaderCellDef>Cliente</mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    <div class="cliente-info">
+                      <div class="nombre">{{ element.guia.cliente.nombreCompleto }}</div>
+                      <div class="telefono">{{ element.guia.cliente.telefono }}</div>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Descripción -->
+                <ng-container matColumnDef="descripcion">
+                  <mat-header-cell *matHeaderCellDef>Contenido</mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    <div class="descripcion-content">
+                      {{ element.guia.descripcionContenido }}
+                      <div class="detalles">
+                        Peso: {{ element.guia.pesoKg }}kg | 
+                        Valor: ${{ element.guia.valorDeclarado }}
+                      </div>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Estado -->
+                <ng-container matColumnDef="estadoActual">
+                  <mat-header-cell *matHeaderCellDef>Estado</mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    <mat-chip 
+                      [class]="'estado-' + element.guia.estadoActual.toLowerCase()">
+                      {{ element.guia.estadoActual }}
+                    </mat-chip>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Repartidor -->
+                <ng-container matColumnDef="repartidor">
+                  <mat-header-cell *matHeaderCellDef>Repartidor</mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    <div class="repartidor-info" *ngIf="element.guia.repartidor; else sinRepartidor">
+                      <mat-icon class="icon-assigned">person</mat-icon>
+                      {{ element.guia.repartidor.nombreCompleto }}
+                    </div>
+                    <ng-template #sinRepartidor>
+                      <div class="sin-repartidor">
+                        <mat-icon class="icon-unassigned">person_outline</mat-icon>
+                        Sin asignar
+                      </div>
+                    </ng-template>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Fecha de Creación -->
+                <ng-container matColumnDef="fechaCreacion">
+                  <mat-header-cell *matHeaderCellDef>Fecha de Creación</mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    {{ formatearFecha(element.guia.fechaCreacion) }}
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Acciones -->
+                <ng-container matColumnDef="acciones">
+                  <mat-header-cell *matHeaderCellDef>Acciones</mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    <button mat-icon-button 
+                            color="primary"
+                            (click)="verDetalleGuia(element.guia)"
+                            matTooltip="Ver más información">
+                      <mat-icon>info</mat-icon>
+                    </button>
+                  </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="columnasTodasGuias"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: columnasTodasGuias;"></mat-row>
+              </mat-table>
+
+              <div class="no-data" *ngIf="todasLasGuias.length === 0 && !loading">
+                <mat-icon>inbox</mat-icon>
+                <p>No hay guías disponibles</p>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Tab 2: Guías Pendientes de Asignar -->
+        <mat-tab label="Asignar Repartidor">
+          <div class="tab-content">
+            <div class="loading-container" *ngIf="loading">
+              <mat-spinner></mat-spinner>
+              <p>Cargando guías pendientes...</p>
+            </div>
+
+            <div class="assignment-section" *ngIf="!loading">
+              <!-- Sección de Asignación -->
+              <mat-card class="assignment-card" *ngIf="guiasPendientes.length > 0">
+                <mat-card-header>
+                  <mat-card-title>Asignar Repartidor a Guía</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="assignment-form">
+                    <mat-form-field appearance="outline" class="form-field">
+                      <mat-label>Seleccionar Repartidor</mat-label>
+                      <mat-select [(value)]="selectedRepartidorId">
+                        <mat-option *ngFor="let repartidor of repartidoresActivos" [value]="repartidor.idRepartidor">
+                          <div class="repartidor-option">
+                            <div class="nombre-repartidor">{{ repartidor.nombreCompleto }}</div>
+                            <div class="info-repartidor">
+                              {{ repartidor.zonaAsignada }} - 
+                              <span [class]="'disponibilidad-' + repartidor.disponibilidad?.toLowerCase()">
+                                {{ obtenerEstadoRepartidor(repartidor.disponibilidad || '') }}
+                              </span>
+                            </div>
+                          </div>
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="form-field">
+                      <mat-label>Fecha de Entrega</mat-label>
+                      <input matInput 
+                             type="date" 
+                             [(ngModel)]="fechaEntrega"
+                             [min]="getFechaMinima()">
+                    </mat-form-field>
+
+                    <button mat-raised-button 
+                            color="primary" 
+                            (click)="asignarRepartidor()"
+                            [disabled]="!selectedGuiaId || !selectedRepartidorId || !fechaEntrega || loading"
+                            class="assign-button">
+                      <mat-icon>assignment_ind</mat-icon>
+                      Asignar Repartidor
+                    </button>
+
+                    <button mat-stroked-button 
+                            (click)="limpiarSeleccion()"
+                            class="clear-button">
+                      <mat-icon>clear</mat-icon>
+                      Limpiar
+                    </button>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+
+              <!-- Tabla de Guías Pendientes -->
+              <div class="table-container">
+                <h3 class="section-title">Guías Pendientes de Asignar</h3>
+                
+                <mat-table [dataSource]="guiasPendientes" class="guias-pendientes-table">
+                  <!-- Número de Guía -->
+                  <ng-container matColumnDef="numeroGuia">
+                    <mat-header-cell *matHeaderCellDef>Número de Guía</mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                      <strong>{{ element.guia.numeroGuia }}</strong>
+                    </mat-cell>
+                  </ng-container>
+
+                  <!-- Cliente -->
+                  <ng-container matColumnDef="cliente">
+                    <mat-header-cell *matHeaderCellDef>Cliente</mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                      <div class="cliente-info">
+                        <div class="nombre">{{ element.guia.cliente.nombreCompleto }}</div>
+                        <div class="ubicacion">
+                          {{ element.guia.direccionEntrega.municipio }}, 
+                          {{ element.guia.direccionEntrega.departamento }}
+                        </div>
+                      </div>
+                    </mat-cell>
+                  </ng-container>
+
+                  <!-- Descripción -->
+                  <ng-container matColumnDef="descripcion">
+                    <mat-header-cell *matHeaderCellDef>Descripción</mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                      <div class="descripcion-pendiente">
+                        {{ element.guia.descripcionContenido }}
+                        <div class="prioridad">
+                          <mat-chip [class]="'prioridad-' + element.guia.prioridad.toLowerCase()">
+                            {{ element.guia.prioridad }}
+                          </mat-chip>
+                        </div>
+                      </div>
+                    </mat-cell>
+                  </ng-container>
+
+                  <!-- Estado -->
+                  <ng-container matColumnDef="estadoActual">
+                    <mat-header-cell *matHeaderCellDef>Estado</mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                      <mat-chip class="estado-pendiente">
+                        {{ element.guia.estadoActual }}
+                      </mat-chip>
+                    </mat-cell>
+                  </ng-container>
+
+                  <!-- Acciones -->
+                  <ng-container matColumnDef="acciones">
+                    <mat-header-cell *matHeaderCellDef>Acciones</mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                      <button mat-icon-button 
+                              color="primary"
+                              (click)="seleccionarGuia(element.guia.idGuia)"
+                              [class.selected]="selectedGuiaId === element.guia.idGuia"
+                              matTooltip="Seleccionar guía">
+                        <mat-icon>{{ selectedGuiaId === element.guia.idGuia ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                      </button>
+                    </mat-cell>
+                  </ng-container>
+
+                  <mat-header-row *matHeaderRowDef="columnasPendientes"></mat-header-row>
+                  <mat-row *matRowDef="let row; columns: columnasPendientes;" 
+                           [class.selected-row]="selectedGuiaId === row.guia.idGuia"></mat-row>
+                </mat-table>
+
+                <div class="no-data" *ngIf="guiasPendientes.length === 0 && !loading">
+                  <mat-icon>check_circle</mat-icon>
+                  <p>No hay guías pendientes de asignar</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Tab 3: Repartidores -->
+        <mat-tab label="Repartidores">
+          <div class="tab-content">
+            <div class="loading-container" *ngIf="loading">
+              <mat-spinner></mat-spinner>
+              <p>Cargando repartidores...</p>
+            </div>
+
+            <div class="table-container" *ngIf="!loading">
+              <h3 class="section-title">
+                <mat-icon>people</mat-icon>
+                Listado de Repartidores
+              </h3>
+              
+              <mat-table [dataSource]="todosLosRepartidores" class="repartidores-table">
+                <!-- Nombre -->
+                <ng-container matColumnDef="nombre">
+                  <mat-header-cell *matHeaderCellDef>Repartidor</mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    <div class="repartidor-nombre">
+                      <div class="nombre-principal">{{ element.repartidor.nombreCompleto }}</div>
+                      <div class="codigo-empleado">{{ element.repartidor.empleadoDetalle?.codigoEmpleado || 'Sin código' }}</div>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Contacto -->
+                <ng-container matColumnDef="contacto">
+                  <mat-header-cell *matHeaderCellDef>Contacto</mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    <div class="contacto-info">
+                      <div class="email">{{ element.repartidor.email }}</div>
+                      <div class="telefono">{{ element.repartidor.telefono }}</div>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Zona y Disponibilidad -->
+                <ng-container matColumnDef="zona">
+                  <mat-header-cell *matHeaderCellDef>Zona y Estado</mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    <div class="zona-info">
+                      <div class="zona">{{ element.repartidor.zonaAsignada || 'No asignada' }}</div>
+                      <mat-chip [class]="'disponibilidad-' + (element.repartidor.disponibilidad || 'inactivo').toLowerCase()">
+                        {{ obtenerEstadoRepartidor(element.repartidor.disponibilidad || 'INACTIVO') }}
+                      </mat-chip>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Estadísticas -->
+                <ng-container matColumnDef="estadisticas">
+                  <mat-header-cell *matHeaderCellDef>Estadísticas</mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    <div class="estadisticas-info">
+                      <div class="calificacion">
+                        <mat-icon class="star-icon">star</mat-icon>
+                        {{ element.repartidor.calificacionPromedio || 0 }}/5
+                      </div>
+                      <div class="entregas">
+                        Completadas: {{ element.repartidor.totalEntregasCompletadas || 0 }}
+                      </div>
+                      <div class="fallidas">
+                        Fallidas: {{ element.repartidor.totalEntregasFallidas || 0 }}
+                      </div>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Guías Asignadas -->
+                <ng-container matColumnDef="guiasAsignadas">
+                  <mat-header-cell *matHeaderCellDef>Guías Activas</mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    <div class="guias-asignadas">
+                      <mat-chip class="guias-count">
+                        {{ element.repartidor.guiasAsignadas?.length || 0 }} guías
+                      </mat-chip>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Acciones -->
+                <ng-container matColumnDef="accionesRepartidor">
+                  <mat-header-cell *matHeaderCellDef>Acciones</mat-header-cell>
+                  <mat-cell *matCellDef="let element">
+                    <button mat-icon-button 
+                            color="primary"
+                            (click)="verDetalleRepartidor(element.repartidor)"
+                            matTooltip="Ver detalle del repartidor">
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                  </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="columnasRepartidores"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: columnasRepartidores;"></mat-row>
+              </mat-table>
+
+              <div class="no-data" *ngIf="todosLosRepartidores.length === 0 && !loading">
+                <mat-icon>people_outline</mat-icon>
+                <p>No hay repartidores disponibles</p>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Modal de detalle de guía -->
+  <div class="modal-overlay" *ngIf="mostrarDetalleGuia" (click)="cerrarDetalleGuia()">
+    <div class="modal-content guia-detail-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2><mat-icon>description</mat-icon> Detalle de Guía</h2>
+        <button mat-icon-button (click)="cerrarDetalleGuia()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      
+      <div class="modal-body" *ngIf="guiaSeleccionada">
+        <div class="detail-section">
+          <h3>Información General</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Número de Guía:</label>
+              <span class="highlight">{{ guiaSeleccionada.numeroGuia }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Código Interno:</label>
+              <span>{{ guiaSeleccionada.codigoInterno }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Estado:</label>
+              <mat-chip [class]="'estado-' + guiaSeleccionada.estadoActual.toLowerCase()">
+                {{ guiaSeleccionada.estadoActual }}
+              </mat-chip>
+            </div>
+            <div class="detail-item">
+              <label>Prioridad:</label>
+              <mat-chip [class]="'prioridad-' + guiaSeleccionada.prioridad.toLowerCase()">
+                {{ guiaSeleccionada.prioridad }}
+              </mat-chip>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Cliente</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Nombre:</label>
+              <span>{{ guiaSeleccionada.cliente.nombreCompleto }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Email:</label>
+              <span>{{ guiaSeleccionada.cliente.email }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Teléfono:</label>
+              <span>{{ guiaSeleccionada.cliente.telefono }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Contenido y Dimensiones</h3>
+          <div class="detail-grid">
+            <div class="detail-item full-width">
+              <label>Descripción:</label>
+              <span>{{ guiaSeleccionada.descripcionContenido }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Peso:</label>
+              <span>{{ guiaSeleccionada.pesoKg }} kg</span>
+            </div>
+            <div class="detail-item">
+              <label>Valor Declarado:</label>
+              <span>${{ guiaSeleccionada.valorDeclarado }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Dimensiones:</label>
+              <span>{{ guiaSeleccionada.dimensiones }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Total:</label>
+              <span class="highlight">${{ guiaSeleccionada.total }}</span>
+            </div>
+          </div>
+          <div class="detail-item full-width" *ngIf="guiaSeleccionada.observaciones">
+            <label>Observaciones:</label>
+            <span>{{ guiaSeleccionada.observaciones }}</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Dirección de Entrega</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Municipio:</label>
+              <span>{{ guiaSeleccionada.direccionEntrega.municipio }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Departamento:</label>
+              <span>{{ guiaSeleccionada.direccionEntrega.departamento }}</span>
+            </div>
+            <div class="detail-item">
+              <label>País:</label>
+              <span>{{ guiaSeleccionada.direccionEntrega.pais }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Código Postal:</label>
+              <span>{{ guiaSeleccionada.direccionEntrega.codigoPostal }}</span>
+            </div>
+            <div class="detail-item full-width" *ngIf="guiaSeleccionada.direccionEntrega.referencias">
+              <label>Referencias:</label>
+              <span>{{ guiaSeleccionada.direccionEntrega.referencias }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section" *ngIf="guiaSeleccionada.repartidor">
+          <h3>Repartidor Asignado</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Nombre:</label>
+              <span>{{ guiaSeleccionada.repartidor.nombreCompleto }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Teléfono:</label>
+              <span>{{ guiaSeleccionada.repartidor.telefono }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Zona:</label>
+              <span>{{ guiaSeleccionada.repartidor.zonaAsignada }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Fechas</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Fecha de Creación:</label>
+              <span>{{ formatearFecha(guiaSeleccionada.fechaCreacion) }}</span>
+            </div>
+            <div class="detail-item" *ngIf="guiaSeleccionada.fechaRecoleccionReal">
+              <label>Fecha de Recolección:</label>
+              <span>{{ formatearFecha(guiaSeleccionada.fechaRecoleccionReal) }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Intentos de Entrega:</label>
+              <span>{{ guiaSeleccionada.intentosEntrega }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de detalle de repartidor -->
+  <div class="modal-overlay" *ngIf="mostrarDetalleRepartidor" (click)="cerrarDetalleRepartidor()">
+    <div class="modal-content repartidor-detail-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2><mat-icon>person</mat-icon> Detalle del Repartidor</h2>
+        <button mat-icon-button (click)="cerrarDetalleRepartidor()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      
+      <div class="modal-body" *ngIf="repartidorSeleccionado">
+        <div class="detail-section">
+          <h3>Información Personal</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Nombre Completo:</label>
+              <span class="highlight">{{ repartidorSeleccionado.nombreCompleto }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Email:</label>
+              <span>{{ repartidorSeleccionado.email }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Teléfono:</label>
+              <span>{{ repartidorSeleccionado.telefono }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Estado:</label>
+              <mat-chip [class]="'disponibilidad-' + (repartidorSeleccionado.disponibilidad || 'inactivo').toLowerCase()">
+                {{ obtenerEstadoRepartidor(repartidorSeleccionado.disponibilidad || 'INACTIVO') }}
+              </mat-chip>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Información Laboral</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Zona Asignada:</label>
+              <span>{{ repartidorSeleccionado.zonaAsignada || 'No asignada' }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Radio de Cobertura:</label>
+              <span>{{ repartidorSeleccionado.radioCobertura || 0 }} km</span>
+            </div>
+            <div class="detail-item">
+              <label>Código de Empleado:</label>
+              <span>{{ repartidorSeleccionado.empleadoDetalle?.codigoEmpleado || 'Sin código' }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Estado del Empleado:</label>
+              <mat-chip [class]="'estado-' + (repartidorSeleccionado.empleadoDetalle?.estadoEmpleado || 'inactivo').toLowerCase()">
+                {{ repartidorSeleccionado.empleadoDetalle?.estadoEmpleado || 'INACTIVO' }}
+              </mat-chip>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Información del Contrato</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Tipo de Contrato:</label>
+              <span>{{ repartidorSeleccionado.contratoDetalle?.tipoContrato || 'Sin información' }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Fecha de Inicio:</label>
+
+                <span *ngIf="repartidorSeleccionado && repartidorSeleccionado.contratoDetalle">
+                {{ repartidorSeleccionado.contratoDetalle.fechaInicio ? formatearFecha(repartidorSeleccionado.contratoDetalle.fechaInicio) : 'Sin fecha' }}
+                </span>
+                <span *ngIf="!repartidorSeleccionado || !repartidorSeleccionado.contratoDetalle">
+                Sin fecha
+                </span>
+            </div>
+            <div class="detail-item">
+                <label>Fecha de Fin:</label>
+                <span *ngIf="repartidorSeleccionado && repartidorSeleccionado.contratoDetalle">
+                {{ repartidorSeleccionado.contratoDetalle.fechaFin === 'Indefinido' ? 'Indefinido' : 
+                    (repartidorSeleccionado.contratoDetalle.fechaFin ? formatearFecha(repartidorSeleccionado.contratoDetalle.fechaFin) : 'Sin fecha') }}
+                </span>
+                <span *ngIf="!repartidorSeleccionado || !repartidorSeleccionado.contratoDetalle">
+                Sin fecha
+                </span>
+            </div>
+            <div class="detail-item">
+              <label>Estado del Contrato:</label>
+              <mat-chip [class]="'estado-' + (repartidorSeleccionado.contratoDetalle?.estadoContrato || 'inactivo').toLowerCase()">
+                {{ repartidorSeleccionado.contratoDetalle?.estadoContrato || 'INACTIVO' }}
+              </mat-chip>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Estadísticas de Rendimiento</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Calificación Promedio:</label>
+              <div class="rating-display">
+                <mat-icon class="star-icon">star</mat-icon>
+                <span class="highlight">{{ repartidorSeleccionado.calificacionPromedio || 0 }}/5</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <label>Entregas Completadas:</label>
+              <span class="success-count">{{ repartidorSeleccionado.totalEntregasCompletadas || 0 }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Entregas Fallidas:</label>
+              <span class="error-count">{{ repartidorSeleccionado.totalEntregasFallidas || 0 }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Tasa de Éxito:</label>
+              <span class="success-rate">{{ calcularTasaExito(repartidorSeleccionado) }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section" *ngIf="repartidorSeleccionado.guiasAsignadas && repartidorSeleccionado.guiasAsignadas.length > 0">
+          <h3>Guías Asignadas Actualmente</h3>
+          <div class="guias-asignadas-list">
+            <div class="guia-item" *ngFor="let guia of repartidorSeleccionado.guiasAsignadas">
+              <div class="guia-numero">{{ guia.numeroGuia }}</div>
+              <div class="guia-descripcion">{{ guia.descripcionContenido }}</div>
+              <mat-chip [class]="'estado-' + guia.estadoActual.toLowerCase()">
+                {{ guia.estadoActual }}
+              </mat-chip>
+              <div class="guia-fecha">{{ formatearFecha(guia.fechaCreacion) }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section" *ngIf="!repartidorSeleccionado.guiasAsignadas || repartidorSeleccionado.guiasAsignadas.length === 0">
+          <h3>Guías Asignadas</h3>
+          <div class="no-guias-asignadas">
+            <mat-icon>assignment_turned_in</mat-icon>
+            <p>No tiene guías asignadas actualmente</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

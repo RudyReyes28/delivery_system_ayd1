@@ -1,15 +1,16 @@
 package org.entregasayd.sistemasentregas.controllers;
 
 import jakarta.validation.Valid;
+import org.entregasayd.sistemasentregas.dto.contrato.ComisionDTO;
+import org.entregasayd.sistemasentregas.dto.contrato.ContratoComisionDTO;
+import org.entregasayd.sistemasentregas.dto.contrato.ContratoRequestDTO;
+import org.entregasayd.sistemasentregas.dto.contrato.RegisterContratoDTO;
 import org.entregasayd.sistemasentregas.dto.user.EmpleadoRequestDTO;
 import org.entregasayd.sistemasentregas.dto.user.RegistroEmpleadoRequestDTO;
 import org.entregasayd.sistemasentregas.dto.user.UsuarioRequestDdto;
 import org.entregasayd.sistemasentregas.dto.user.UsuarioResponseDto;
 import org.entregasayd.sistemasentregas.models.*;
-import org.entregasayd.sistemasentregas.services.DireccionService;
-import org.entregasayd.sistemasentregas.services.PersonaService;
-import org.entregasayd.sistemasentregas.services.RolService;
-import org.entregasayd.sistemasentregas.services.UsuarioService;
+import org.entregasayd.sistemasentregas.services.*;
 import org.entregasayd.sistemasentregas.utils.ErrorApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,8 @@ public class UserController {
 
         UsuarioRequestDdto usuario = register.getUsuarioRequestDdto();
         EmpleadoRequestDTO empleado = register.getEmpleadoRequestDdto();
+        Direccion direccion = register.getDireccion();
+        RegisterContratoDTO registerContrato = register.getContrato();
 
         Persona personaSave = new Persona();
         personaSave.setNombre(usuario.getNombre());
@@ -42,12 +45,6 @@ public class UserController {
         personaSave.setDpi(usuario.getDpi());
         personaSave.setCorreo(usuario.getCorreo());
         personaSave.setTelefono(usuario.getTelefono());
-
-        Direccion direccionSave = direccionService.findById(usuario.getIdDireccion());
-        if (direccionSave == null) {
-            throw new ErrorApi(400, "La direccion no existe");
-        }
-        personaSave.setDireccion(direccionSave);
 
         Rol rolSave = rolService.findById(usuario.getIdRol());
         if (rolSave == null) {
@@ -72,7 +69,7 @@ public class UserController {
         empleadoSave.setEstadoEmpleado(empleado.getEstadoEmpleado());
         empleadoSave.setFechaIngreso(empleado.getFechaIngreso());
 
-        return usuarioService.create(personaSave, usuarioSave, empleadoSave);
+        return usuarioService.create(direccion, personaSave, usuarioSave, empleadoSave, registerContrato.getContrato(), registerContrato.getComision());
     }
 
     @PutMapping("/update")
