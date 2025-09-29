@@ -3,7 +3,7 @@ version: '3.8'
 services:
   backend:
     build:
-      context: ../
+      context: ../..
       dockerfile: ./config-dev-docker/Dockerfile
     container_name: sistemas_entregas_backend
     restart: always
@@ -30,6 +30,6 @@ services:
       dockerfile: Dockerfile
     container_name: sistemas_entregas_frontend
     ports:
-      - "4200:4200"
+      - "80:80"
     depends_on:
       - backend
