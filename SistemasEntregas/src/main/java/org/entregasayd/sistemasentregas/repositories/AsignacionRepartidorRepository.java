@@ -11,4 +11,6 @@ public interface AsignacionRepartidorRepository extends JpaRepository<Asignacion
     List<AsignacionRepartidor> findByRepartidor_IdRepartidor(Long idRepartidor);
 
     List<AsignacionRepartidor> findByGuia_IdGuia(Long idGuia);
+
+    List<AsignacionRepartidor> findByRepartidor_IdRepartidorAndGuia_IdGuia(Long idRepartidor, Long idGuia);
 }
