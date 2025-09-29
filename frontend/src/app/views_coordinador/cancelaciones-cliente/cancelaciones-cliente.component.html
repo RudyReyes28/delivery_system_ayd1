@@ -1,0 +1,203 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Cancelaciones de Cliente</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="header-section">
+        <h3>Gestión de Cancelaciones de Cliente</h3>
+        <div class="actions">
+          <button mat-raised-button color="primary" (click)="cargarCancelaciones()" [disabled]="cargando">
+            <mat-icon>refresh</mat-icon> Actualizar
+          </button>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="filter-section">
+        <div class="filter-pills">
+          <button mat-raised-button 
+                  [color]="filtroActual === 'TODAS' ? 'primary' : ''"
+                  class="filter-pill" 
+                  (click)="aplicarFiltro('TODAS')">
+            Todas ({{cancelaciones.length}})
+          </button>
+          <button mat-raised-button 
+                  [color]="filtroActual === 'ABIERTA' ? 'primary' : ''"
+                  class="filter-pill" 
+                  matBadge="{{contarPorEstado('ABIERTA')}}"
+                  [matBadgeHidden]="contarPorEstado('ABIERTA') === 0"
+                  matBadgeColor="warn"
+                  (click)="aplicarFiltro('ABIERTA')">
+            Abiertas
+          </button>
+          <button mat-raised-button 
+                  [color]="filtroActual === 'EN_ATENCION' ? 'primary' : ''"
+                  class="filter-pill" 
+                  (click)="aplicarFiltro('EN_ATENCION')">
+            En Atención ({{contarPorEstado('EN_ATENCION')}})
+          </button>
+          <button mat-raised-button 
+                  [color]="filtroActual === 'RESUELTA' ? 'primary' : ''"
+                  class="filter-pill" 
+                  (click)="aplicarFiltro('RESUELTA')">
+            Resueltas ({{contarPorEstado('RESUELTA')}})
+          </button>
+          <button mat-raised-button 
+                  [color]="filtroActual === 'CERRADA' ? 'primary' : ''"
+                  class="filter-pill" 
+                  (click)="aplicarFiltro('CERRADA')">
+            Cerradas ({{contarPorEstado('CERRADA')}})
+          </button>
+        </div>
+      </div>
+
+      <!-- Loader mientras se cargan las cancelaciones -->
+      <div *ngIf="cargando" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando cancelaciones...</p>
+      </div>
+
+      <!-- Lista de cancelaciones -->
+      <div *ngIf="!cargando && cancelacionesFiltradas.length > 0" class="cancelaciones-list">
+        <div *ngFor="let item of cancelacionesFiltradas" class="cancelacion-item">
+          <div class="cancelacion-header">
+            <div class="cancelacion-info">
+              <div class="cancelacion-data">
+                <span class="cancelacion-codigo">{{ item.incidencia.codigoIncidencia }}</span>
+                <span class="cancelacion-guia">Guía: {{ item.incidencia.guia.numeroGuia }}</span>
+                <span class="cancelacion-fecha">{{ formatearFecha(item.incidencia.fechaReporte) }}</span>
+              </div>
+              <div class="cancelacion-badges">
+                <span class="badge" [ngClass]="obtenerClaseSeveridad(item.incidencia.severidad)">
+                  {{ item.incidencia.severidad }}
+                </span>
+                <span class="badge" [ngClass]="obtenerClaseEstado(item.incidencia.estadoIncidencia || 'ABIERTA')">
+                  {{ item.incidencia.estadoIncidencia || 'ABIERTA' }}
+                </span>
+              </div>
+            </div>
+            <div class="cancelacion-actions">
+              <button mat-icon-button color="primary" (click)="toggleExpandir(item.incidencia.idIncidencia)">
+                <mat-icon>{{ cancelacionesExpandidas[item.incidencia.idIncidencia] ? 'expand_less' : 'expand_more' }}</mat-icon>
+              </button>
+              
+              <!-- Añadir un log de depuración visible -->
+              <span class="debug-info" *ngIf="item.incidencia.estadoIncidencia === 'ABIERTA'">
+                Estado: {{item.incidencia.estadoIncidencia}}
+              </span>
+              
+              <!-- Modificar la condición para mostrar el botón -->
+              <button *ngIf="item.incidencia.estadoIncidencia === 'ABIERTA'" 
+                      mat-raised-button 
+                      color="accent" 
+                      (click)="abrirDialogoAtender(item)">
+                <mat-icon>reply_all</mat-icon> Devolver a Sucursal
+              </button>
+            </div>
+          </div>
+
+          <!-- Detalles expandibles de la cancelación -->
+          <div *ngIf="cancelacionesExpandidas[item.incidencia.idIncidencia]" class="cancelacion-details">
+            <mat-divider></mat-divider>
+
+            <!-- Información de la incidencia -->
+            <div class="detail-section">
+              <h4><mat-icon>error_outline</mat-icon> Detalles de la Incidencia</h4>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="label">Tipo:</span>
+                  <span class="value">{{ item.incidencia.tipoIncidencia }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Severidad:</span>
+                  <span class="value">{{ item.incidencia.severidad }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Estado:</span>
+                  <span class="value">{{ item.incidencia.estadoIncidencia || 'ABIERTA' }}</span>
+                </div>
+                <div class="detail-item full-width">
+                  <span class="label">Descripción:</span>
+                  <span class="value">{{ item.incidencia.descripcion }}</span>
+                </div>
+                <div class="detail-item full-width" *ngIf="item.incidencia.solucionAplicada">
+                  <span class="label">Solución Aplicada:</span>
+                  <span class="value">{{ item.incidencia.solucionAplicada }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información de la guía -->
+            <div class="detail-section">
+              <h4><mat-icon>local_shipping</mat-icon> Detalles de la Guía</h4>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="label">Número:</span>
+                  <span class="value">{{ item.incidencia.guia.numeroGuia }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Estado:</span>
+                  <span class="value">{{ item.incidencia.guia.estadoActual }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Prioridad:</span>
+                  <span class="value" [ngClass]="obtenerClasePrioridad(item.incidencia.guia.prioridad)">
+                    {{ item.incidencia.guia.prioridad }}
+                  </span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Creación:</span>
+                  <span class="value">{{ formatearFecha(item.incidencia.guia.fechaCreacion) }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Peso:</span>
+                  <span class="value">{{ item.incidencia.guia.pesoKg }} kg</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Dimensiones:</span>
+                  <span class="value">{{ item.incidencia.guia.dimensiones }}</span>
+                </div>
+                <div class="detail-item full-width">
+                  <span class="label">Contenido:</span>
+                  <span class="value">{{ item.incidencia.guia.descripcionContenido }}</span>
+                </div>
+                <div class="detail-item full-width" *ngIf="item.incidencia.guia.observaciones">
+                  <span class="label">Observaciones:</span>
+                  <span class="value">{{ item.incidencia.guia.observaciones }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información del repartidor -->
+            <div class="detail-section">
+              <h4><mat-icon>person</mat-icon> Repartidor</h4>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="label">Nombre:</span>
+                  <span class="value">{{ item.incidencia.guia.repartidor.nombreCompleto }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Email:</span>
+                  <span class="value">{{ item.incidencia.guia.repartidor.email }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Teléfono:</span>
+                  <span class="value">{{ item.incidencia.guia.repartidor.telefono }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje si no hay cancelaciones -->
+      <div *ngIf="!cargando && cancelacionesFiltradas.length === 0" class="no-data">
+        <mat-icon>info</mat-icon>
+        <p>No hay cancelaciones de cliente para mostrar</p>
+        <p class="subtext">No se encontraron cancelaciones con el filtro aplicado</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -18,7 +18,7 @@ import java.io.IOException;
 @Service
 public class S3StorageService {
 
-    @Value("${s3.bucket}")
+    @Value("${s3.bucket.backend}")
     private String bucketName;
 
     @Value("${aws.region}")

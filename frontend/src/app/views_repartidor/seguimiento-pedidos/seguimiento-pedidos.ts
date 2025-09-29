@@ -33,6 +33,9 @@ import {
   TIPOS_INCIDENCIAS,
 } from '../../../models/repartidor-models/IncidenciaModel';
 import { ESTADOS_GUIA } from '../../../models/repartidor-models/EstadosGuia';
+import { MatDialog } from '@angular/material/dialog';
+import { CancelacionClienteDialogComponent } from '../cancelacion-cliente-dialog/cancelacion-cliente-dialog.component';
+import { RepartidorService } from '../../../services/repartidor-service/repartidor.service';
 
 @Component({
   selector: 'app-seguimiento-pedidos',
@@ -91,6 +94,8 @@ export class SeguimientoPedidos implements OnInit {
   private readonly ID_USUARIO_ACTUAL = Number(sessionStorage.getItem('idUsuario'));
 
   constructor(
+    private dialog: MatDialog,
+    private repartidorService: RepartidorService,
     private snackBar: MatSnackBar,
     private formBuilder: FormBuilder,
     private seguiminetoService: SeguimientoService,
@@ -420,6 +425,32 @@ export class SeguimientoPedidos implements OnInit {
     }
   }
 
+  // Método para abrir el diálogo de cancelación del cliente
+  registrarCancelacionCliente(idGuia: number): void {
+    // Obtener ID de usuario de la sesión
+    const idUsuario = Number(sessionStorage.getItem('idUsuario')) || 0;
+    
+    if (idUsuario === 0) {
+      this.showSnackbar('No se ha podido identificar al usuario. Inicie sesión nuevamente.' , 'error-snackbar');
+      return;
+    }
+    
+    const dialogRef = this.dialog.open(CancelacionClienteDialogComponent, {
+      width: '500px',
+      data: { idGuia, idUsuario }
+    });
+    
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.success) {
+        this.showSnackbar(result.message || 'Cancelación registrada correctamente', 'success-snackbar');
+        // Recargar los datos
+        this.setGuias();
+      } else if (result && !result.success) {
+        this.showSnackbar(result.message || 'Error al registrar la cancelación', 'error-snackbar');
+      }
+    });
+  }
+  
   showSnackbar(message: string, tipo: string): void {
     const mensaje = message;
     this.snackBar.open(mensaje, 'Cerrar', {

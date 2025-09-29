@@ -8,12 +8,13 @@ import {
   ProcesarLiquidacionRequest, 
   ApiResponse 
 } from '../models/admin-liquidacion.model';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminLiquidacionService {
-  private readonly baseUrl = 'http://localhost:8081/admin/liquidacion/repartidor';
+  private readonly baseUrl = `${environment.apiUrl}/admin/liquidacion/repartidor`;
 
   constructor(private http: HttpClient) {}
 
@@ -43,5 +44,13 @@ export class AdminLiquidacionService {
    */
   obtenerRepartidoresLiquidacion(): Observable<RepartidorResponse[]> {
     return this.http.get<RepartidorResponse[]>(`${this.baseUrl}/liquidaciones`);
+  }
+  
+  /**
+   * Cierra un periodo de liquidación
+   * @param idPeriodo ID del periodo a cerrar
+   */
+  cerrarPeriodo(idPeriodo: number): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.baseUrl}/cerrar-periodo/${idPeriodo}`, {});
   }
 }

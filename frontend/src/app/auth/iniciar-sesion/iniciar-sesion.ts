@@ -154,14 +154,17 @@ export class IniciarSesion implements OnInit {
 
   private mostrarVista() {
     if (this.nombreRolActual === "ADMINISTRADOR") {
-      this.router.navigate(['/']);
+      this.router.navigate(['/gestion-empleados']);
     } else if (this.nombreRolActual === "CLIENTE") {
       this.router.navigate(['/']);
     } else if (this.nombreRolActual === "SUCURSAL") {
       this.router.navigate(['/general-sucursal']);
     } else if (this.nombreRolActual === "REPARTIDOR") {
       this.router.navigate(['/gestion-pedidos']);
+    }else if (this.nombreRolActual === "COORDINADOR_OPERACIONES") {
+      this.router.navigate(['/guia-repartidor']);
     }
+
   }
 
   private mostrarMensaje(mensaje: string, tipo: string): void {

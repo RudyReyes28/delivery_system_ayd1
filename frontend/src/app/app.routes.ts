@@ -12,18 +12,18 @@ import { GuiaSucursal } from './views_sucursal/guia-sucursal/guia-sucursal';
 import { GuiaCliente } from './views_cliente/guia-cliente/guia-cliente';
 import { GuiaCoordenador } from './guia-coordenador/guia-coordenador';
 import { Liquidacion } from './liquidacion/liquidacion';
+import { CancelacionGuiasComponent } from './views_sucursal/cancelacion-guias/cancelacion-guias.component';
+import { SolicitudesCancelacionComponent } from './views_coordinador/solicitudes-cancelacion/solicitudes-cancelacion.component';
+import { CancelacionesClienteComponent } from './views_coordinador/cancelaciones-cliente/cancelaciones-cliente.component';
 
 //repartidor
 import { GestionPedidos } from './views_repartidor/gestion-pedidos/gestion-pedidos';
 import { SeguimientoPedidos } from './views_repartidor/seguimiento-pedidos/seguimiento-pedidos';
-
+import { CancelacionClienteComponent } from './views_repartidor/cancelacion-cliente/cancelacion-cliente.component';
 
 export const routes: Routes = [
     {
         path: 'login', component: IniciarSesion, title: "Iniciar Sesión"
-    },
-    {
-        path: '', redirectTo: '/login', pathMatch: 'full'
     },
     {
         path: "crear-usuario", component: CrearUsuario, title: "Crear Usuario"
@@ -31,6 +31,7 @@ export const routes: Routes = [
     {
         path: "recuperar-cuenta", component: RecuperarCuenta, title: "Recuperar Cuenta"
     },
+    // Rutas del Administrador
     {
         path: "empresa", component: Empresa, title: "Gestión Empresas"
     },
@@ -39,6 +40,15 @@ export const routes: Routes = [
     },
     {
         path: "fidelizacion", component: Fidelizacion, title: "Fidelización"
+    },
+    {
+        path: "gestion-empleados", component: Empleados, title: "Empleados"
+    },
+    {
+        path: "gestion-contratos", component: Contratos, title: "Contratos"
+    },
+    {
+        path: "periodos-liquidacion", component: Liquidacion, title: "Periodos de Liquidación"
     },
     {
         path: "general-sucursal", component: GeneralSucursal, title: "Información General"
@@ -50,7 +60,17 @@ export const routes: Routes = [
         path: "gestion-contratos", component: Contratos, title: "Contratos"
     },
     {
-        path: "guia-sucursal",  component: GuiaSucursal, title: "Guia"
+        path: "guia-sucursal", component: GuiaSucursal, title: "Guia"
+    },
+    {
+        path: "cancelacion-guias", component: CancelacionGuiasComponent, title: "Cancelación de Guías"
+    },
+    // Rutas del Coordinador
+    {
+        path: "solicitudes-cancelacion", component: SolicitudesCancelacionComponent, title: "Solicitudes de Cancelación"
+    },
+    {
+        path: "cancelaciones-cliente", component: CancelacionesClienteComponent, title: "Cancelaciones de Cliente"
     },
     //rutas repartidor
     {
@@ -58,6 +78,12 @@ export const routes: Routes = [
     },
     {
       path: "seguimiento-pedidos", component: SeguimientoPedidos, title: "Seguimiento Pedidos"
+    },
+    {
+      path: "cancelacion-cliente", component: CancelacionClienteComponent, title: "Cancelación Cliente"
+    },
+    {
+      path: "cancelacion-cliente/:id", component: CancelacionClienteComponent, title: "Cancelación Cliente"
     },
     {
         path: "", component: GuiaCliente, title: "Guía"

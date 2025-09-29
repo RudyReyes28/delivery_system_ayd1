@@ -1,0 +1,63 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Registrar Cancelación de Cliente</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="form-container">
+        <div class="header-section">
+          <h3>Formulario de Cancelación</h3>
+        </div>
+        
+        <form [formGroup]="cancelacionForm" (ngSubmit)="onSubmit()">
+          <div class="form-section">
+            <p class="instruction-text">
+              Complete los siguientes campos para registrar la cancelación del pedido por parte del cliente.
+              Esta información será revisada por el coordinador.
+            </p>
+            
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>ID de la Guía</mat-label>
+              <input matInput type="number" formControlName="idGuia" [readonly]="idGuia !== null">
+              <mat-hint *ngIf="idGuia === null">Ingrese el ID de la guía cancelada</mat-hint>
+              <mat-error *ngIf="cancelacionForm.get('idGuia')?.hasError('required')">
+                El ID de la guía es requerido
+              </mat-error>
+              <mat-error *ngIf="cancelacionForm.get('idGuia')?.hasError('min')">
+                El ID de la guía debe ser un número válido
+              </mat-error>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Descripción de la Cancelación</mat-label>
+              <textarea matInput formControlName="descripcion" rows="5" 
+                placeholder="Describa el motivo por el cual el cliente canceló el pedido..."></textarea>
+              <mat-hint align="end">{{ cancelacionForm.get('descripcion')?.value?.length || 0 }}/500</mat-hint>
+              <mat-error *ngIf="cancelacionForm.get('descripcion')?.hasError('required')">
+                La descripción es requerida
+              </mat-error>
+              <mat-error *ngIf="cancelacionForm.get('descripcion')?.hasError('minlength')">
+                La descripción debe tener al menos 10 caracteres
+              </mat-error>
+              <mat-error *ngIf="cancelacionForm.get('descripcion')?.hasError('maxlength')">
+                La descripción no debe exceder los 500 caracteres
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-actions">
+            <button mat-button type="button" color="warn" [disabled]="submitting" routerLink="/seguimiento-pedidos">
+              <mat-icon>cancel</mat-icon> Cancelar
+            </button>
+            <button mat-raised-button type="submit" color="primary" [disabled]="submitting || cancelacionForm.invalid">
+              <mat-icon *ngIf="!submitting">save</mat-icon>
+              <mat-spinner *ngIf="submitting" diameter="20" class="spinner-button"></mat-spinner>
+              {{ submitting ? 'Enviando...' : 'Registrar Cancelación' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

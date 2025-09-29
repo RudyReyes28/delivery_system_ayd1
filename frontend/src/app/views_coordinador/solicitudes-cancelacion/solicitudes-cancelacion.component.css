@@ -1,0 +1,216 @@
+.container {
+  padding: 20px;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header-section h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+}
+
+.loading-container p {
+  margin-top: 15px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.solicitudes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.solicitud-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.solicitud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #f9f9f9;
+}
+
+.solicitud-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.solicitud-numero {
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.solicitud-fecha {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.solicitud-estado, .solicitud-prioridad {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.estado-creada {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.estado-asignada {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.prioridad-normal {
+  background-color: #e8eaf6;
+  color: #3949ab;
+}
+
+.prioridad-alta {
+  background-color: #fff8e1;
+  color: #ff8f00;
+}
+
+.prioridad-urgente {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.estado-solicitada {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.estado-autorizada {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.estado-procesada {
+  background-color: #e0f7fa;
+  color: #0097a7;
+}
+
+.estado-rechazada {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.solicitud-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.solicitud-details {
+  padding: 16px;
+  background-color: white;
+}
+
+.detail-section {
+  margin-bottom: 20px;
+}
+
+.detail-section h4 {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.detail-section h4 mat-icon {
+  margin-right: 8px;
+  color: #1976d2;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.label {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.value {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px 0;
+  color: #666;
+}
+
+.no-data mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #bdbdbd;
+  margin-bottom: 16px;
+}
+
+.no-data p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.no-data .subtext {
+  font-size: 0.9rem;
+  margin-top: 8px;
+  color: #888;
+}
+
+@media (max-width: 768px) {
+  .solicitud-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .solicitud-actions {
+    margin-top: 12px;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+}

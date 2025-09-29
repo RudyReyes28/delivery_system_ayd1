@@ -6,6 +6,12 @@
         <mat-icon>schedule</mat-icon>
         Periodo Activo
       </mat-card-title>
+      <!-- Botón para cerrar periodo (solo para administradores) - corregimos la comparación del estado -->
+      <div class="spacer"></div>
+      <button mat-raised-button color="warn" (click)="cerrarPeriodoActivo()" *ngIf="periodoActivo?.estado === 'ABIERTO'">
+        <mat-icon>lock</mat-icon>
+        Cerrar Periodo
+      </button>
     </mat-card-header>
     <mat-card-content>
       <div class="periodo-info">
