@@ -21,8 +21,8 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('SistemasEntregas') {
-                    // Usar Maven con JDK 21 - etiqueta correcta
-                    sh 'docker run --rm -v $PWD:/app -w /app maven:3.9-openjdk-21 mvn clean package -DskipTests'
+                    // ESTA IMAGEN SÍ EXISTE - Verificada en Docker Hub oficial
+                    sh 'docker run --rm -v $PWD:/app -w /app maven:eclipse-temurin-21 mvn clean package -DskipTests'
                 }
             }
         }
@@ -38,9 +38,7 @@ pipeline {
         stage('Deploy Frontend to S3') {
             steps {
                 echo "Subiendo archivos estáticos al bucket S3: ${S3_BUCKET_NAME}"
-                withAWS(region: "${AWS_REGION}") {
-                    sh "aws s3 sync frontend/dist/frontend/ s3://${S3_BUCKET_NAME} --delete"
-                }
+                sh "aws s3 sync frontend/dist/frontend/ s3://${S3_BUCKET_NAME} --delete"
             }
         }
 
@@ -48,11 +46,9 @@ pipeline {
             steps {
                 script {
                     def imageUriWithTag = "${ECR_REPOSITORY_URI}:${BUILD_NUMBER}"
-                    withAWS(region: "${AWS_REGION}") {
-                        sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPOSITORY_URI}"
-                        sh "docker build -f Dockerfile.backend -t ${imageUriWithTag} ."
-                        sh "docker push ${imageUriWithTag}"
-                    }
+                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPOSITORY_URI}"
+                    sh "docker build -f Dockerfile.backend -t ${imageUriWithTag} ."
+                    sh "docker push ${imageUriWithTag}"
                 }
             }
         }

@@ -1,7 +1,7 @@
 # --- Etapa 1: Construcción (Build Stage) ---
 # Define un entorno temporal con todas las herramientas para compilar tu proyecto.
 # CORREGIDO: Usando una imagen que SÍ existe
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM maven:eclipse-temurin-21 AS build
 
 # Establece el directorio de trabajo dentro del contenedor.
 WORKDIR /app
