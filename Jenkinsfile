@@ -1,12 +1,10 @@
 pipeline {
     agent any
-
     environment {
         AWS_REGION         = 'us-east-2'
         S3_BUCKET_NAME     = 'delivery-system-frontend'
         ECR_REPOSITORY_URI = '776410620122.dkr.ecr.us-east-2.amazonaws.com/delivery-system/backend'
     }
-
     stages {
         stage('Checkout') {
             steps {
@@ -17,18 +15,14 @@ pipeline {
                     credentialsId: 'github-credentials-ci'
             }
         }
-
         stage('Build Backend') {
             steps {
-                dir('SistemasEntregas') {
-                    // Construimos el backend usando el Dockerfile multi-stage
-                    sh """
-                           docker build -f ../Dockerfile.backend -t backend:${BUILD_NUMBER} .
-                        """
-                }
+                // Construir desde la raíz del proyecto, no desde SistemasEntregas
+                sh """
+                    docker build -f Dockerfile.backend -t backend:${BUILD_NUMBER} .
+                """
             }
         }
-
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
@@ -36,14 +30,12 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy Frontend to S3') {
             steps {
                 echo "Subiendo archivos estáticos al bucket S3: ${S3_BUCKET_NAME}"
                 sh "aws s3 sync frontend/dist/frontend/ s3://${S3_BUCKET_NAME} --delete"
             }
         }
-
         stage('Push Backend Image to ECR') {
             steps {
                 script {
@@ -54,7 +46,6 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy Backend to Production') {
             steps {
                 echo "IMAGEN LISTA PARA DESPLEGAR: ${ECR_REPOSITORY_URI}:${BUILD_NUMBER}"
@@ -62,7 +53,6 @@ pipeline {
             }
         }
     }
-
     post {
         always {
             echo 'Pipeline finalizado. Limpiando espacio de trabajo.'
