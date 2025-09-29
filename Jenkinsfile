@@ -21,7 +21,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('SistemasEntregas') {
-                    sh 'docker run --rm -v $PWD:/app -w /app maven:3.9.6-eclipse-temurin-24 mvn clean package -DskipTests'
+                    sh 'docker run --rm -v $PWD:/app -w /app maven:3.9.6-jdk-24 mvn clean package -DskipTests'
                 }
             }
         }
