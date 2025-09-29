@@ -24,7 +24,13 @@ pipeline {
         // --- Etapa 2: Construir el Backend ---
         stage('Build Backend') {
             // Usa un agente Docker temporal solo para esta etapa.
-            agent { docker { image 'maven:3.9.6-eclipse-temurin-24' } }
+            stage('Build Backend') {
+                steps {
+                    dir('SistemasEntregas') {
+                        sh 'docker run --rm -v $PWD:/app -w /app maven:3.9.6-eclipse-temurin-24 mvn clean package -DskipTests'
+                    }
+                }
+            }
             steps {
                 // Ejecuta el comando de Maven dentro del directorio del backend.
                 dir('SistemasEntregas') {
@@ -36,7 +42,13 @@ pipeline {
         // --- Etapa 3: Construir el Frontend ---
         stage('Build Frontend') {
             // Usa un agente Docker temporal con Node.js.
-            agent { docker { image 'node:22-alpine' } }
+            stage('Build Frontend') {
+                steps {
+                    dir('frontend') {
+                        sh 'docker run --rm -v $PWD:/app -w /app node:22-alpine sh -c "npm install && npm run build"'
+                    }
+                }
+            }
             steps {
                 // Ejecuta los comandos de npm dentro del directorio del frontend.
                 dir('frontend') {
