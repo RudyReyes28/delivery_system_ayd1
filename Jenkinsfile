@@ -37,12 +37,11 @@ pipeline {
 
 
         stage('Deploy') {
-            steps {
+             steps {
                 sh 'cd SistemasEntregas && mvn package -DskipTests'
-                sh 'cd SistemasEntregas/target/config-dev-docker && sudo -E docker-compose down'
-                sh 'cd SistemasEntregas/target/config-dev-docker && sudo -E docker-compose up --build -d'
+                sh 'sudo -E docker-compose down'
+                sh 'sudo -E docker-compose up --build -d'
                 echo "Despliegue a DEV exitoso"
-
             }
         }
     }
