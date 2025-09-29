@@ -22,6 +22,12 @@ public class EvidenciaService {
     @Value("${storage.path}")
     private String URL_BASE;
 
+    @Value("${storage.path.local}")
+    private String URL_BASE_LOCAL;
+
+    @Value("${storage.type}")
+    private String storageType;
+
     public EvidenciaEntrega create(EvidenciaDTO evidenciaDTO){
         Guia guia = guiaRespository.findById(evidenciaDTO.getIdGuia()).
                 orElseThrow(()-> new  ErrorApi(404,"Guia no encontrada." ));
@@ -54,7 +60,10 @@ public class EvidenciaService {
     public List<EvidenciaEntrega> getEvidenciasPorGuia(Long idGuia){
         List<EvidenciaEntrega> evidencias = repository.findByGuiaIdGuia(idGuia);
         for(EvidenciaEntrega evidenciaEntrega : evidencias){
-            evidenciaEntrega.setUrlArchivo(URL_BASE + evidenciaEntrega.getUrlArchivo());
+            if(storageType.equals("local")){
+                evidenciaEntrega.setUrlArchivo(URL_BASE_LOCAL + evidenciaEntrega.getUrlArchivo());
+            }
+            evidenciaEntrega.setUrlArchivo( URL_BASE + evidenciaEntrega.getUrlArchivo());
         }
         return evidencias;
     }
