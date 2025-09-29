@@ -23,7 +23,7 @@ pipeline {
                 dir('SistemasEntregas') {
                     // Construimos el backend usando el Dockerfile multi-stage
                     sh """
-                           docker build -f Dockerfile.backend -t backend:${BUILD_NUMBER} .
+                           docker build -f ../Dockerfile.backend -t backend:${BUILD_NUMBER} .
                         """
                 }
             }
