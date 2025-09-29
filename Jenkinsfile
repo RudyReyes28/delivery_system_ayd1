@@ -13,8 +13,8 @@ pipeline {
         // Variables AWS / Storage
         // ------------------------
         AWS_REGION           = "us-east-2"
-        AWS_ACCESS_KEY_ID    = credentials('aws-access-key-id')?: 'dumbplaceholder' // Evita error si no está configurado
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')?: 'dumbplaceholder' // Evita error si no está configurado
+        //AWS_ACCESS_KEY_ID    = credentials('aws-access-key-id') // Evita error si no está configurado
+        //AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key') // Evita error si no está configurado
         S3_BUCKET_FRONTEND   = "delivery-system-frontend "
         S3_BUCKET_BACKEND    = "mi-proyecto-backend-storage"
 
@@ -81,8 +81,6 @@ pipeline {
                             --cors.allowed.origins=${CORS_ALLOWED_ORIGINS} \
                             --storage.type=s3 \
                             --storage.path=${S3_BUCKET_BACKEND} \
-                            --aws.accessKeyId=${AWS_ACCESS_KEY_ID} \
-                            --aws.secretAccessKey=${AWS_SECRET_ACCESS_KEY} \
                             --aws.region=${AWS_REGION} \
                             > /var/log/backend.log 2>&1 &
 
