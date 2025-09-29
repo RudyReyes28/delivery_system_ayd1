@@ -42,13 +42,13 @@ pipeline {
                 echo '🔄 Clonando repositorio...'
                 git branch: 'main',
                     credentialsId: 'github-credentials',
-                    url: 'https://github.com/tu-usuario/tu-repositorio.git'
+                    url: 'https://github.com/RudyReyes28/delivery_system_ayd1.git'
             }
         }
 
         stage('Build Backend') {
             steps {
-                echo '🏗️ Construyendo Backend (Spring Boot)...'
+                echo 'Construyendo Backend (Spring Boot)...'
                 dir('SistemasEntregas') {
                     sh 'mvn clean package -DskipTests'
                 }
@@ -66,7 +66,7 @@ pipeline {
 
         stage('Deploy Backend') {
             steps {
-                echo '🚀 Desplegando Backend...'
+                echo ' Desplegando Backend...'
                 dir('SistemasEntregas') {
                     sh """
                         # Detener proceso anterior
@@ -96,7 +96,7 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
-                echo '🏗️ Construyendo Frontend (Angular)...'
+                echo 'Construyendo Frontend (Angular)...'
                 dir('frontend') {
                     sh '''
                         npm ci
@@ -108,7 +108,7 @@ pipeline {
 
         stage('Deploy Frontend to S3') {
             steps {
-                echo '🚀 Desplegando Frontend a S3...'
+                echo ' Desplegando Frontend a S3...'
                 withAWS(credentials: 'aws-credentials', region: "${AWS_REGION}") {
                     dir('frontend/dist') {
                         sh """
