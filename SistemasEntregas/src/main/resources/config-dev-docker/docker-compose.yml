@@ -1,12 +1,12 @@
 version: '3'
 
 services:
-  entregas-db:
-    image: entregas-db
+  entregas-dev:
+    image: entregas-dev
     build:
       context: ../
       dockerfile: ./config-dev-docker/Dockerfile
-    container_name: entregas-db
+    container_name: entregas-dev
     restart: always
     environment:
       - SERVER_PORT=8081
