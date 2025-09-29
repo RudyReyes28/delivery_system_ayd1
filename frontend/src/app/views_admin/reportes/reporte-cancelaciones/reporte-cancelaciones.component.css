@@ -1,0 +1,304 @@
+.reporte-container {
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.reporte-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.reporte-header h2 {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.reporte-header h2 mat-icon {
+  margin-right: 10px;
+}
+
+/* Loader */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.loading-container p {
+  margin-top: 16px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Error */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: #f44336;
+}
+
+.error-container mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+}
+
+.error-container p {
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+
+/* Dashboard */
+.dashboard-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  padding: 16px;
+}
+
+.stat-icon {
+  background-color: #e3f2fd;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+}
+
+.stat-icon mat-icon {
+  color: #1976d2;
+  font-size: 24px;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.stat-title {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.stat-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cat-chip {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-weight: 500;
+}
+
+/* Filters */
+.filters-card {
+  margin-bottom: 20px;
+}
+
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.filters-container mat-form-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Lista de empresas */
+.empresas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.empresa-card {
+  overflow: hidden;
+}
+
+.clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.empresa-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.empresa-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cancelaciones-count {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.count-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background-color: #e0e0e0;
+  font-weight: 500;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.empresa-content {
+  padding-top: 16px;
+}
+
+/* Tabla de cancelaciones */
+.cancelaciones-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.cancelaciones-table th,
+.cancelaciones-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.cancelaciones-table th {
+  background-color: #f5f5f5;
+  font-weight: 500;
+}
+
+.cancelaciones-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.categoria-chip {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Categorías de cancelación */
+.categoria-error {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.categoria-cambio {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.categoria-falta {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.categoria-rechaza {
+  background-color: #fff8e1;
+  color: #ff8f00;
+}
+
+.categoria-default {
+  background-color: #f5f5f5;
+  color: #616161;
+}
+
+/* No data */
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.no-data mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  color: #bdbdbd;
+}
+
+.no-data p {
+  margin-bottom: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .filters-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-actions {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .dashboard-cards {
+    flex-direction: column;
+  }
+  
+  .empresa-title {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .cancelaciones-count {
+    margin-top: 8px;
+  }
+  
+  .cancelaciones-table {
+    display: block;
+    overflow-x: auto;
+  }
+}

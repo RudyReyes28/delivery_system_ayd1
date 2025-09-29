@@ -10,7 +10,7 @@ pipeline {
         AWS_REGION                 = "us-east-2"
         AWS_ACCESS_KEY_ID          = credentials('aws-key')
         AWS_SECRET_ACCESS_KEY      = credentials('aws-secret')
-        S3_BUCKET_FRONTEND         = "delivery-system-frontend "
+        S3_BUCKET_FRONTEND         = "delivery-system-frontend"
         S3_BUCKET_BACKEND          = "mi-proyecto-backend-storage"
 
         // ------------------------

@@ -466,6 +466,7 @@ public class PedidosRepartidorService {
         //Actualizar el total de entregas
         empresaFidelizacion.setTotalEntregas(empresaFidelizacion.getTotalEntregas() + 1);
         empresaFidelizacion.setMontoTotalEntregas(empresaFidelizacion.getMontoTotalEntregas() + total);
+        empresaFidelizacion.setDescuentoAplicado(descuentoFidelizacion);
         EmpresaFidelizacionRepository.save(empresaFidelizacion);
 
         //Actualizar los estados

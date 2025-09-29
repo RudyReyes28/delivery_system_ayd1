@@ -1,0 +1,172 @@
+<div class="reporte-container">
+  <div class="reporte-header">
+    <h2>
+      <mat-icon>cancel</mat-icon>
+      Reporte de Cancelaciones por Empresa
+    </h2>
+    <div class="header-actions">
+      <button mat-raised-button color="accent" (click)="exportarPDF()" [disabled]="cargando || filteredCancelaciones.length === 0" matTooltip="Exportar reporte a PDF">
+        <mat-icon>picture_as_pdf</mat-icon> Exportar
+      </button>
+      <button mat-icon-button color="primary" (click)="cargarReporte()" [disabled]="cargando" matTooltip="Actualizar reporte">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenido para exportar -->
+  <div id="cancelaciones-pdf-export">
+    <!-- Loader mientras se cargan los datos -->
+    <div *ngIf="cargando" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando reporte de cancelaciones...</p>
+    </div>
+
+    <!-- Mensaje de error si falla la carga -->
+    <div *ngIf="error && !cargando" class="error-container">
+      <mat-icon color="warn">error_outline</mat-icon>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" (click)="cargarReporte()">Reintentar</button>
+    </div>
+    
+    <!-- Contenido del reporte cuando se carga exitosamente -->
+    <ng-container *ngIf="!cargando && !error">
+      <!-- Dashboard de estadísticas -->
+      <div class="dashboard-cards">
+        <mat-card class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>business</mat-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-title">Empresas</div>
+            <div class="stat-value">{{ totalEmpresas }}</div>
+          </div>
+        </mat-card>
+        
+        <mat-card class="stat-card">
+          <div class="stat-icon">
+            <mat-icon>cancel</mat-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-title">Cancelaciones</div>
+            <div class="stat-value">{{ totalCancelaciones }}</div>
+          </div>
+        </mat-card>
+        
+        <mat-card class="stat-card categories">
+          <div class="stat-icon">
+            <mat-icon>category</mat-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-title">Categorías más comunes</div>
+            <div class="stat-categories">
+              <span *ngFor="let cat of categoriasMasComunes" class="cat-chip" [ngClass]="getCategoriaClass(cat.categoria)">
+                {{ cat.categoria }} ({{ cat.cantidad }})
+              </span>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+      
+      <!-- Lista de empresas con cancelaciones -->
+      <div class="empresas-list" *ngIf="filteredCancelaciones.length > 0">
+        <mat-card *ngFor="let empresa of filteredCancelaciones" class="empresa-card">
+          <mat-card-header (click)="toggleExpanded(empresa.idEmpresa)" class="clickable">
+            <mat-card-title class="empresa-title">
+              <div class="empresa-name">
+                <mat-icon>business</mat-icon>
+                {{ empresa.nombreEmpresa }}
+              </div>
+              <div class="cancelaciones-count">
+                <span class="count-chip">{{ empresa.totalCancelaciones }}</span> cancelaciones
+              </div>
+            </mat-card-title>
+            <div class="spacer"></div>
+            <button mat-icon-button>
+              <mat-icon>{{ isExpanded(empresa.idEmpresa) ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+          </mat-card-header>
+          
+          <!-- Detalles de cancelaciones de la empresa -->
+          <mat-card-content *ngIf="isExpanded(empresa.idEmpresa)" class="empresa-content">
+            <mat-divider></mat-divider>
+            
+            <table class="cancelaciones-table">
+              <thead>
+                <tr>
+                  <th>Guía</th>
+                  <th>Fecha</th>
+                  <th>Categoría</th>
+                  <th>Motivo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let guia of empresa.guiasCanceladas">
+                  <td>{{ guia.numeroGuia }}</td>
+                  <td>{{ formatDate(guia.fechaCancelacion) }}</td>
+                  <td>
+                    <span class="categoria-chip" [ngClass]="getCategoriaClass(guia.categoriaCancelacion)">
+                      {{ guia.categoriaCancelacion }}
+                    </span>
+                  </td>
+                  <td>{{ guia.motivoCancelacion }}</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <!-- Sin cancelaciones -->
+            <div *ngIf="empresa.guiasCanceladas.length === 0" class="no-data">
+              <mat-icon>info</mat-icon>
+              <p>No hay cancelaciones para mostrar</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      
+      <!-- Mensaje si no hay datos -->
+      <div *ngIf="filteredCancelaciones.length === 0 && !cargando" class="no-data">
+        <mat-icon>info</mat-icon>
+        <p>No hay datos de cancelaciones que coincidan con los filtros</p>
+        <button mat-button (click)="resetFiltros()">Restablecer filtros</button>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Filtros - Fuera del contenido exportable -->
+  <mat-card class="filters-card" *ngIf="!cargando && !error && filteredCancelaciones.length > 0">
+    <mat-card-content>
+      <div class="filters-container">
+        <mat-form-field appearance="outline">
+          <mat-label>Buscar</mat-label>
+          <input matInput [(ngModel)]="filtroTexto" placeholder="Nombre de empresa">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Filtrar por empresa</mat-label>
+          <select matNativeControl [(ngModel)]="filtroEmpresa">
+            <option value="">Todas las empresas</option>
+            <option *ngFor="let empresa of empresasUnicas" [value]="empresa">{{ empresa }}</option>
+          </select>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Filtrar por categoría</mat-label>
+          <select matNativeControl [(ngModel)]="filtroCategoria">
+            <option value="">Todas las categorías</option>
+            <option *ngFor="let categoria of categoriasUnicas" [value]="categoria">{{ categoria }}</option>
+          </select>
+        </mat-form-field>
+        
+        <div class="filter-actions">
+          <button mat-raised-button color="primary" (click)="aplicarFiltros()">
+            <mat-icon>filter_list</mat-icon> Aplicar Filtros
+          </button>
+          <button mat-button (click)="resetFiltros()">
+            <mat-icon>clear</mat-icon> Limpiar
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
