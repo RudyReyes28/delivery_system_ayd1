@@ -21,8 +21,8 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('SistemasEntregas') {
-                    // Opción 1: Usar Maven con JDK 21 (más estable)
-                    sh 'docker run --rm -v $PWD:/app -w /app maven:3.9.6-openjdk-21 mvn clean package -DskipTests'
+                    // Usar Maven con JDK 21 - etiqueta correcta
+                    sh 'docker run --rm -v $PWD:/app -w /app maven:3.9-openjdk-21 mvn clean package -DskipTests'
                 }
             }
         }
