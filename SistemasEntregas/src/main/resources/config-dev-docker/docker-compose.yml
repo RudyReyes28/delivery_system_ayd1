@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  entregas-db:
+    image: entregas-db
+    build:
+      context: ../
+      dockerfile: ./config-dev-docker/Dockerfile
+    container_name: entregas-db
+    restart: always
+    environment:
+      - SERVER_PORT=8081
+    ports:
+      - "8081:8081"
+    expose:
+      - 8081
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.4"
