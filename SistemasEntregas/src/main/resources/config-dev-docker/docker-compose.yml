@@ -3,7 +3,7 @@ version: '3.8'
 services:
   backend:
     build:
-      context: ../
+      context: .
       dockerfile: src/main/resources/config-dev-docker/Dockerfile
     container_name: sistemas_entregas_backend
     environment:
