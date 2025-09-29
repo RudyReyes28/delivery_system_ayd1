@@ -4,7 +4,7 @@ services:
   backend:
     build:
       context: ./SistemasEntregas
-      dockerfile: ./SistemasEntregas/src/main/resources/config-dev-docker/Dockerfile
+      dockerfile: ./src/main/resources/config-dev-docker/Dockerfile
     container_name: sistemas_entregas_backend
     restart: always
     environment:
