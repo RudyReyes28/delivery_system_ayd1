@@ -6,14 +6,20 @@ pipeline {
         SPRING_DATASOURCE_USERNAME = credentials('db-user')
         SPRING_DATASOURCE_PASSWORD = credentials('db-password')
         SERVER_PORT                = "8081"
-        CORS_ALLOWED_ORIGINS       = "http://localhost:4200"
 
+        AWS_REGION                 = "us-east-2"
         AWS_ACCESS_KEY_ID          = credentials('aws-key')
         AWS_SECRET_ACCESS_KEY      = credentials('aws-secret')
-        AWS_REGION                 = "us-east-1"
+        S3_BUCKET_FRONTEND         = "delivery-system-frontend "
+        S3_BUCKET_BACKEND          = "mi-proyecto-backend-storage"
+
+        // ------------------------
+        // Backend y Frontend
+        // ------------------------
+        SERVER_PORT           = "8081"
+        CORS_ALLOWED_ORIGINS  = "http://${S3_BUCKET_FRONTEND}.s3-website-${AWS_REGION}.amazonaws.com"
 
         STORAGE_TYPE               = "s3"
-        S3_BUCKET_ARCHIVOS         = "archivos-ayd1-proyecto1"
         RUTA_LOCAL                 = "/tmp/uploads/"
     }
 
