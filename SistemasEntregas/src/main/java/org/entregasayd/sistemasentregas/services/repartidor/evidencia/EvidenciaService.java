@@ -19,11 +19,14 @@ public class EvidenciaService {
     @Autowired
     private GuiaRespository guiaRespository;
 
-    @Value("${storage.path}")
-    private String URL_BASE;
+    @Value("${s3.bucket.backend}")
+    private String S3_BUCKET_BACKEND;
 
     @Value("${storage.path.local}")
     private String URL_BASE_LOCAL;
+
+    @Value("${aws.region}")
+    private String region;
 
     @Value("${storage.type}")
     private String storageType;
@@ -62,8 +65,10 @@ public class EvidenciaService {
         for(EvidenciaEntrega evidenciaEntrega : evidencias){
             if(storageType.equals("local")){
                 evidenciaEntrega.setUrlArchivo(URL_BASE_LOCAL + evidenciaEntrega.getUrlArchivo());
+            }else {
+                String urlS3 = "https://" + S3_BUCKET_BACKEND + ".s3." + region + ".amazonaws.com/" + evidenciaEntrega.getUrlArchivo();
+                evidenciaEntrega.setUrlArchivo(urlS3);
             }
-            evidenciaEntrega.setUrlArchivo( URL_BASE + evidenciaEntrega.getUrlArchivo());
         }
         return evidencias;
     }
