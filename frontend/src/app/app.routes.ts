@@ -20,6 +20,7 @@ import { CancelacionesClienteComponent } from './views_coordinador/cancelaciones
 import { GestionPedidos } from './views_repartidor/gestion-pedidos/gestion-pedidos';
 import { SeguimientoPedidos } from './views_repartidor/seguimiento-pedidos/seguimiento-pedidos';
 import { CancelacionClienteComponent } from './views_repartidor/cancelacion-cliente/cancelacion-cliente.component';
+import { ReportesComponent } from './views_admin/reportes/reportes.component';
 
 export const routes: Routes = [
     {
@@ -49,6 +50,9 @@ export const routes: Routes = [
     },
     {
         path: "periodos-liquidacion", component: Liquidacion, title: "Periodos de Liquidación"
+    },
+    {
+        path: "reportes", component: ReportesComponent, title: "Reportes"
     },
     {
         path: "general-sucursal", component: GeneralSucursal, title: "Información General"

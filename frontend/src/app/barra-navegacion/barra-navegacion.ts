@@ -60,6 +60,7 @@ export class BarraNavegacion implements OnInit {
       route: '/crear-usuario',
       roles: ['ADMINISTRADOR'],
     },
+    // Opciones para el administrador
     {
       icon: 'business_center',
       label: 'Gestión Empresas',
@@ -94,6 +95,12 @@ export class BarraNavegacion implements OnInit {
       icon: 'account_balance',
       label: 'Periodos de Liquidación',
       route: '/periodos-liquidacion',
+      roles: ['ADMINISTRADOR'],
+    },
+    {
+      icon: 'assessment',
+      label: 'Reportes',
+      route: '/reportes',
       roles: ['ADMINISTRADOR'],
     },
     {

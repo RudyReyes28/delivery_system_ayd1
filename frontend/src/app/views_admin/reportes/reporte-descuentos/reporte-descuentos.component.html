@@ -1,0 +1,137 @@
+<div class="reporte-container">
+  <div class="reporte-header">
+    <h2>
+      <mat-icon>card_membership</mat-icon>
+      Reporte de Descuentos por Nivel de Tarjeta
+    </h2>
+    <div class="header-actions">
+      <button mat-raised-button color="accent" (click)="exportarPDF()" [disabled]="cargando || descuentos.length === 0" matTooltip="Exportar reporte a PDF">
+        <mat-icon>picture_as_pdf</mat-icon> Exportar
+      </button>
+      <button mat-icon-button color="primary" (click)="cargarReporte()" [disabled]="cargando" matTooltip="Actualizar reporte">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenido para exportar -->
+  <div id="descuentos-pdf-export">
+    <!-- Loader mientras se cargan los datos -->
+    <div *ngIf="cargando" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando reporte...</p>
+    </div>
+
+    <!-- Mensaje de error si falla la carga -->
+    <div *ngIf="error && !cargando" class="error-container">
+      <mat-icon color="warn">error_outline</mat-icon>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" (click)="cargarReporte()">Reintentar</button>
+    </div>
+
+    <!-- Resumen estadístico -->
+    <div *ngIf="!cargando && !error && descuentos.length > 0" class="statistics-cards">
+      <mat-card class="stat-card">
+        <div class="stat-icon">
+          <mat-icon>business</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-title">Total Empresas Beneficiadas</div>
+          <div class="stat-value">{{ totalEmpresasBeneficiadas }}</div>
+        </div>
+      </mat-card>
+      
+      <mat-card class="stat-card">
+        <div class="stat-icon">
+          <mat-icon>savings</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-title">Total Descuentos Aplicados</div>
+          <div class="stat-value">{{ formatMoneda(totalDescuentosAplicados) }}</div>
+        </div>
+      </mat-card>
+      
+      <mat-card class="stat-card">
+        <div class="stat-icon">
+          <mat-icon>stars</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-title">Niveles Disponibles</div>
+          <div class="stat-value">{{ descuentos.length }}</div>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Contenido del reporte -->
+    <div *ngIf="!cargando && !error && descuentos.length > 0" class="reporte-content">
+      <mat-card>
+        <mat-card-content>
+          <!-- Tabla de niveles de fidelización -->
+          <div class="table-container">
+            <table mat-table [dataSource]="dataSource" matSort class="niveles-table">
+              
+              <!-- Columna Nombre del Nivel -->
+              <ng-container matColumnDef="nombreNivel">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre del Nivel </th>
+                <td mat-cell *matCellDef="let nivel">{{ nivel.nombreNivel }}</td>
+              </ng-container>
+              
+              <!-- Columna Código del Nivel -->
+              <ng-container matColumnDef="codigoNivel">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Código </th>
+                <td mat-cell *matCellDef="let nivel">
+                  <mat-chip [ngClass]="getCodigoNivelClass(nivel.codigoNivel)">
+                    {{ nivel.codigoNivel }}
+                  </mat-chip>
+                </td>
+              </ng-container>
+              
+              <!-- Columna Porcentaje de Descuento -->
+              <ng-container matColumnDef="porcentajeDescuento">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Descuento </th>
+                <td mat-cell *matCellDef="let nivel">{{ formatPorcentaje(nivel.porcentajeDescuento) }}</td>
+              </ng-container>
+              
+              <!-- Columna Total Descuentos Aplicados -->
+              <ng-container matColumnDef="totalDescuentosAplicados">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Descuentos Aplicados </th>
+                <td mat-cell *matCellDef="let nivel">{{ formatMoneda(nivel.totalDescuentosAplicados) }}</td>
+              </ng-container>
+              
+              <!-- Columna Total Empresas Beneficiadas -->
+              <ng-container matColumnDef="totalEmpresasBeneficiadas">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Empresas Beneficiadas </th>
+                <td mat-cell *matCellDef="let nivel">{{ nivel.totalEmpresasBeneficiadas }}</td>
+              </ng-container>
+              
+              <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+              <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
+              
+              <!-- Fila mostrada cuando no hay resultados de búsqueda -->
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="5">No se encontraron niveles que coincidan con el filtro</td>
+              </tr>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Campo de filtrado - Fuera del contenido exportable -->
+  <mat-card *ngIf="!cargando && !error && descuentos.length > 0">
+    <mat-card-content>
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filtrar</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Ej. Oro">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+  
+  <!-- Mensaje si no hay niveles -->
+  <div *ngIf="!cargando && !error && descuentos.length === 0" class="no-data">
+    <mat-icon>info</mat-icon>
+    <p>No hay niveles de fidelización disponibles</p>
+  </div>
+</div>

@@ -1,0 +1,179 @@
+<div class="reporte-container">
+  <div class="reporte-header">
+    <h2>
+      <mat-icon>paid</mat-icon>
+      Reporte de Comisiones por Repartidor y Periodo
+    </h2>
+    <div class="header-actions">
+      <button mat-raised-button color="accent" (click)="exportarPDF()" [disabled]="cargando || comisiones.length === 0" matTooltip="Exportar reporte a PDF">
+        <mat-icon>picture_as_pdf</mat-icon> Exportar
+      </button>
+      <button mat-icon-button color="primary" (click)="cargarReporte()" [disabled]="cargando" matTooltip="Actualizar reporte">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loader mientras se cargan los datos -->
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando reporte...</p>
+  </div>
+
+  <!-- Mensaje de error si falla la carga -->
+  <div *ngIf="error && !cargando" class="error-container">
+    <mat-icon color="warn">error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="cargarReporte()">Reintentar</button>
+  </div>
+
+  <!-- Contenido del reporte -->
+  <div *ngIf="!cargando && !error && comisiones.length > 0" class="reporte-content">
+    <!-- Tarjetas de periodos -->
+    <mat-card *ngFor="let item of comisiones" class="periodo-card">
+      <mat-card-header (click)="togglePeriodo(item.periodo.idPeriodo)" class="clickable">
+        <mat-card-title>
+          {{ item.periodo.descripcion }}
+          <span class="periodo-fecha">
+            ({{ formatFecha(item.periodo.fechaInicio) }} - {{ formatFecha(item.periodo.fechaFin) }})
+          </span>
+          <span class="badge" [ngClass]="getEstadoClass(item.periodo.estado)">
+            {{ item.periodo.estado }}
+          </span>
+        </mat-card-title>
+        <div class="spacer"></div>
+        <div class="periodo-summary">
+          <div class="summary-item">
+            <div class="summary-label">Total Repartidores</div>
+            <div class="summary-value">{{ calcularTotalRepartidoresPeriodo(item.periodo) }}</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Total Comisiones</div>
+            <div class="summary-value">{{ formatMoneda(calcularTotalComisionesPeriodo(item.periodo)) }}</div>
+          </div>
+        </div>
+        <button mat-icon-button>
+          <mat-icon>{{ isPeriodoExpanded(item.periodo.idPeriodo) ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </button>
+      </mat-card-header>
+
+      <!-- Detalles expandibles del periodo -->
+      <mat-card-content *ngIf="isPeriodoExpanded(item.periodo.idPeriodo)" class="periodo-details">
+        <h3>Repartidores en este periodo</h3>
+        
+        <!-- Tarjetas de repartidores -->
+        <div class="repartidores-container">
+          <mat-card *ngFor="let repartidor of item.periodo.repartidores" class="repartidor-card">
+            <mat-card-header (click)="toggleRepartidor(repartidor.idLiquidacion)" class="clickable">
+              <mat-card-title-group>
+                <mat-card-title>
+                  <mat-icon>person</mat-icon>
+                  {{ repartidor.nombreRepartidor }}
+                </mat-card-title>
+                <mat-card-subtitle>ID: {{ repartidor.idRepartidor }}</mat-card-subtitle>
+              </mat-card-title-group>
+              <div class="spacer"></div>
+              <div class="repartidor-summary">
+                <div class="summary-value">{{ formatMoneda(repartidor.totalNeto) }}</div>
+              </div>
+              <button mat-icon-button>
+                <mat-icon>{{ isRepartidorExpanded(repartidor.idLiquidacion) ? 'expand_less' : 'expand_more' }}</mat-icon>
+              </button>
+            </mat-card-header>
+            
+            <!-- Detalles expandibles del repartidor -->
+            <mat-card-content *ngIf="isRepartidorExpanded(repartidor.idLiquidacion)" class="repartidor-details">
+              <div class="repartidor-financials">
+                <div class="financials-row">
+                  <div class="financials-item">
+                    <div class="financials-label">Comisiones</div>
+                    <div class="financials-value positive">{{ formatMoneda(repartidor.totalComisiones) }}</div>
+                  </div>
+                  <div class="financials-item">
+                    <div class="financials-label">Bonificaciones</div>
+                    <div class="financials-value positive">{{ formatMoneda(repartidor.totalBonificaciones) }}</div>
+                  </div>
+                  <div class="financials-item">
+                    <div class="financials-label">Deducciones</div>
+                    <div class="financials-value negative">{{ formatMoneda(repartidor.totalDeducciones) }}</div>
+                  </div>
+                </div>
+                <div class="financials-row">
+                  <div class="financials-item">
+                    <div class="financials-label">Subtotal</div>
+                    <div class="financials-value">{{ formatMoneda(repartidor.subtotal) }}</div>
+                  </div>
+                  <div class="financials-item">
+                    <div class="financials-label">Desc. IGSS</div>
+                    <div class="financials-value negative">{{ formatMoneda(repartidor.descuentoIgss) }}</div>
+                  </div>
+                  <div class="financials-item">
+                    <div class="financials-label">Desc. ISR</div>
+                    <div class="financials-value negative">{{ formatMoneda(repartidor.descuentoIsr) }}</div>
+                  </div>
+                </div>
+                <div class="financials-row total-row">
+                  <div class="financials-item">
+                    <div class="financials-label">Total Neto</div>
+                    <div class="financials-value total">{{ formatMoneda(repartidor.totalNeto) }}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Tabla de detalles de comisión -->
+              <h4 *ngIf="repartidor.detallesComision.length > 0">Detalles de Comisiones</h4>
+              <div class="table-container" *ngIf="repartidor.detallesComision.length > 0">
+                <table class="detalles-table">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Guía</th>
+                      <th>Tipo</th>
+                      <th>Base</th>
+                      <th>%</th>
+                      <th>Comisión</th>
+                      <th>Bonificación</th>
+                      <th>Deducción</th>
+                      <th>Neto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let detalle of repartidor.detallesComision">
+                      <td>{{ formatFechaHora(detalle.fechaEntrega) }}</td>
+                      <td>{{ detalle.numeroGuia }}</td>
+                      <td>{{ detalle.tipoComision }}</td>
+                      <td>{{ formatMoneda(detalle.montoBaseCalculo) }}</td>
+                      <td>{{ formatPorcentaje(detalle.valorComision) }}</td>
+                      <td>{{ formatMoneda(detalle.montoComision) }}</td>
+                      <td>{{ formatMoneda(detalle.bonificacion) }}</td>
+                      <td>{{ formatMoneda(detalle.deduccion) }}</td>
+                      <td>{{ formatMoneda(detalle.montoNeto) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Mensaje si no hay detalles de comisión -->
+              <div class="no-data" *ngIf="repartidor.detallesComision.length === 0">
+                <mat-icon>info</mat-icon>
+                <p>No hay detalles de comisión disponibles</p>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        
+        <!-- Mensaje si no hay repartidores -->
+        <div class="no-data" *ngIf="item.periodo.repartidores.length === 0">
+          <mat-icon>info</mat-icon>
+          <p>No hay repartidores en este periodo</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  
+  <!-- Mensaje si no hay periodos -->
+  <div *ngIf="!cargando && !error && comisiones.length === 0" class="no-data">
+    <mat-icon>info</mat-icon>
+    <p>No hay datos de comisiones disponibles</p>
+  </div>
+</div>

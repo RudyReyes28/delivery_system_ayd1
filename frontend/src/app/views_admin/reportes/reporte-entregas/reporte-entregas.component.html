@@ -1,0 +1,334 @@
+<div class="reporte-container">
+  <mat-card>
+    <mat-card-header>
+      <div class="header-content">
+        <mat-card-title>
+          <mat-icon>analytics</mat-icon>
+          Reporte de Entregas
+        </mat-card-title>
+        <div class="header-actions">
+          <button mat-icon-button color="primary" (click)="cargarReporte()" [disabled]="cargando" matTooltip="Refrescar reporte">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Loader mientras se cargan los datos -->
+      <div *ngIf="cargando" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando reporte...</p>
+      </div>
+
+      <!-- Mensaje de error si falla la carga -->
+      <div *ngIf="error && !cargando" class="error-container">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <p>{{ error }}</p>
+        <button mat-raised-button color="primary" (click)="cargarReporte()">Reintentar</button>
+      </div>
+
+      <!-- Contenido del reporte -->
+      <div *ngIf="reporte && !cargando" class="reporte-content">
+        <!-- Resumen estadístico -->
+        <div class="reporte-summary">
+          <div class="summary-card completadas">
+            <div class="summary-icon">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+            <div class="summary-data">
+              <h3>Completadas</h3>
+              <div class="summary-count">{{ getTotalCompletadas() }}</div>
+            </div>
+          </div>
+
+          <div class="summary-card canceladas">
+            <div class="summary-icon">
+              <mat-icon>cancel</mat-icon>
+            </div>
+            <div class="summary-data">
+              <h3>Canceladas</h3>
+              <div class="summary-count">{{ getTotalCanceladas() }}</div>
+            </div>
+          </div>
+
+          <div class="summary-card rechazadas">
+            <div class="summary-icon">
+              <mat-icon>highlight_off</mat-icon>
+            </div>
+            <div class="summary-data">
+              <h3>Rechazadas</h3>
+              <div class="summary-count">{{ getTotalRechazadas() }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pestañas para los diferentes tipos de entregas -->
+        <mat-tab-group>
+          <!-- Pestaña de Entregas Completadas -->
+          <mat-tab label="Completadas ({{ getTotalCompletadas() }})">
+            <div class="tab-content">
+              <!-- Lista de entregas completadas -->
+              <div class="list-container" *ngIf="reporte.entregasCompletadas?.length">
+                <div class="list-item" *ngFor="let entrega of reporte.entregasCompletadas">
+                  <div class="item-header" (click)="toggleExpansion('completadas', entrega.entregasCompletadas.guia.idGuia)">
+                    <div class="item-details">
+                      <div class="item-title">
+                        <span class="guia-numero">{{ entrega.entregasCompletadas.guia.numeroGuia }}</span>
+                        <span class="chip" [ngClass]="getEstadoClass(entrega.entregasCompletadas.guia.estadoActual)">
+                          {{ entrega.entregasCompletadas.guia.estadoActual }}
+                        </span>
+                      </div>
+                      <div class="item-subtitle">
+                        <span class="cliente">Cliente: {{ entrega.entregasCompletadas.guia.cliente.nombreCompleto }}</span>
+                        <span class="fecha">Fecha: {{ formatDate(entrega.entregasCompletadas.guia.fechaCreacion) }}</span>
+                      </div>
+                    </div>
+                    <div class="item-expand-button">
+                      <button mat-icon-button>
+                        <mat-icon>{{ isExpanded('completadas', entrega.entregasCompletadas.guia.idGuia) ? 'expand_less' : 'expand_more' }}</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Detalles expandidos -->
+                  <div class="item-expanded" *ngIf="isExpanded('completadas', entrega.entregasCompletadas.guia.idGuia)">
+                    <mat-divider></mat-divider>
+                    
+                    <!-- Información de la guía -->
+                    <div class="expanded-section">
+                      <h4 class="section-title"><mat-icon>local_shipping</mat-icon>Información de la Guía</h4>
+                      <div class="details-grid">
+                        <div class="detail-item">
+                          <span class="label">Código Interno:</span>
+                          <span class="value">{{ entrega.entregasCompletadas.guia.codigoInterno }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="label">Descripción:</span>
+                          <span class="value">{{ entrega.entregasCompletadas.guia.descripcionContenido }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="label">Valor Declarado:</span>
+                          <span class="value">{{ formatCurrency(entrega.entregasCompletadas.guia.valorDeclarado) }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="label">Peso:</span>
+                          <span class="value">{{ entrega.entregasCompletadas.guia.pesoKg }} kg</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="label">Dimensiones:</span>
+                          <span class="value">{{ entrega.entregasCompletadas.guia.dimensiones }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="label">Total:</span>
+                          <span class="value">{{ formatCurrency(entrega.entregasCompletadas.guia.total) }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Dirección de Entrega -->
+                    <div class="expanded-section">
+                      <h4 class="section-title"><mat-icon>location_on</mat-icon>Dirección de Entrega</h4>
+                      <div class="details-grid">
+                        <div class="detail-item">
+                          <span class="label">Municipio:</span>
+                          <span class="value">{{ entrega.entregasCompletadas.guia.direccionEntrega.municipio }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="label">Departamento:</span>
+                          <span class="value">{{ entrega.entregasCompletadas.guia.direccionEntrega.departamento }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="label">País:</span>
+                          <span class="value">{{ entrega.entregasCompletadas.guia.direccionEntrega.pais }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="label">Código Postal:</span>
+                          <span class="value">{{ entrega.entregasCompletadas.guia.direccionEntrega.codigoPostal }}</span>
+                        </div>
+                        <div class="detail-item full-width">
+                          <span class="label">Referencias:</span>
+                          <span class="value">{{ entrega.entregasCompletadas.guia.direccionEntrega.referencias }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Repartidor -->
+                    <div class="expanded-section">
+                      <h4 class="section-title"><mat-icon>person</mat-icon>Repartidor</h4>
+                      <div class="details-grid">
+                        <div class="detail-item">
+                          <span class="label">Nombre:</span>
+                          <span class="value">{{ entrega.entregasCompletadas.guia.repartidor.nombreCompleto }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="label">Email:</span>
+                          <span class="value">{{ entrega.entregasCompletadas.guia.repartidor.email }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="label">Teléfono:</span>
+                          <span class="value">{{ entrega.entregasCompletadas.guia.repartidor.telefono }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Historial de estados -->
+                    <div class="expanded-section">
+                      <h4 class="section-title"><mat-icon>history</mat-icon>Historial de Estados</h4>
+                      <div class="timeline">
+                        <div class="timeline-item" *ngFor="let estado of entrega.entregasCompletadas.guia.estadosEntregas">
+                          <div class="timeline-point"></div>
+                          <div class="timeline-content">
+                            <div class="timeline-date">{{ formatDate(estado.fechaCambio) }}</div>
+                            <div class="timeline-title">
+                              <span class="estado-desde">{{ estado.estadoAnterior }}</span>
+                              <mat-icon class="estado-arrow">arrow_forward</mat-icon>
+                              <span class="estado-hasta">{{ estado.estadoNuevo }}</span>
+                            </div>
+                            <div class="timeline-text">
+                              <div *ngIf="estado.motivoCambio">{{ estado.motivoCambio }}</div>
+                              <div *ngIf="estado.comentarios" class="timeline-comment">{{ estado.comentarios }}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Mensaje si no hay entregas completadas -->
+              <div class="no-data" *ngIf="!reporte.entregasCompletadas?.length">
+                <mat-icon>info</mat-icon>
+                <p>No hay entregas completadas para mostrar</p>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Pestaña de Entregas Canceladas -->
+          <mat-tab label="Canceladas ({{ getTotalCanceladas() }})">
+            <div class="tab-content">
+              <!-- Lista de entregas canceladas -->
+              <div class="list-container" *ngIf="reporte.entregasCanceladas?.length">
+                <div class="list-item" *ngFor="let entrega of reporte.entregasCanceladas">
+                  <div class="item-header" (click)="toggleExpansion('canceladas', entrega.entregasCanceladas.guia.idGuia)">
+                    <div class="item-details">
+                      <div class="item-title">
+                        <span class="guia-numero">{{ entrega.entregasCanceladas.guia.numeroGuia }}</span>
+                        <span class="chip" [ngClass]="getEstadoClass(entrega.entregasCanceladas.guia.estadoActual)">
+                          {{ entrega.entregasCanceladas.guia.estadoActual }}
+                        </span>
+                      </div>
+                      <div class="item-subtitle">
+                        <span class="cliente">Cliente: {{ entrega.entregasCanceladas.guia.cliente.nombreCompleto }}</span>
+                        <span class="fecha">Fecha: {{ formatDate(entrega.entregasCanceladas.guia.fechaCreacion) }}</span>
+                      </div>
+                    </div>
+                    <div class="item-expand-button">
+                      <button mat-icon-button>
+                        <mat-icon>{{ isExpanded('canceladas', entrega.entregasCanceladas.guia.idGuia) ? 'expand_less' : 'expand_more' }}</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Detalles expandidos de canceladas (similar a completadas) -->
+                  <div class="item-expanded" *ngIf="isExpanded('canceladas', entrega.entregasCanceladas.guia.idGuia)">
+                    <mat-divider></mat-divider>
+                    
+                    <!-- Información de la guía -->
+                    <div class="expanded-section">
+                      <h4 class="section-title"><mat-icon>local_shipping</mat-icon>Información de la Guía</h4>
+                      <div class="details-grid">
+                        <!-- Similar al de completadas pero con entregasCanceladas -->
+                        <div class="detail-item">
+                          <span class="label">Código Interno:</span>
+                          <span class="value">{{ entrega.entregasCanceladas.guia.codigoInterno }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="label">Descripción:</span>
+                          <span class="value">{{ entrega.entregasCanceladas.guia.descripcionContenido }}</span>
+                        </div>
+                        <!-- ...otros detalles similares... -->
+                      </div>
+                    </div>
+                    
+                    <!-- Más secciones similares a las completadas pero adaptadas para canceladas -->
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Mensaje si no hay entregas canceladas -->
+              <div class="no-data" *ngIf="!reporte.entregasCanceladas?.length">
+                <mat-icon>info</mat-icon>
+                <p>No hay entregas canceladas para mostrar</p>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Pestaña de Entregas Rechazadas -->
+          <mat-tab label="Rechazadas ({{ getTotalRechazadas() }})">
+            <div class="tab-content">
+              <!-- Lista de entregas rechazadas -->
+              <div class="list-container" *ngIf="reporte.entregasRechazadas?.length">
+                <div class="list-item" *ngFor="let entrega of reporte.entregasRechazadas">
+                  <div class="item-header" (click)="toggleExpansion('rechazadas', entrega.entregasRechazadas.guia.idGuia)">
+                    <div class="item-details">
+                      <div class="item-title">
+                        <span class="guia-numero">{{ entrega.entregasRechazadas.guia.numeroGuia }}</span>
+                        <span class="chip" [ngClass]="getEstadoClass(entrega.entregasRechazadas.guia.estadoActual)">
+                          {{ entrega.entregasRechazadas.guia.estadoActual }}
+                        </span>
+                      </div>
+                      <div class="item-subtitle">
+                        <span class="cliente">Cliente: {{ entrega.entregasRechazadas.guia.cliente.nombreCompleto }}</span>
+                        <span class="fecha">Fecha: {{ formatDate(entrega.fechaRechazo) }}</span>
+                      </div>
+                      <div class="item-motivo">
+                        <strong>Motivo: </strong>{{ entrega.motivoRechazo }}
+                      </div>
+                    </div>
+                    <div class="item-expand-button">
+                      <button mat-icon-button>
+                        <mat-icon>{{ isExpanded('rechazadas', entrega.entregasRechazadas.guia.idGuia) ? 'expand_less' : 'expand_more' }}</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Detalles expandidos de rechazadas (similar a las otras) -->
+                  <div class="item-expanded" *ngIf="isExpanded('rechazadas', entrega.entregasRechazadas.guia.idGuia)">
+                    <mat-divider></mat-divider>
+                    
+                    <!-- Información de la guía -->
+                    <div class="expanded-section">
+                      <h4 class="section-title"><mat-icon>local_shipping</mat-icon>Información de la Guía</h4>
+                      <div class="details-grid">
+                        <!-- Similar al de completadas pero con entregasRechazadas -->
+                        <div class="detail-item">
+                          <span class="label">Código Interno:</span>
+                          <span class="value">{{ entrega.entregasRechazadas.guia.codigoInterno }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="label">Descripción:</span>
+                          <span class="value">{{ entrega.entregasRechazadas.guia.descripcionContenido }}</span>
+                        </div>
+                        <!-- ...otros detalles similares... -->
+                      </div>
+                    </div>
+                    
+                    <!-- Más secciones similares a las completadas pero adaptadas para rechazadas -->
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Mensaje si no hay entregas rechazadas -->
+              <div class="no-data" *ngIf="!reporte.entregasRechazadas?.length">
+                <mat-icon>info</mat-icon>
+                <p>No hay entregas rechazadas para mostrar</p>
+              </div>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

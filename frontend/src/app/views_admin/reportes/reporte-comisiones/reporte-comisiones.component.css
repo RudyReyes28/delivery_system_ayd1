@@ -1,0 +1,269 @@
+.reporte-container {
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.reporte-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.reporte-header h2 {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.reporte-header h2 mat-icon {
+  margin-right: 10px;
+}
+
+/* Estilos para el contenedor de carga */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.loading-container p {
+  margin-top: 16px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Estilos para el contenedor de error */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: #f44336;
+}
+
+.error-container mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+}
+
+.error-container p {
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+
+/* Tarjetas de periodo */
+.periodo-card {
+  margin-bottom: 16px;
+}
+
+.periodo-card mat-card-header {
+  padding: 16px;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.periodo-fecha {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-left: 10px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 12px;
+  margin-left: 10px;
+  font-weight: 500;
+}
+
+.estado-abierto {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.estado-cerrado {
+  background-color: #e0e0e0;
+  color: #616161;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.periodo-summary {
+  display: flex;
+  gap: 20px;
+}
+
+.summary-item {
+  text-align: center;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.summary-value {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Detalles del periodo */
+.periodo-details {
+  padding: 16px;
+}
+
+.periodo-details h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.repartidores-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.repartidor-card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.repartidor-card mat-card-header {
+  padding: 16px;
+}
+
+.repartidor-summary {
+  text-align: right;
+  margin-right: 16px;
+}
+
+/* Detalles del repartidor */
+.repartidor-details {
+  padding: 16px;
+}
+
+.repartidor-financials {
+  background-color: #f5f5f5;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.financials-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.financials-item {
+  flex: 1;
+  text-align: center;
+}
+
+.financials-label {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 4px;
+}
+
+.financials-value {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.positive {
+  color: #2e7d32;
+}
+
+.negative {
+  color: #c62828;
+}
+
+.total {
+  color: #1976d2;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.total-row {
+  margin-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 12px;
+}
+
+/* Tabla de detalles */
+.repartidor-details h4 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.detalles-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.detalles-table th,
+.detalles-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.detalles-table th {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.7);
+  background-color: #f5f5f5;
+}
+
+.detalles-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Mensaje cuando no hay datos */
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+  color: #666;
+}
+
+.no-data mat-icon {
+  font-size: 48px;
+  height: 48px;
+  width: 48px;
+  margin-bottom: 16px;
+  color: #bdbdbd;
+}
+
+/* Estilos para móviles */
+@media (max-width: 768px) {
+  .periodo-summary {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .financials-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

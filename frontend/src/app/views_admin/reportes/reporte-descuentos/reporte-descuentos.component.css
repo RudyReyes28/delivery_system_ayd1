@@ -1,0 +1,165 @@
+.reporte-container {
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.reporte-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.reporte-header h2 {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.reporte-header h2 mat-icon {
+  margin-right: 10px;
+}
+
+/* Estilos para el contenedor de carga */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.loading-container p {
+  margin-top: 16px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Estilos para el contenedor de error */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: #f44336;
+}
+
+.error-container mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+}
+
+.error-container p {
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+
+/* Tarjetas de estadísticas */
+.statistics-cards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  padding: 16px;
+}
+
+.stat-icon {
+  background-color: #e3f2fd;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+}
+
+.stat-icon mat-icon {
+  color: #1976d2;
+  font-size: 24px;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-title {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 500;
+}
+
+/* Contenido del reporte */
+.reporte-content {
+  margin-bottom: 20px;
+}
+
+.filter-field {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.niveles-table {
+  width: 100%;
+}
+
+/* Estilos para los chips de código de nivel */
+.nivel-plata {
+  background-color: #eceff1;
+  color: #546e7a;
+}
+
+.nivel-oro {
+  background-color: #fff8e1;
+  color: #ff8f00;
+}
+
+.nivel-diamante {
+  background-color: #e8eaf6;
+  color: #3949ab;
+}
+
+/* Mensaje cuando no hay datos */
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+  color: #666;
+}
+
+.no-data mat-icon {
+  font-size: 48px;
+  height: 48px;
+  width: 48px;
+  margin-bottom: 16px;
+  color: #bdbdbd;
+}
+
+/* Estilos para móviles */
+@media (max-width: 768px) {
+  .statistics-cards {
+    flex-direction: column;
+  }
+}
