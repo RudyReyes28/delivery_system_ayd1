@@ -1,0 +1,187 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Gestión de entregas</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Botón para crear nueva asignación -->
+      <div class="create-button-section">
+        <mat-form-field class="mr-4" appearance="outline">
+          <mat-label>Filtrar por estado</mat-label>
+          <mat-select (selectionChange)="filtrarPorEstado($event.value)">
+            @for (item of estadosAsginacion; track $index) {
+            <mat-option [value]="item">
+              {{ item }}
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Tab para Lista de Entregas -->
+      <mat-tab-group>
+        <mat-tab label="Lista de Entregas">
+          <div class="tab-content">
+            <div class="header-section">
+              <h2>Lista de Asignaciones</h2>
+              @if(loadingAsignaciones){
+              <mat-spinner diameter="30"></mat-spinner>
+              }
+            </div>
+
+            @if (!loadingAsignaciones && asignaciones.length > 0) {
+            <div class="items-container">
+              @for (item of asignaciones; track $index) {
+              <div class="list-item asignacion-item">
+                <div class="item-content">
+                  <!-- Información básica -->
+                  <div class="basic-info">
+                    <div class="primary-text">
+                      <strong>Asignación #{{ item.asignacion.idAsignacion }}</strong>
+                      <mat-chip class="status-chip">
+                        {{ item.asignacion.estadoAsignacion }}
+                      </mat-chip>
+                    </div>
+                    <div class="secondary-text">
+                      Fecha: {{ item.asignacion.fechaAsignacion | date : 'dd/MM/yyyy' }} | Número
+                      Guía: {{ item.asignacion.guia.numeroGuia }} | Cliente:
+                      {{ item.asignacion.guia.cliente.nombreCompleto }}
+                    </div>
+                  </div>
+
+                  <!-- Expandible -->
+                  @if (item.expanded) {
+                  <div class="expanded-info">
+                    <mat-divider></mat-divider>
+
+                    <!-- Información de Guía -->
+                    <div class="section-title">
+                      <mat-icon>local_shipping</mat-icon>
+                      Información de la Guía
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Código Interno:</span>
+                        <span class="value">{{ item.asignacion.guia.codigoInterno }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Contenido:</span>
+                        <span class="value">{{ item.asignacion.guia.descripcionContenido }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Valor Declarado:</span>
+                        <span class="value">{{
+                          item.asignacion.guia.valorDeclarado | currency
+                        }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Peso:</span>
+                        <span class="value">{{ item.asignacion.guia.pesoKg }} kg</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Dimensiones:</span>
+                        <span class="value">{{ item.asignacion.guia.dimensiones }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Estado:</span>
+                        <span class="value">{{ item.asignacion.guia.estadoGuia }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Información del Cliente -->
+                    <div class="section-title">
+                      <mat-icon>person</mat-icon>
+                      Información del Cliente
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Nombre:</span>
+                        <span class="value">{{ item.asignacion.guia.cliente.nombreCompleto }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Correo:</span>
+                        <span class="value">{{ item.asignacion.guia.cliente.email }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Teléfono:</span>
+                        <span class="value">{{ item.asignacion.guia.cliente.telefono }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Información de Dirección -->
+                    <div class="section-title">
+                      <mat-icon>location_on</mat-icon>
+                      Dirección de Entrega
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Municipio:</span>
+                        <span class="value">{{
+                          item.asignacion.guia.direccionEntrega.municipio
+                        }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Departamento:</span>
+                        <span class="value">{{
+                          item.asignacion.guia.direccionEntrega.departamento
+                        }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">País:</span>
+                        <span class="value">{{ item.asignacion.guia.direccionEntrega.pais }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Código Postal:</span>
+                        <span class="value">{{
+                          item.asignacion.guia.direccionEntrega.codigoPostal
+                        }}</span>
+                      </div>
+                    </div>
+
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Referencias:</span>
+                        <span>{{ item.asignacion.guia.direccionEntrega.referencias }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  }
+
+                  <!-- Botones -->
+                  <div class="action-buttons">
+                    <div class="button-group">
+                      <button mat-button color="primary" (click)="toggleExpanded(item)">
+                        <mat-icon>{{ item.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+                        {{ item.expanded ? 'Ocultar Detalles' : 'Ver Detalles' }}
+                      </button>
+
+                      @if(item.asignacion.estadoAsignacion === 'PENDIENTE' ){
+                      <button mat-button color="primary" (click)="aceptarAsignacion(item.asignacion.idAsignacion)">
+                        <mat-icon>check_circle</mat-icon>
+                        Aceptar
+                      </button>
+                      <button mat-button color="danger" (click)="recharzarAsignacion(item.asignacion.idAsignacion)">
+                        <mat-icon>cancel</mat-icon>
+                        Rechazar
+                      </button>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+            }
+            @if(!loadingAsignaciones && asignaciones.length === 0){
+            <div class="no-data">
+              <mat-icon>assignment_late</mat-icon>
+              <p>No se encontraron asignaciones</p>
+            </div>
+            }
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

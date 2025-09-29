@@ -52,7 +52,7 @@ export class Empresa implements OnInit {
   modoEdicion = false;
   empresaForm: FormGroup;
   empresaEditando: EmpresaModel | null = null;
-  
+
   private cambioProgmatico = false;
 
   constructor(
@@ -117,7 +117,7 @@ export class Empresa implements OnInit {
 
   cargarEmpresas(): void {
     this.loadingEmpresas = true;
-    
+
     this.empresaService.listarEmpresas().subscribe({
       next: (data) => {
         this.empresas = data.map(item => ({
@@ -139,7 +139,7 @@ export class Empresa implements OnInit {
     this.modoEdicion = false;
     this.empresaEditando = null;
     this.resetearFormularioCompleto();
-    
+
     this.cambioProgmatico = true;
     this.selectedTabIndex = 0;
   }
@@ -147,7 +147,7 @@ export class Empresa implements OnInit {
   editarEmpresa(empresa: EmpresaModel): void {
     this.modoEdicion = true;
     this.empresaEditando = empresa;
-    
+
     this.empresaForm.patchValue({
       tipoEmpresa: empresa.tipoEmpresa,
       nombreComercial: empresa.nombreComercial,
@@ -163,7 +163,7 @@ export class Empresa implements OnInit {
       fechaFin: empresa.contacto?.fechaFin || '',
       activo: empresa.contacto?.activo || true
     });
-    
+
     this.cambioProgmatico = true;
     this.selectedTabIndex = 0;
   }
@@ -176,7 +176,7 @@ export class Empresa implements OnInit {
 
     this.guardandoEmpresa = true;
     const formData: EmpresaFormData = this.empresaForm.value;
-    
+
     if (!formData.fechaFin) {
       formData.fechaFin = null;
     }
@@ -263,7 +263,7 @@ export class Empresa implements OnInit {
           empresaItem.empresa.fechaAfiliacion = response.fechaAfiliacion;
           empresaItem.empresa.fechaVencimientoAfiliacion = response.fechaVencimientoAfiliacion;
 
-          empresaItem.actualizandoEstado = false; 
+          empresaItem.actualizandoEstado = false;
           this.mostrarMensaje(`Estado de la empresa "${empresaItem.empresa.nombreComercial}" actualizado a: ${response.estado}`, "success-snackbar");
 
         },
@@ -282,7 +282,7 @@ export class Empresa implements OnInit {
       verticalPosition: 'top'
     });
   }
-  
+
   refrescarDatos(): void {
     this.cargarUsuariosSucursal();
     this.cargarEmpresas();

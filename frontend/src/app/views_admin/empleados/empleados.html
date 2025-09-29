@@ -200,7 +200,7 @@
 
                   <mat-form-field appearance="outline" class="form-field">
                     <mat-label>Número Dependientes</mat-label>
-                    <input matInput type="number" formControlName="numeroDependientes" required />
+                    <input matInput type="number" formControlName="numeroDependientes" min="0" required />
                   </mat-form-field>
                 </div>
 
@@ -338,17 +338,17 @@
 
                 <div class="grid grid-cols-4 gap-4">
                   <!-- switch-->
-                  <mat-slide-toggle formControlName="incluyeAguinaldo"
+                  <mat-slide-toggle formControlName="incluyeAguinaldo" value="false"
                     >¿Incluye Aguinaldo?</mat-slide-toggle
                   >
                   <!-- switch-->
-                  <mat-slide-toggle formControlName="incluyeBono14"
+                  <mat-slide-toggle formControlName="incluyeBono14" value="false"
                     >¿Incluye Bono 14?</mat-slide-toggle
                   >
-                  <mat-slide-toggle formControlName="incluyeVacaciones"
+                  <mat-slide-toggle formControlName="incluyeVacaciones" value="false"
                     >¿Incluye vacaciones?</mat-slide-toggle
                   >
-                  <mat-slide-toggle formControlName="incluyeIgss">¿Incluye Igss?</mat-slide-toggle>
+                  <mat-slide-toggle formControlName="incluyeIgss" value="fale">¿Incluye Igss?</mat-slide-toggle>
                 </div>
               </div>
 
