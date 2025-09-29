@@ -1,7 +1,9 @@
 package org.entregasayd.sistemasentregas.controllers;
 
 import org.entregasayd.sistemasentregas.services.filestorage.FileStorageService;
+import org.entregasayd.sistemasentregas.services.filestorage.S3StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +24,12 @@ public class FileController {
     @Autowired
     private FileStorageService fileStorageService;
 
+    @Autowired
+    private S3StorageService s3StorageService;
+
+    @Value("${storage.type}")
+    private String storageType;
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
@@ -30,7 +38,14 @@ public class FileController {
 //            Path path = Paths.get(url + File.separator + pathFile);
 //            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 
-            String pathFile = fileStorageService.getUrl(file);
+            String pathFile = "";
+
+            if(storageType.equals("local")){
+                pathFile = fileStorageService.getUrl(file);
+            }else if(storageType.equals("s3")){
+                pathFile = s3StorageService.uploadToS3(file);
+            }
+
             Map<String, String> map = new HashMap<>();
             map.put("url", pathFile);
             return ResponseEntity.ok().body(map);
