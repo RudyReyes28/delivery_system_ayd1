@@ -16,7 +16,6 @@ pipeline {
         // ------------------------
         // Backend y Frontend
         // ------------------------
-        SERVER_PORT           = "8081"
         CORS_ALLOWED_ORIGINS  = "http://${S3_BUCKET_FRONTEND}.s3-website-${AWS_REGION}.amazonaws.com"
 
         STORAGE_TYPE               = "s3"
