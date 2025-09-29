@@ -13,6 +13,10 @@ import { GuiaCliente } from './views_cliente/guia-cliente/guia-cliente';
 import { GuiaCoordenador } from './guia-coordenador/guia-coordenador';
 import { Liquidacion } from './liquidacion/liquidacion';
 
+//repartidor
+import { GestionPedidos } from './views_repartidor/gestion-pedidos/gestion-pedidos';
+import { SeguimientoPedidos } from './views_repartidor/seguimiento-pedidos/seguimiento-pedidos';
+
 
 export const routes: Routes = [
     {
@@ -47,6 +51,13 @@ export const routes: Routes = [
     },
     {
         path: "guia-sucursal",  component: GuiaSucursal, title: "Guia"
+    },
+    //rutas repartidor
+    {
+      path: "gestion-pedidos", component: GestionPedidos, title: "Gestión Pedidos"
+    },
+    {
+      path: "seguimiento-pedidos", component: SeguimientoPedidos, title: "Seguimiento Pedidos"
     },
     {
         path: "", component: GuiaCliente, title: "Guía"
