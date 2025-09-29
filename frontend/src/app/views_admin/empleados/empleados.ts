@@ -487,6 +487,80 @@ export class Empleados implements OnInit {
     this.modoEdicion = false;
     this.guardandoEmpleado = false;
     this.selectedTabIndex = 0;
+
+    //this.setTestValues();
+
+  }
+
+  setTestValues(): void {
+    this.empleadoForm.patchValue({
+      // Información del Usuario
+      nombreUsuario: 'jdoe',
+      password: 'Password123!',
+      idRol: 2, // ID de ejemplo para un rol como 'REPARTIDOR' o 'EMPLEADO'
+      nombre: 'John',
+      apellido: 'Doe',
+      fechaNacimiento: '1990-05-15',
+      dpi: '1234567890123',
+      correo: 'johndoe@example.com',
+      telefono: '55512345',
+
+      // Dirección
+      departamento: 'Guatemala',
+      municipio: 'Guatemala',
+      codigoPostal: '01001',
+      tipoDireccion: 'RESIDENCIA',
+      referencias: 'Casa de dos pisos con portón negro, cerca del parque.',
+
+      // Información de Empleado
+      codigoEmpleado: 'EMP-001',
+      numeroIgss: '987654321',
+      numeroIrtra: '123456789',
+      tipoSangre: 'O+',
+      estadoCivil: 'SOLTERO',
+      numeroDependientes: 0,
+      contactoEmergenciaNombre: 'Jane Doe',
+      contactoEmergenciaTelefono: '55556789',
+      estadoEmpleado: 'ACTIVO',
+      fechaIngreso: '2023-01-15',
+      fechaSalida: null,
+      motivoSalida: null,
+
+      // Contrato inicial
+      numeroContrato: 'CONT-2023-001',
+      tipoContrato: 'TEMPORAL',
+      modalidadTrabajo: 'PRESENCIAL',
+      fechaInicio: '2023-01-15',
+      fechaFin: '2024-01-14',
+      estadoContrato: 'ACTIVO',
+      salarioBase: 5500.0,
+      frecuenciaPago: 'MENSUAL',
+      renovacionAutomatica: false,
+      incluyeAguinaldo: false,
+      incluyeBono14: false,
+      incluyeVacaciones: false,
+      incluyeIgss: false,
+
+      // Comisiones
+      tipoComision: 'PORCENTAJE',
+      porcentaje: 0.05,
+      montoFijo: 0,
+      fechaDesde: '2023-02-01',
+      fechaHasta: '2024-01-31',
+      comisionActiva: false,
+      minimoEntregasMes: 20,
+      maximoEntregasMes: 100,
+      factorMultiplicador: 1.2,
+
+      // Campos adicionales de Repartidor
+      disponibilidad: 'DISPONIBLE',
+      numeroLicencia: 'L-12345678',
+      tipoLicencia: 'A',
+      fechaVenLicencia: '2025-08-30',
+      zonaAsignada: 'ZONA_1',
+      radioCobertura: 5,
+      vehiculosAsignados: [1, 3], // IDs de vehículos de ejemplo
+    });
   }
 
   guardarEmpleado(): void {
@@ -601,14 +675,19 @@ export class Empleados implements OnInit {
                 `Empleado ${this.empleadoRequest.codigoEmpleado} actualizado exitosamente`,
                 'success-snackbar'
               );
+              this.resetearFormularioCompleto();
+              this.empleados = [];
+              this.setEmpleados();
               this.guardandoEmpleado = false;
               this.cambioProgmatico = true;
               this.selectedTabIndex = 1;
-              this.resetearFormularioCompleto();
-              this.setEmpleados();
             },
-            error: (error) => {
-              this.showSnackbar(`Error al actualizar el empleado`, 'error-snackbar');
+            error: (error: any) => {
+              if (error.status == 400 || error.status == 409 || error.status == 404) {
+                this.showSnackbar(error.error.message, 'error-snackbar');
+              } else {
+                this.showSnackbar(`Error al actualizar al empleado`, 'error-snackbar');
+              }
               console.log(error);
             },
           });
@@ -624,16 +703,15 @@ export class Empleados implements OnInit {
         contrato: this.registroContrato,
         direccion: this.direccion,
       };
+      console.log(this.empleadoForm.value);
+      this.vehiculosAsignados = [];
+      this.vehiculosAsignados = this.empleadoForm.get('vehiculosAsignados')?.value;
+
+      let todoBien: boolean = false;
       this.usuarioService.crearUsuario(this.registerEmpleado).subscribe({
         next: (empleado: EmpleadoRequestDto) => {
-          const nombreRols = this.roles.find(
-            (rol) => rol.idRol === this.empleadoForm.get('idRol')?.value
-          )?.nombre;
-
-          console.log('es repartidor ? > ', nombreRols);
-
-          if (nombreRols?.toUpperCase().trim() === 'REPARTIDOR') {
-            console.log('Es repartidor, se crea registro en tabla repartidor');
+          const rolSeleccionado = this.roles.find((rol) => rol.idRol === this.usuarioRequest.idRol);
+          if (rolSeleccionado?.nombre === 'REPARTIDOR') {
             const repartidor: RepartidorDTO = {
               idRepartidor: 0,
               idEmpleado: empleado.idEmpleado,
@@ -649,19 +727,21 @@ export class Empleados implements OnInit {
             };
             this.repartidorService.crearRepartidor(repartidor).subscribe({
               next: (repartidorCreado: RepartidorDTO) => {
-                const vehiculosSeleccionados: number[] =
-                  this.empleadoForm.get('vehiculosAsignados')?.value || [];
-                for (const vehiculo in vehiculosSeleccionados) {
+                this.vehiculosAsignados = this.empleadoForm.get('vehiculosAsignados')?.value;
+                  console.log('Vehículos seleccionados: ', this.vehiculosAsignados);
+                for (const vehiculo in this.vehiculosAsignados) {
+                  console.log('id-vehiculo ', this.vehiculosAsignados[vehiculo]);
                   const repartidorVehiculo: RepartidorVehiculoDTO = {
                     idRepartidorVehiculo: 0,
                     idRepartidor: repartidorCreado.idRepartidor,
-                    idVehiculo: vehiculosSeleccionados[vehiculo],
+                    idVehiculo: this.vehiculosAsignados[vehiculo],
                     fechaAsignacion: '',
                     esVehiculoPrincipal: true,
                     activo: true,
                   };
                   this.vehiculoRepartidor.crearRepartidorVehiculo(repartidorVehiculo).subscribe({
                     next: (asignacion: RepartidorVehiculoDTO) => {
+                      todoBien = true;
                       console.log('Asignación creada:', asignacion);
                     },
                     error: (error) => {
@@ -674,25 +754,30 @@ export class Empleados implements OnInit {
                 console.log(error);
               },
             });
-          }else {
-            console.log('No es repartidor, no se crea registro en tabla repartidor');
           }
-          this.showSnackbar(
-            `Empleado ${this.empleadoRequest.codigoEmpleado} creado exitosamente`,
-            'success-snackbar'
-          );
-          /*
-          this.guardandoEmpleado = false;
-          this.cambioProgmatico = true;
-          this.selectedTabIndex = 1;
-          this.resetearFormularioCompleto();
-          this.setEmpleados();
-          */
+          todoBien = true;
         },
-        error: (error) => {
+        error: (error: any) => {
+          if(error.status == 400 || error.status == 409 || error.status == 404){
+            this.showSnackbar(error.error.message, 'error-snackbar');
+          } else {
+            this.showSnackbar(`Error al crear el empleado`, 'error-snackbar');
+          }
           console.log(error);
         },
       });
+      if (todoBien) {
+        this.showSnackbar(
+          `Empleado ${this.empleadoRequest.codigoEmpleado} creado exitosamente`,
+          'success-snackbar'
+        );
+        this.resetearFormularioCompleto();
+        this.empleados = [];
+        this.setEmpleados();
+        this.guardandoEmpleado = false;
+        this.cambioProgmatico = true;
+        this.selectedTabIndex = 1;
+      }
     }
   }
 
@@ -792,7 +877,6 @@ export class Empleados implements OnInit {
         console.log(error);
       },
     });
-
     setTimeout(() => {
       this.selectedTabIndex = 0;
     }, 0);

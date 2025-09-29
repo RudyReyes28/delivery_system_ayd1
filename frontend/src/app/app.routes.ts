@@ -11,6 +11,10 @@ import { Contratos } from './views_admin/contratos/contratos';
 import { GuiaSucursal } from './views_sucursal/guia-sucursal/guia-sucursal';
 import { GuiaCliente } from './views_cliente/guia-cliente/guia-cliente';
 
+//repartidor
+import { GestionPedidos } from './views_repartidor/gestion-pedidos/gestion-pedidos';
+import { SeguimientoPedidos } from './views_repartidor/seguimiento-pedidos/seguimiento-pedidos';
+
 
 export const routes: Routes = [
     {
@@ -46,7 +50,15 @@ export const routes: Routes = [
     {
         path: "guia-sucursal",  component: GuiaSucursal, title: "Guia"
     },
+    //rutas repartidor
+    {
+      path: "gestion-pedidos", component: GestionPedidos, title: "Gestión Pedidos"
+    },
+    {
+      path: "seguimiento-pedidos", component: SeguimientoPedidos, title: "Seguimiento Pedidos"
+    },
     {
         path: "", component: GuiaCliente, title: "Guía"
-    }
+    },
+
 ];

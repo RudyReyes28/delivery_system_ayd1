@@ -54,7 +54,7 @@ public class ContratoService {
         }
 
         if(searchByNumberContrato(contratoRequestDTO.getNumeroContrato()) != null){
-            throw new ErrorApi(404,String.format("El numero del contrato %s ya existe",contratoRequestDTO.getNumeroContrato()));
+            throw new ErrorApi(400,String.format("El numero del contrato %s ya existe",contratoRequestDTO.getNumeroContrato()));
         }
 
         Empleado empleado = empleadoOptional.get();
