@@ -102,6 +102,7 @@
     </dependencies>
 
     <build>
+        <finalName>SistemasEntregas</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -131,6 +132,26 @@
                         </exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <configuration>
+                            <target>
+                                <echo>Copiando las carpetas de configuración Docker</echo>
+                                <copy todir="${basedir}/target/config-dev-docker">
+                                    <fileset dir="${basedir}/src/main/resources/config-dev-docker" />
+                                </copy>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
