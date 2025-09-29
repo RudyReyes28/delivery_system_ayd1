@@ -173,11 +173,13 @@ public class CancelacionesCoordinadorService {
         guia.setEstadoActual(Guia.EstadoActual.CANCELADA);
         guiaRepository.save(guia);
 
-        List<AsignacionRepartidor> asignacionRepartidor = asignacionRepartidorRepository.findByRepartidor_IdRepartidorAndGuia_IdGuia(guia.getRepartidor().getIdRepartidor(), guia.getIdGuia());
-        for (AsignacionRepartidor asignacion : asignacionRepartidor) {
-            if (asignacion.getEstadoAsignacion() == AsignacionRepartidor.EstadoAsignacion.PENDIENTE || asignacion.getEstadoAsignacion() == AsignacionRepartidor.EstadoAsignacion.ACEPTADA) {
-                asignacion.setEstadoAsignacion(AsignacionRepartidor.EstadoAsignacion.CANCELADA);
-                asignacionRepartidorRepository.save(asignacion);
+        if(aplicaPenalizacion){
+            List<AsignacionRepartidor> asignacionRepartidor = asignacionRepartidorRepository.findByRepartidor_IdRepartidorAndGuia_IdGuia(guia.getRepartidor().getIdRepartidor(), guia.getIdGuia());
+            for (AsignacionRepartidor asignacion : asignacionRepartidor) {
+                if (asignacion.getEstadoAsignacion() == AsignacionRepartidor.EstadoAsignacion.PENDIENTE || asignacion.getEstadoAsignacion() == AsignacionRepartidor.EstadoAsignacion.ACEPTADA) {
+                    asignacion.setEstadoAsignacion(AsignacionRepartidor.EstadoAsignacion.CANCELADA);
+                    asignacionRepartidorRepository.save(asignacion);
+                }
             }
         }
 
@@ -225,6 +227,7 @@ public class CancelacionesCoordinadorService {
             incidenciaDTO.setSeveridad(incidencia.getSeveridad().name());
             incidenciaDTO.setDescripcion(incidencia.getDescripcion());
             incidenciaDTO.setFechaReporte(incidencia.getFechaReporte().toString());
+            incidenciaDTO.setEstadoIncidencia(incidencia.getEstado().name());
 
             Guia guia = incidencia.getGuia();
             GuiaDetalleClienteDTO.GuiaDetalleDto guiaDTO = new GuiaDetalleClienteDTO.GuiaDetalleDto();

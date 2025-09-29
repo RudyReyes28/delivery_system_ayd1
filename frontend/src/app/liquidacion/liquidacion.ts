@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { ConfirmacionDialogComponent } from './confirmacion-dialog.component';
+import { ApiResponse } from '../../models/admin-liquidacion.model'; // Asegúrate de que este tipo exista
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AdminLiquidacionService } from '../../services/admin-liquidacion.service';
 import { PeriodoLiquidacion, RepartidorResponse, Repartidor,NuevoPeriodoRequest,ProcesarLiquidacionRequest } from '../../models/admin-liquidacion.model';
@@ -68,6 +70,11 @@ export class Liquidacion implements OnInit {
     fechaInicio: '',
     fechaFin: ''
   };
+
+  // Definir las constantes para los estados
+  readonly ESTADO_ABIERTO = 'ABIERTO';
+  readonly ESTADO_CERRADO = 'CERRADO';
+  readonly ESTADO_LIQUIDADO = 'LIQUIDADO';
 
   constructor(
     private liquidacionService: AdminLiquidacionService,
@@ -162,6 +169,39 @@ export class Liquidacion implements OnInit {
     });
   }
 
+  cerrarPeriodoActivo(): void {
+    if (!this.periodoActivo) {
+      this.showSnackbar('No hay un periodo activo para cerrar');
+      return;
+    }
+
+    // Abrir diálogo de confirmación
+    const dialogRef = this.dialog.open(ConfirmacionDialogComponent, {
+      width: '400px',
+      data: {
+        titulo: 'Cerrar Periodo de Liquidación',
+        mensaje: `¿Está seguro que desea cerrar el periodo "${this.periodoActivo.descripcion}"? Esta acción no se puede deshacer.`,
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && this.periodoActivo) { // Agregamos verificación adicional para evitar null
+        this.cargando = true;
+        this.liquidacionService.cerrarPeriodo(this.periodoActivo.idPeriodo).subscribe({
+          next: (response: ApiResponse) => {
+            this.showSnackbar(response.message || 'Periodo cerrado correctamente');
+            this.cargarDatos(); // Recargar datos
+          },
+          error: (error: any) => { // Añadimos tipo explícito
+            console.error('Error al cerrar periodo:', error);
+            this.showSnackbar('Error al cerrar el periodo');
+            this.cargando = false;
+          }
+        });
+      }
+    });
+  }
+
   tieneLiquidacionActiva(repartidor: Repartidor): boolean {
     return repartidor.liquidacionRepartidor.idLiquidacion !== null;
   }
@@ -203,6 +243,14 @@ export class Liquidacion implements OnInit {
       panelClass: [tipo],
       horizontalPosition: 'center',
       verticalPosition: 'top',
+    });
+  }
+
+  private showSnackbar(message: string): void {
+    this.snackBar.open(message, 'Cerrar', {
+      duration: 5000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
     });
   }
 

@@ -232,6 +232,12 @@
                       </button>
                       } }
                     </div>
+
+                    <!-- Añadir botón de cancelación por cliente -->
+                    <button mat-button color="warn" *ngIf="item.guia.estadoActual === 'EN_REPARTO'" (click)="registrarCancelacionCliente(item.guia.idGuia)">
+                      <mat-icon>cancel</mat-icon>
+                      Cancelación Cliente
+                    </button>
                   </div>
                 </div>
               </div>

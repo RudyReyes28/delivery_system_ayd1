@@ -1,0 +1,167 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Cancelación de Guías</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <!-- Sección principal con la lista de guías -->
+      <div class="content-section">
+        <div class="header-section">
+          <h3>Guías disponibles para cancelación</h3>
+          <div class="actions">
+            <button mat-raised-button color="primary" (click)="loadGuias()">
+              <mat-icon>refresh</mat-icon> Actualizar
+            </button>
+          </div>
+        </div>
+
+        <!-- Loader mientras se cargan las guías -->
+        <div *ngIf="loading" class="loading-container">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Cargando guías...</p>
+        </div>
+
+        <!-- Lista de guías -->
+        <div *ngIf="!loading && guias.length > 0" class="guias-list">
+          <div *ngFor="let item of guias" class="guia-item">
+            <div class="guia-header">
+              <div class="guia-info">
+                <span class="guia-numero">{{ item.guia.numeroGuia }}</span>
+                <span class="guia-fecha">{{ item.guia.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
+                <span class="guia-estado" [ngClass]="getEstadoClase(item.guia.estadoActual)">
+                  {{ item.guia.estadoActual }}
+                </span>
+              </div>
+              <div class="guia-actions">
+                <button mat-icon-button color="primary" (click)="toggleExpanded(item.guia.idGuia)">
+                  <mat-icon>{{ expandedGuias[item.guia.idGuia] ? 'expand_less' : 'expand_more' }}</mat-icon>
+                </button>
+                <button mat-raised-button color="warn" (click)="openCancelDialog(item)">
+                  <mat-icon>cancel</mat-icon> Cancelar
+                </button>
+              </div>
+            </div>
+
+            <!-- Detalles expandibles de la guía -->
+            <div *ngIf="expandedGuias[item.guia.idGuia]" class="guia-details">
+              <mat-divider></mat-divider>
+              
+              <!-- Información básica de la guía -->
+              <div class="detail-section">
+                <h4><mat-icon>local_shipping</mat-icon> Información de la Guía</h4>
+                <div class="details-grid">
+                  <div class="detail-item">
+                    <span class="label">Código Interno:</span>
+                    <span class="value">{{ item.guia.codigoInterno }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Prioridad:</span>
+                    <span class="value">{{ item.guia.prioridad }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Peso:</span>
+                    <span class="value">{{ item.guia.pesoKg }} kg</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Dimensiones:</span>
+                    <span class="value">{{ item.guia.dimensiones }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Valor Declarado:</span>
+                    <span class="value">Q{{ item.guia.valorDeclarado | number:'1.2-2' }}</span>
+                  </div>
+                  <div class="detail-item full-width">
+                    <span class="label">Descripción del Contenido:</span>
+                    <span class="value">{{ item.guia.descripcionContenido }}</span>
+                  </div>
+                  <div class="detail-item full-width" *ngIf="item.guia.observaciones">
+                    <span class="label">Observaciones:</span>
+                    <span class="value">{{ item.guia.observaciones }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Información del cliente -->
+              <div class="detail-section">
+                <h4><mat-icon>person</mat-icon> Cliente</h4>
+                <div class="details-grid">
+                  <div class="detail-item">
+                    <span class="label">Nombre:</span>
+                    <span class="value">{{ item.guia.cliente.nombreCompleto }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Email:</span>
+                    <span class="value">{{ item.guia.cliente.email }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Teléfono:</span>
+                    <span class="value">{{ item.guia.cliente.telefono }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Información de dirección -->
+              <div class="detail-section">
+                <h4><mat-icon>location_on</mat-icon> Dirección de Entrega</h4>
+                <div class="details-grid">
+                  <div class="detail-item">
+                    <span class="label">Municipio:</span>
+                    <span class="value">{{ item.guia.direccionEntrega.municipio }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Departamento:</span>
+                    <span class="value">{{ item.guia.direccionEntrega.departamento }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">País:</span>
+                    <span class="value">{{ item.guia.direccionEntrega.pais }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Código Postal:</span>
+                    <span class="value">{{ item.guia.direccionEntrega.codigoPostal }}</span>
+                  </div>
+                  <div class="detail-item full-width">
+                    <span class="label">Referencias:</span>
+                    <span class="value">{{ item.guia.direccionEntrega.referencias }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Historial de estados -->
+              <div class="detail-section">
+                <h4><mat-icon>history</mat-icon> Historial de Estados</h4>
+                <div class="timeline">
+                  <div *ngFor="let estado of item.guia.estadosEntregas" class="timeline-item">
+                    <div class="timeline-marker" [ngClass]="getEstadoClase(estado.estadoNuevo)"></div>
+                    <div class="timeline-content">
+                      <div class="timeline-header">
+                        <span class="timeline-date">{{ estado.fechaCambio | date:'dd/MM/yyyy HH:mm' }}</span>
+                        <span class="timeline-estado">{{ estado.estadoNuevo }}</span>
+                      </div>
+                      <div class="timeline-details">
+                        <span class="timeline-label">Motivo:</span>
+                        <span class="timeline-value">{{ estado.motivoCambio }}</span>
+                      </div>
+                      <div class="timeline-details" *ngIf="estado.comentarios">
+                        <span class="timeline-label">Comentarios:</span>
+                        <span class="timeline-value">{{ estado.comentarios }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensaje si no hay guías disponibles -->
+        <div *ngIf="!loading && guias.length === 0" class="no-data">
+          <mat-icon>info</mat-icon>
+          <p>No hay guías disponibles para cancelación</p>
+          <p class="subtext">Solo las guías en estado "CREADA" o "ASIGNADA" pueden ser canceladas</p>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

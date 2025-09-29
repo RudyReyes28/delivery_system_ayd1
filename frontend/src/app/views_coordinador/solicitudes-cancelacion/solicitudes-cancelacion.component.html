@@ -1,0 +1,148 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Solicitudes de Cancelación</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="header-section">
+        <h3>Gestión de Solicitudes</h3>
+        <div class="actions">
+          <button mat-raised-button color="primary" (click)="cargarSolicitudes()" [disabled]="cargando">
+            <mat-icon>refresh</mat-icon> Actualizar
+          </button>
+        </div>
+      </div>
+
+      <!-- Loader mientras se cargan las solicitudes -->
+      <div *ngIf="cargando" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando solicitudes...</p>
+      </div>
+
+      <!-- Lista de solicitudes -->
+      <div *ngIf="!cargando && solicitudes.length > 0" class="solicitudes-list">
+        <div *ngFor="let solicitud of solicitudes" class="solicitud-item">
+          <div class="solicitud-header">
+            <div class="solicitud-info">
+              <span class="solicitud-numero">
+                Guía: <strong>{{ solicitud.guia.numeroGuia }}</strong>
+              </span>
+              <span class="solicitud-fecha">
+                {{ solicitud.fechaCancelacion | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+              <span class="solicitud-estado" [ngClass]="obtenerClaseEstadoCancelacion(solicitud.estadoCancelacion)">
+                {{ solicitud.estadoCancelacion }}
+              </span>
+              <span class="solicitud-estado" [ngClass]="obtenerClaseEstado(solicitud.guia.estadoActual)">
+                {{ solicitud.guia.estadoActual }}
+              </span>
+              <span class="solicitud-prioridad" [ngClass]="obtenerClasePrioridad(solicitud.guia.prioridad)">
+                {{ solicitud.guia.prioridad }}
+              </span>
+            </div>
+            <div class="solicitud-actions">
+              <button mat-icon-button color="primary" (click)="toggleExpandir(solicitud.idCancelacion)">
+                <mat-icon>{{ solicitudesExpandidas[solicitud.idCancelacion] ? 'expand_less' : 'expand_more' }}</mat-icon>
+              </button>
+              <!-- Solo mostrar botones si el estado es SOLICITADA -->
+              <ng-container *ngIf="solicitud.estadoCancelacion === 'SOLICITADA'">
+                <button mat-raised-button color="primary" (click)="abrirDialogoAceptar(solicitud)">
+                  <mat-icon>check</mat-icon> Aceptar
+                </button>
+                <button mat-raised-button color="warn" (click)="abrirDialogoRechazar(solicitud)">
+                  <mat-icon>close</mat-icon> Rechazar
+                </button>
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- Detalles expandibles de la solicitud -->
+          <div *ngIf="solicitudesExpandidas[solicitud.idCancelacion]" class="solicitud-details">
+            <mat-divider></mat-divider>
+
+            <!-- Motivo de cancelación -->
+            <div class="detail-section">
+              <h4><mat-icon>report_problem</mat-icon> Motivo de Cancelación</h4>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="label">Categoría:</span>
+                  <span class="value">{{ formatearMotivo(solicitud.motivoCategoria) }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Estado:</span>
+                  <span class="value">{{ solicitud.estadoCancelacion }}</span>
+                </div>
+                <div class="detail-item full-width">
+                  <span class="label">Detalle:</span>
+                  <span class="value">{{ solicitud.motivoDetalle }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información de la guía -->
+            <div class="detail-section">
+              <h4><mat-icon>local_shipping</mat-icon> Información de la Guía</h4>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="label">Código Interno:</span>
+                  <span class="value">{{ solicitud.guia.codigoInterno }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Peso:</span>
+                  <span class="value">{{ solicitud.guia.pesoKg }} kg</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Dimensiones:</span>
+                  <span class="value">{{ solicitud.guia.dimensiones }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Valor Declarado:</span>
+                  <span class="value">Q{{ solicitud.guia.valorDeclarado | number:'1.2-2' }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Total:</span>
+                  <span class="value">Q{{ solicitud.guia.total | number:'1.2-2' }}</span>
+                </div>
+                <div class="detail-item full-width">
+                  <span class="label">Descripción del Contenido:</span>
+                  <span class="value">{{ solicitud.guia.descripcionContenido }}</span>
+                </div>
+                <div class="detail-item full-width" *ngIf="solicitud.guia.observaciones">
+                  <span class="label">Observaciones:</span>
+                  <span class="value">{{ solicitud.guia.observaciones }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fechas e información adicional -->
+            <div class="detail-section">
+              <h4><mat-icon>calendar_today</mat-icon> Fechas y Estado</h4>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="label">Fecha de Creación:</span>
+                  <span class="value">{{ solicitud.guia.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Estado Actual:</span>
+                  <span class="value">{{ solicitud.guia.estadoActual }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Intentos de Entrega:</span>
+                  <span class="value">{{ solicitud.guia.intentosEntrega }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje si no hay solicitudes -->
+      <div *ngIf="!cargando && solicitudes.length === 0" class="no-data">
+        <mat-icon>info</mat-icon>
+        <p>No hay solicitudes de cancelación pendientes</p>
+        <p class="subtext">Las solicitudes aparecerán aquí cuando las sucursales soliciten cancelaciones</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

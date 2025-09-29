@@ -24,6 +24,7 @@ public class CancelacionesClienteDTO {
         private String severidad;
         private String descripcion;
         private String fechaReporte;
+        private String estadoIncidencia;
         private GuiaDetalleClienteDTO.GuiaDetalleDto guia;
     }
 

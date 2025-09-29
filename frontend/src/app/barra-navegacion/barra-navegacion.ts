@@ -20,6 +20,7 @@ interface MenuItem {
   route: string;
   roles?: string[];
   roleIds?: number[];
+  showWhenLoggedIn?: boolean; // Nuevo flag para controlar visibilidad cuando usuario está logueado
 }
 
 @Component({
@@ -45,28 +46,18 @@ export class BarraNavegacion implements OnInit {
       icon: 'local_shipping',
       label: 'General',
       route: '/',
+      showWhenLoggedIn: false, // Nuevo flag para controlar visibilidad cuando usuario está logueado
     },
     {
       icon: 'account_circle',
       label: 'Iniciar Sesión',
       route: '/login',
+      showWhenLoggedIn: false, // Nuevo flag para controlar visibilidad cuando usuario está logueado
     },
     {
       icon: 'person',
       label: 'Crear Usuario',
       route: '/crear-usuario',
-      roles: ['ADMINISTRADOR'],
-    },
-    {
-      icon: 'group',
-      label: 'Gestión Empleados',
-      route: '/gestion-empleados',
-      roles: ['ADMINISTRADOR'],
-    },
-    {
-      icon: 'density_small',
-      label: 'Gestión de Contratos',
-      route: '/gestion-contratos',
       roles: ['ADMINISTRADOR'],
     },
     {
@@ -88,6 +79,24 @@ export class BarraNavegacion implements OnInit {
       roles: ['ADMINISTRADOR'],
     },
     {
+      icon: 'group',
+      label: 'Gestión Empleados',
+      route: '/gestion-empleados',
+      roles: ['ADMINISTRADOR'],
+    },
+    {
+      icon: 'description',
+      label: 'Gestión de Contratos',
+      route: '/gestion-contratos',
+      roles: ['ADMINISTRADOR'],
+    },
+    {
+      icon: 'account_balance',
+      label: 'Periodos de Liquidación',
+      route: '/periodos-liquidacion',
+      roles: ['ADMINISTRADOR'],
+    },
+    {
       icon: 'settings',
       label: 'General',
       route: 'general-sucursal',
@@ -98,6 +107,31 @@ export class BarraNavegacion implements OnInit {
       label: 'Gestión Guías',
       route: '/guia-sucursal',
       roles: ['SUCURSAL'],
+    },
+    {
+      icon: 'cancel',
+      label: 'Cancelación de Guías',
+      route: '/cancelacion-guias',
+      roles: ['SUCURSAL'],
+    },
+    // Opciones para el coordinador
+    {
+      icon: 'local_shipping',
+      label: 'Gestión Guías',
+      route: '/guia-repartidor',
+      roles: ['COORDINADOR_OPERACIONES'],
+    },
+    {
+      icon: 'assignment_return',
+      label: 'Solicitudes de Cancelación',
+      route: '/solicitudes-cancelacion',
+      roles: ['COORDINADOR_OPERACIONES'],
+    },
+    {
+      icon: 'cancel',
+      label: 'Cancelaciones de Cliente',
+      route: '/cancelaciones-cliente',
+      roles: ['COORDINADOR_OPERACIONES'],
     },
     // opciones para el repartidor
     {
@@ -113,16 +147,16 @@ export class BarraNavegacion implements OnInit {
       roles: ['REPARTIDOR'],
     },
     {
-      icon: 'local_shipping',
-      label: 'Gestión Guías Coordinador',
-      route: '/guia-repartidor',
-      roles: ['COORDINADOR_OPERACIONES'],
+      icon: 'cancel',
+      label: 'Registrar Cancelación',
+      route: '/cancelacion-cliente',
+      roles: ['REPARTIDOR'],
     },
     {
       icon: 'logout',
       label: 'Cerrar Sesión',
       route: '/logout',
-      roles: ['ADMINISTRADOR', 'SUCURSAL', 'REPARTIDOR', 'CLIENTE'],
+      roles: ['ADMINISTRADOR', 'SUCURSAL', 'REPARTIDOR', 'CLIENTE', 'COORDINADOR_OPERACIONES'],
     },
   ];
 
@@ -168,10 +202,18 @@ export class BarraNavegacion implements OnInit {
 
   private filtrarMenu() {
     this.menuItems = this.allMenuItems.filter((item) => {
+      // Si el usuario está logueado y el ítem no debe mostrarse cuando hay login, lo excluimos
+      if (this.idUsuarioActual && item.showWhenLoggedIn === false) {
+        return false;
+      }
+      
+      // Si el ítem no tiene restricciones de roles
       if (!item.roles && !item.roleIds) {
-        return true;
+        // Solo mostramos si no tiene flag de showWhenLoggedIn o si este es true
+        return item.showWhenLoggedIn === undefined || item.showWhenLoggedIn;
       }
 
+      // Si el ítem tiene roles y el usuario tiene un rol
       if (item.roles && this.nombreRolActual) {
         if (item.roles.includes(this.nombreRolActual)) {
           return true;
