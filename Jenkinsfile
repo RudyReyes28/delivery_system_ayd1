@@ -48,10 +48,11 @@ pipeline {
 
         stage('Build Backend') {
             steps {
-                echo 'Construyendo Backend (Spring Boot)...'
-                dir('SistemasEntregas') {
-                    sh 'mvn clean package -DskipTests'
-                }
+                sh 'cd demo && mvn package -DskipTests'
+                sh 'cd demo && cd target/config-dev-docker && sudo docker-compose down'
+                sh 'cd demo && cd target/config-dev-docker && sudo docker-compose up --build -d'
+                echo "Despliegue a DEV exitoso"
+
             }
         }
 
