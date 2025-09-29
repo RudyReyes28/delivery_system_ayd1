@@ -15,7 +15,9 @@ pipeline {
             steps {
                 echo 'Limpiando el espacio de trabajo y clonando el repositorio...'
                 cleanWs() // Buena práctica: borra archivos de builds anteriores.
-                git branch: 'main', url: 'https://github.com/RudyReyes28/delivery_system_ayd1.git' // Reemplaza con la URL de tu repo.
+                git branch: 'main',
+                    url: 'https://github.com/RudyReyes28/delivery_system_ayd1.git',
+                    credentialsId: 'github-credentials-ci'
             }
         }
 
