@@ -21,8 +21,10 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('SistemasEntregas') {
-                    // ESTA IMAGEN SÍ EXISTE - Verificada en Docker Hub oficial
-                    sh 'docker run --rm -v $PWD:/app -w /app bellsoft/liberica-openjdk-alpine:21.0.3 mvn clean package -DskipTests'
+                    // Construimos el backend usando el Dockerfile multi-stage
+                    sh '''
+                        docker build -f Dockerfile.backend -t backend:${BUILD_NUMBER} .
+                    '''
                 }
             }
         }
@@ -42,12 +44,12 @@ pipeline {
             }
         }
 
-        stage('Build and Push Backend Image to ECR') {
+        stage('Push Backend Image to ECR') {
             steps {
                 script {
                     def imageUriWithTag = "${ECR_REPOSITORY_URI}:${BUILD_NUMBER}"
                     sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPOSITORY_URI}"
-                    sh "docker build -f Dockerfile.backend -t ${imageUriWithTag} ."
+                    sh "docker tag backend:${BUILD_NUMBER} ${imageUriWithTag}"
                     sh "docker push ${imageUriWithTag}"
                 }
             }
@@ -56,7 +58,7 @@ pipeline {
         stage('Deploy Backend to Production') {
             steps {
                 echo "IMAGEN LISTA PARA DESPLEGAR: ${ECR_REPOSITORY_URI}:${BUILD_NUMBER}"
-                echo "Próximo paso: Configurar Elastic Beanstalk."
+                echo "Próximo paso: Configurar Elastic Beanstalk o ECS."
             }
         }
     }

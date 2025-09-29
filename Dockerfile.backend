@@ -1,41 +1,29 @@
-# --- Etapa 1: Construcción (Build Stage) ---
-# Define un entorno temporal con todas las herramientas para compilar tu proyecto.
-# CORREGIDO: Usando una imagen que SÍ existe
-FROM bellsoft/liberica-openjdk-alpine:21.0.3 AS build
+# --- Etapa 1: Build ---
+FROM amazoncorretto:24-alpine AS build
 
-# Establece el directorio de trabajo dentro del contenedor.
 WORKDIR /app
 
-# Copia solo el archivo pom.xml de tu proyecto backend.
-# Esto es un truco de caché: si las dependencias no cambian, Docker no las volverá a descargar.
+# Copia solo el pom.xml primero para usar la cache de Maven
 COPY SistemasEntregas/pom.xml .
 
-# Descarga todas las dependencias definidas en el pom.xml.
-RUN mvn dependency:go-offline
+# Instala Maven y dependencias offline
+RUN apk add --no-cache maven bash \
+    && mvn dependency:go-offline
 
-# Ahora copia el resto del código fuente de tu backend.
+# Copia el resto del código fuente
 COPY SistemasEntregas/src ./src
 
-# Compila el código, ejecuta las pruebas (si las hay) y empaqueta la aplicación en un archivo .jar.
-# -DskipTests se usa para acelerar el proceso en el pipeline.
+# Compila el backend
 RUN mvn clean package -DskipTests
 
+# --- Etapa 2: Run ---
+FROM amazoncorretto:24-jre-alpine
 
-# --- Etapa 2: Ejecución (Run Stage) ---
-# Define la imagen final, que será mucho más ligera y segura.
-# CORREGIDO: Usando JRE 21 que es estable y LTS
-FROM eclipse-temurin:21-jre-alpine
-
-# Establece el directorio de trabajo.
 WORKDIR /app
 
-# Copia ÚNICAMENTE el archivo .jar compilado desde la etapa 'build'.
-# Esta es la magia del multi-stage build: ningún código fuente o herramienta de compilación llega a la imagen final.
+# Copia el jar compilado desde la etapa build
 COPY --from=build /app/target/*.jar app.jar
 
-# Informa a Docker que el contenedor escuchará en el puerto 8080.
 EXPOSE 8080
 
-# Este es el comando que se ejecutará cuando el contenedor se inicie.
-# Simplemente ejecuta la aplicación Spring Boot.
 ENTRYPOINT ["java","-jar","app.jar"]
