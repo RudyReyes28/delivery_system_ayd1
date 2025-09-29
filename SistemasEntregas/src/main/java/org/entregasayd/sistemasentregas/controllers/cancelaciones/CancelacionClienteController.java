@@ -20,6 +20,7 @@ class CancelacionClienteController {
         this.cancelacionClienteService = cancelacionClienteService;
     }
 
+    //Revisa las cancelaciones del cliente
     @PostMapping("/guias/incidencia")
     public ResponseEntity<?> registrarIncidenciaCliente(@RequestBody IncidenciaCancelacionDTO incidenciaDTO) {
         try{
