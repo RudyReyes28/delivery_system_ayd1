@@ -22,7 +22,7 @@ pipeline {
             steps {
                 dir('SistemasEntregas') {
                     // ESTA IMAGEN SÍ EXISTE - Verificada en Docker Hub oficial
-                    sh 'docker run --rm -v $PWD:/app -w /app maven:eclipse-temurin-21 mvn clean package -DskipTests'
+                    sh 'docker run --rm -v $PWD:/app -w /app bellsoft/liberica-openjdk-alpine:21.0.3 mvn clean package -DskipTests'
                 }
             }
         }
