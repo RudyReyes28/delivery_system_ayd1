@@ -1,0 +1,503 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Gestión de entregas</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Filtro por estado -->
+      <div class="create-button-section">
+        <mat-form-field class="mr-4" appearance="outline">
+          <mat-label>Filtrar por estado</mat-label>
+          <mat-select (selectionChange)="filtrarPorEstado($event.value)">
+            @for (item of estados; track $index) {
+            <mat-option [value]="item" >
+              {{ item }}
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
+        <!-- Tab para Lista de Entregas -->
+        <mat-tab label="Lista de Entregas">
+          <div class="tab-content">
+            <div class="header-section">
+              <h2 class="text-center text-bold">Lista de Asignaciones</h2>
+              @if(loadingGuias){
+              <mat-spinner diameter="30"></mat-spinner>
+              }
+            </div>
+
+            @if (!loadingGuias && guias.length > 0) {
+            <div class="items-container">
+              @for (item of guias; track $index) {
+              <div class="list-item asignacion-item">
+                <div class="item-content">
+                  <!-- Información básica -->
+                  <div class="basic-info">
+                    <div class="primary-text">
+                      <strong>Asignación #{{ item.guia.codigoInterno }}</strong>
+                      <mat-chip
+                        class="status-chip"
+                        [ngClass]="{
+                          finalizada: item.guia.estadoActual === 'Entregado',
+                          enProceso: item.guia.estadoActual === 'En Proceso',
+                          pendiente: item.guia.estadoActual === 'Pendiente'
+                        }"
+                      >
+                        {{ item.guia.estadoActual }}
+                      </mat-chip>
+                    </div>
+                    <div class="secondary-text">
+                      Fecha: {{ item.guia.fechaCreacion | date : 'dd/MM/yyyy' }} | Número Guía:
+                      {{ item.guia.numeroGuia }} | Cliente: {{ item.guia.cliente.nombreCompleto }} |
+                    </div>
+                  </div>
+
+                  <!-- Expandible -->
+                  @if (item.expanded) {
+                  <div class="expanded-info">
+                    <mat-divider></mat-divider>
+
+                    <!-- Información de Guía -->
+                    <div class="section-title">
+                      <mat-icon>local_shipping</mat-icon>
+                      Información de la Guía
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Código Interno:</span>
+                        <span class="value">{{ item.guia.codigoInterno }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Contenido:</span>
+                        <span class="value">{{ item.guia.descripcionContenido }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Valor Declarado:</span>
+                        <span class="value">{{ item.guia.valorDeclarado | currency }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Peso:</span>
+                        <span class="value">{{ item.guia.pesoKg }} kg</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Dimensiones:</span>
+                        <span class="value">{{ item.guia.dimensiones }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Estado Actual:</span>
+                        <span class="value">{{ item.guia.estadoActual }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Prioridad:</span>
+                        <span class="value">{{ item.guia.prioridad }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Observaciones:</span>
+                        <span class="value">{{ item.guia.observaciones }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Información del Cliente -->
+                    <div class="section-title">
+                      <mat-icon>person</mat-icon>
+                      Información del Cliente
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Nombre:</span>
+                        <span class="value">{{ item.guia.cliente.nombreCompleto }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Correo:</span>
+                        <span class="value">{{ item.guia.cliente.email }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Teléfono:</span>
+                        <span class="value">{{ item.guia.cliente.telefono }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Información de Dirección -->
+                    <div class="section-title">
+                      <mat-icon>location_on</mat-icon>
+                      Dirección de Entrega
+                    </div>
+                    <div class="details-grid">
+                      <div class="detail-item">
+                        <span class="label">Municipio:</span>
+                        <span class="value">{{ item.guia.direccionEntrega.municipio }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Departamento:</span>
+                        <span class="value">{{ item.guia.direccionEntrega.departamento }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">País:</span>
+                        <span class="value">{{ item.guia.direccionEntrega.pais }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Código Postal:</span>
+                        <span class="value">{{ item.guia.direccionEntrega.codigoPostal }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <span class="label">Referencias:</span>
+                        <span>{{ item.guia.direccionEntrega.referencias }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Historial de Estados -->
+                    <div class="section-title">
+                      <mat-icon>history</mat-icon>
+                      Historial de Estados
+                    </div>
+                    <div class="details-grid">
+                      @for (estado of item.guia.estadosEntregas; track estado.idGuiaEstado) {
+                      <div class="detail-item full-width">
+                        <span class="label">
+                          {{ estado.fechaCambio | date : 'dd/MM/yyyy HH:mm' }}:
+                        </span>
+                        <span class="value">
+                          <strong>{{ estado.estadoAnterior }}</strong>
+                          →
+                          <strong>{{ estado.estadoNuevo }}</strong>
+                          <span *ngIf="estado.comentarios"> | {{ estado.comentarios }}</span>
+                          <br />
+                          <em>{{ estado.motivoCambio }}</em>
+                        </span>
+                      </div>
+                      }
+                    </div>
+                  </div>
+                  }
+
+                  <!-- Botones -->
+                  <div class="action-buttons">
+                    <div class="button-group">
+                      <button mat-button color="primary" (click)="toggleExpanded(item)">
+                        <mat-icon>{{ item.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+                        {{ item.expanded ? 'Ocultar Detalles' : 'Ver Detalles' }}
+                      </button>
+                      @if(item.guia.estadoActual !== 'ENTREGADA'){ @if(item.guia.estadoActual ==
+                      'ASIGNADA'){
+                      <button mat-button color="warn" (click)="cambiarEstadoEntregada(item)">
+                        <mat-icon>check_box</mat-icon>
+                        Marcar como recogida
+                      </button>
+                      } @if(item.guia.estadoActual === 'RECOLECTADA'){
+                      <button mat-button color="warn" (click)="cambiarEstadoEntregada(item)">
+                        <mat-icon>directions_bike</mat-icon>
+                        Iniciar Entrega
+                      </button>
+                      <button mat-button color="accent" (click)="devolver(item)">
+                        <mat-icon>keyboard_return</mat-icon>
+                        Marcar como devuelta
+                      </button>
+                      } @if(item.guia.estadoActual === 'EN_TRANSITO'){
+                      <button mat-button color="accent" (click)="cambiarEstadoEntregada(item)">
+                        <mat-icon>hand_package</mat-icon>
+                        Marcar como "Repartiendo"
+                      </button>
+                      <button mat-button color="accent" (click)="devolver(item)">
+                        <mat-icon>keyboard_return</mat-icon>
+                        Marcar como devuelta
+                      </button>
+                      } @if(item.guia.estadoActual === 'EN_REPARTO'){
+                      <button mat-button color="accent" (click)="devolver(item)">
+                        <mat-icon>keyboard_return</mat-icon>
+                        Marcar como devuelta
+                      </button>
+
+                      <button mat-button color="accent" (click)="marcarComoEntregada(item)">
+                        <mat-icon>check_circle</mat-icon>
+                        Finalizar Entrega
+                      </button>
+
+                      <button mat-button color="accent" (click)="cancelarEntrega(item)">
+                        <mat-icon>cancel</mat-icon>
+                        Cancelar
+                      </button>
+
+                      } @if(item.guia.estadoActual === 'DEVUELTA'){
+                      <button mat-button color="warn" (click)="cambiarEstadoEntregada(item)">
+                        <mat-icon>directions_bike</mat-icon>
+                        Iniciar Entrega
+                      </button>
+                      <button mat-button color="accent" (click)="cancelarEntrega(item)">
+                        <mat-icon>cancel</mat-icon>
+                        Cancelar
+                      </button>
+                      } }
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+            } @if(!loadingGuias && guias.length === 0){
+            <div class="no-data">
+              <mat-icon>assignment_late</mat-icon>
+              <p>No se encontraron asignaciones</p>
+            </div>
+            }
+          </div>
+        </mat-tab>
+
+        <!-- Tab para agregar evidencias -->
+        <mat-tab label="">
+          <div class="tab-content">
+            <div>
+              <h1 class="text-center text-2xl font-bold">Agregar evidencias</h1>
+              @if(loadingGuias){
+              <mat-spinner diameter="30"></mat-spinner>
+              }
+            </div>
+            <form [formGroup]="formEvidencia" (ngSubmit)="guardarEvidencia()" class="empresa-form">
+              <!-- Información sobre la evidencia -->
+              <div class="form-section">
+                <h4>Informacion de la evidencia</h4>
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Motivo</mat-label>
+                    <input matInput type="text" formControlName="motivo" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Comentarios</mat-label>
+                    <input matInput type="text" formControlName="comentarios" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Nombre del receptor</mat-label>
+                    <input matInput type="text" formControlName="receptor" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Parentesco del receptor</mat-label>
+                    <input matInput type="text" formControlName="parentesco" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Observaciones</mat-label>
+                    <input matInput type="text" formControlName="observaciones" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Tipo de evidencia</mat-label>
+                    <mat-select formControlName="tipoEvidencia" required>
+                      @for (item of tiposEvidencia; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <div class="form-field">
+                    <label for="archivo" class="block text-sm font-medium mb-1">Archivo</label>
+                    <input
+                      id="archivo"
+                      type="file"
+                      title="Seleccione un archivo"
+                      accept=".png .jpg, .jpeg, .pdf"
+                      (change)="onFileSelected($event)"
+                      [disabled]="guardandoEvidencia"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button
+                  mat-button
+                  type="button"
+                  color="warn"
+                  (click)="cancelarFormularios()"
+                  [disabled]="guardandoEvidencia"
+                >
+                  Cancelar
+                </button>
+                <button
+                  mat-raised-button
+                  type="submit"
+                  color="primary"
+                  [disabled]="formEvidencia.invalid"
+                >
+                  @if(guardandoEvidencia){
+                  <mat-spinner diameter="20" style="margin-right: 8px"></mat-spinner>
+                  }
+                  {{ guardandoEvidencia ? 'Guardando' : 'Guardar' }}
+                </button>
+              </div>
+            </form>
+
+            @if(!loadingGuias && guias.length === 0){
+            <div class="no-data">
+              <mat-icon>assignment_late</mat-icon>
+              <p>No se encontraron asignaciones</p>
+            </div>
+            }
+          </div>
+        </mat-tab>
+
+        <!-- Tab para cambiar estado de una guia -->
+        <mat-tab label="">
+          <div class="tab-content">
+            <div>
+              <h1 class="text-center text-2xl font-bold">
+                Confirmacion de cambio de estado de una entrega
+              </h1>
+            </div>
+            <form
+              [formGroup]="formCambioEstado"
+              (ngSubmit)="guardarCambioEstado()"
+              class="empresa-form"
+            >
+              <div class="form-section">
+                <h4>Informacion sobre el cambio de estado</h4>
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Motivo</mat-label>
+                    <input matInput type="text" formControlName="motivoEstado" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Comentarios</mat-label>
+                    <input matInput type="text" formControlName="comentariosEstado" />
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button
+                  mat-button
+                  type="button"
+                  color="warn"
+                  (click)="cancelarFormularios()"
+                  [disabled]="guardandoCambioEstado"
+                >
+                  Cancelar
+                </button>
+                <button
+                  mat-raised-button
+                  type="submit"
+                  color="primary"
+                  [disabled]="formCambioEstado.invalid"
+                >
+                  @if(guardandoCambioEstado){
+                  <mat-spinner diameter="20" style="margin-right: 8px"></mat-spinner>
+                  }
+                  {{ guardandoCambioEstado ? 'Guardando' : 'Guardar' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+
+        <!-- Tab para registra incidencia -->
+        <mat-tab label="">
+          <div class="tab-content">
+            <div>
+              <h1 class="text-center text-2xl font-bold">Registro de incidencia</h1>
+            </div>
+            <form
+              [formGroup]="formIncidencia"
+              (ngSubmit)="guardarIncidencia()"
+              class="empresa-form"
+            >
+              <div class="form-section">
+                <h4>{{ tituloIncidencia }}</h4>
+                <div class="grid grid-cols-3 gap-4">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Tipo de incidencia</mat-label>
+                    <mat-select formControlName="tipoIncidencia" required>
+                      @for (item of tiposIncidencia; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Severidad</mat-label>
+                    <mat-select formControlName="severidad" required>
+                      @for (item of serveridades; track $index) {
+                      <mat-option [value]="item">
+                        {{ item }}
+                      </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Costo adicional</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      min="0"
+                      formControlName="costoAdicional"
+                      required
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Descripción</mat-label>
+                    <input matInput type="text" formControlName="descripcion" required />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Motivo</mat-label>
+                    <input matInput type="text" formControlName="motivo" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Comentario adicional</mat-label>
+                    <input matInput type="text" formControlName="comentarios" />
+                  </mat-form-field>
+
+                  @if(devolverGuia){
+                  <!-- switch-->
+                  <mat-slide-toggle formControlName="requiereDevolucion"
+                    >¿Requiere devolución?</mat-slide-toggle
+                  >
+                  <!-- switch-->
+                  <mat-slide-toggle formControlName="ponerEnTransito"
+                    >¿Poner en transito?</mat-slide-toggle
+                  >
+                  }
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button
+                  mat-button
+                  type="button"
+                  color="warn"
+                  (click)="cancelarFormularios()"
+                  [disabled]="guardandoIncidencia"
+                >
+                  Cancelar
+                </button>
+                <button
+                  mat-raised-button
+                  type="submit"
+                  color="primary"
+                  [disabled]="formIncidencia.invalid"
+                >
+                  @if(guardandoIncidencia){
+                  <mat-spinner diameter="20" style="margin-right: 8px"></mat-spinner>
+                  }
+                  {{ guardandoIncidencia ? 'Guardando' : 'Guardar' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

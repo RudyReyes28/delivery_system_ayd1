@@ -360,9 +360,13 @@ export class Contratos implements OnInit {
         this.contratos = [];
         this.setContratos();
       },
-      error: (err) => {
-        console.error(`Error al actualizar el contrato a ${estado}:`, err);
-        this.showSnackbar(`Error al actualizar el contrato a ${estado}.`, 'error-snackbar');
+      error: (error: any) => {
+        if (error.status == 400 || error.status == 409 || error.status == 404) {
+          this.showSnackbar(error.error.message, 'error-snackbar');
+        } else {
+          this.showSnackbar(`Error al actualizar el contrato`, 'error-snackbar');
+        }
+        console.log(error);
       },
     });
   }

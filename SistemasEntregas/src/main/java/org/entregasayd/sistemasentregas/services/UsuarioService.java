@@ -8,6 +8,7 @@ import org.entregasayd.sistemasentregas.dto.user.UsuarioResponseDto;
 import org.entregasayd.sistemasentregas.mapper.EmpleadoMap;
 import org.entregasayd.sistemasentregas.mapper.UsuarioMap;
 import org.entregasayd.sistemasentregas.models.*;
+import org.entregasayd.sistemasentregas.repositories.EmpleadoRepository;
 import org.entregasayd.sistemasentregas.repositories.UsuarioRepository;
 import org.entregasayd.sistemasentregas.utils.Encriptation;
 import org.entregasayd.sistemasentregas.utils.ErrorApi;
@@ -25,6 +26,8 @@ public class UsuarioService {
     private PersonaService personaService;
     @Autowired
     private EmpleadoService empleadoService;
+    @Autowired
+    private EmpleadoRepository empleadoRepository;
     @Autowired
     private ContratoService contratoService;
     @Autowired
@@ -68,6 +71,14 @@ public class UsuarioService {
             }
             if(personaService.findByCorreo(persona.getCorreo()) != null){
                 throw new ErrorApi(400,"El correo ya se encuentra en uso");
+            }
+
+            if(empleadoRepository.getByCodigoEmpleado(empleado.getCodigoEmpleado()) != null){
+                throw new ErrorApi(400,String.format("El codigo %s de empleado ya se encuentra en uso.", empleado.getCodigoEmpleado()));
+            }
+
+            if(empleadoRepository.findByNumeroIgss(empleado.getNumeroIgss()) != null){
+                throw new ErrorApi(400,String.format("El el numero de iggs '%s' de empleado ya se encuentra en uso.", empleado.getNumeroIgss()));
             }
 
             Direccion direccionSave = direccionService.create(direccion);

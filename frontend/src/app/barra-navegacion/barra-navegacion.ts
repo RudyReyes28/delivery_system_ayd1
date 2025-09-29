@@ -99,6 +99,19 @@ export class BarraNavegacion implements OnInit {
       route: '/guia-sucursal',
       roles: ['SUCURSAL'],
     },
+    // opciones para el repartidor
+    {
+      icon: 'assignment',
+      label: 'Mis Entregas',
+      route: '/gestion-pedidos',
+      roles: ['REPARTIDOR'],
+    },
+    {
+      icon: 'local_shipping',
+      label: 'Seguimiento de Pedidos',
+      route: '/seguimiento-pedidos',
+      roles: ['REPARTIDOR'],
+    },
     {
       icon: 'local_shipping',
       label: 'Gestión Guías Coordinador',
@@ -109,7 +122,7 @@ export class BarraNavegacion implements OnInit {
       icon: 'logout',
       label: 'Cerrar Sesión',
       route: '/logout',
-      roles: ['ADMINISTRADOR', 'SUCURSAL'],
+      roles: ['ADMINISTRADOR', 'SUCURSAL', 'REPARTIDOR', 'CLIENTE'],
     },
   ];
 

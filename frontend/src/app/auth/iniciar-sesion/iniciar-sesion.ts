@@ -47,11 +47,11 @@ export class IniciarSesion implements OnInit {
   isVerificandoToken = false;
   isReenviandoCodigo = false;
   nombreRolActual: string = "";
-  
+
   constructor(
-    private formBuilder: FormBuilder, 
-    private router: Router, 
-    private authService: AuthService, 
+    private formBuilder: FormBuilder,
+    private router: Router,
+    private authService: AuthService,
     private snackBar: MatSnackBar
   ) {
     this.loginForm = this.createLoginForm();
@@ -139,16 +139,16 @@ export class IniciarSesion implements OnInit {
 
   private guardarInformacionUsuario(response: any, guardar: boolean): void {
     this.mostrarMensaje("¡Login exitoso! Bienvenido", "success-snackbar" );
-    sessionStorage.setItem('idUsuario', response.credenciales.idUsuario.toString());  
+    sessionStorage.setItem('idUsuario', response.credenciales.idUsuario.toString());
     this.nombreRolActual =  response.credenciales.nombreRol;
 
     if (guardar) {
-      sessionStorage.setItem('rol', response.credenciales.rol?.toString() ?? ""); 
+      sessionStorage.setItem('rol', response.credenciales.rol?.toString() ?? "");
       sessionStorage.setItem('nombreRol', response.credenciales.nombreRol || "");
       sessionStorage.setItem('nombreUsuario', response.credenciales.nombreUsuario || "");
     } else {
       sessionStorage.setItem('token', response.credenciales.token || "");
-    } 
+    }
     this.mostrarVista();
   }
 
@@ -159,6 +159,8 @@ export class IniciarSesion implements OnInit {
       this.router.navigate(['/']);
     } else if (this.nombreRolActual === "SUCURSAL") {
       this.router.navigate(['/general-sucursal']);
+    } else if (this.nombreRolActual === "REPARTIDOR") {
+      this.router.navigate(['/gestion-pedidos']);
     }
   }
 
@@ -173,7 +175,7 @@ export class IniciarSesion implements OnInit {
 
   private manejoDeErrores(error: any): void {
     let mensaje = '';
-    
+
     if (error.status === 401) {
       mensaje = 'Credenciales incorrectas. Verifica tu usuario y contraseña.';
     } else if (error.status === 404) {
